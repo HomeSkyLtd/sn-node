@@ -7,11 +7,13 @@ function test(){
              console.log("Message received from " + from.address + ", port: " + from.port);
              console.log(new String(msg));
              socket.close();
+             process.exit();
          }
      }, (err) => {
      	if (!err) { 
      		console.log("Listening!");
-     		driver.send({address: "localhost", port: 4567}, "Oi", function () {
+            console.log("Sending test message...")
+     		driver.send({address: "localhost", port: 4567}, "Test", function () {
     			console.log("Sent!");
     		});
     	}

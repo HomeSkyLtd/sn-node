@@ -1,0 +1,11 @@
+{
+  "name": "udp",
+  "version": "1.0.0",
+  "description": "UDP driver",
+  "main": "driver.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "author": "",
+  "license": "ISC"
+}
