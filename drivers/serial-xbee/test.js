@@ -14,14 +14,16 @@ var serialport = new SerialPort("/dev/ttyAMA0", {
 });
 
 serialport.on("open", function() {
-    var frame_obj = { // AT Request to be sent to  
-        type: C.FRAME_TYPE.AT_COMMAND,
-        command: "NI",
-        commandParameter: [],
-    };
+    setInterval(function () {
+        var frame_obj = { // AT Request to be sent to  
+            type: C.FRAME_TYPE.AT_COMMAND,
+            command: "NI",
+            commandParameter: [],
+        };
 
-    serialport.write(xbeeAPI.buildFrame(frame_obj));
-     console.log('Sent to serial port.');
+        serialport.write(xbeeAPI.buildFrame(frame_obj));
+         console.log('Sent to serial port.');
+     }, 3000);
 });
 
 // All frames parsed by the XBee will be emitted here 
