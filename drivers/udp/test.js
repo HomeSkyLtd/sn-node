@@ -4,21 +4,18 @@ function test(){
     udpDriver1 = new driver.Driver({rport:4567});
     udpDriver2 = new driver.Driver({rport:4568});
     udpDriver1.listen(
-        (err, msg, from, server) => msgCallback(err, msg, from, server, udpDriver1),
+        (msg, from, server) => msgCallback(msg, from, server, udpDriver1),
         (err, server) => listenCallback(err, server, udpDriver1));
     udpDriver2.listen(
-        (err, msg, from, server) => msgCallback(err, msg, from, server, udpDriver2),
+        (msg, from, server) => msgCallback(msg, from, server, udpDriver2),
         (err, server) => listenCallback(err, server, udpDriver2));
 }
 
-function msgCallback(err, msg, from, server, driver){
-    if(err) console.log("Error listening");
-    else {
-         console.log("Message received from " + from.address + ", port: " + from.port);
-         console.log(new String(msg));
-         driver.close();
-         //process.exit();
-    }
+function msgCallback(msg, from, server, driver){
+    console.log("Message received from " + from.address + ", port: " + from.port);
+    console.log(new String(msg));
+    driver.close();
+    //process.exit();
 }
 
 function listenCallback(err, server, driver){
@@ -30,6 +27,7 @@ function listenCallback(err, server, driver){
             else console.log(err);
         });
     }
+    else console.log("Error listening");
 }
 
 test();

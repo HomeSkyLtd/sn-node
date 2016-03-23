@@ -35,7 +35,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
     });
 
     this.server.on('message', (msg, rinfo) =>{
-        msgCallback(null, msg, rinfo, listenObj);
+        msgCallback(msg, rinfo, listenObj);
     });
 }
 
