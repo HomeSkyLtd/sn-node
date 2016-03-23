@@ -1,52 +1,56 @@
 const dgram = require("dgram");
 
-var RPORT;
-var client = dgram.createSocket('udp4');
-
 /**
-    Sets the parameters for the UDP server
+    Creates a driver for a UDP socket
     @param {Object} params - an object with the following parameters:<br />
     <ul>
         <li>rport: The port listened by the server
     </ul>
 */
-function init(params){
-    RPORT = params.rport;
+function Driver(params){
+    this.RPORT = params.rport
+    this.server =dgram.createSocket('udp4');
 }
 
 
-function listen(msgCallback, listenCallback) {
+Driver.prototype.listen = function (msgCallback, listenCallback) {
     
-    var server = dgram.createSocket('udp4');
     var listenObj = {
+        port: this.RPORT,
         close: function () {
-            server.close(RPORT);
+            this.server.close(this.RPORT);
         }
     };
 
-    server.on('error', (err) =>{
+    this.server.bind(this.RPORT, function () {
+        // listenObj.address = this.server.address(); <-- this.server is undefined!    
+    });
+
+    this.server.on('error', (err) =>{
         if (listenCallback) listenCallback(err, listenObj);
     });
 
-    server.on('listening', () =>{
+    this.server.on('listening', () =>{
         if (listenCallback) listenCallback(null, listenObj);
     });
 
-    server.on('message', (msg, rinfo) =>{
+    this.server.on('message', (msg, rinfo) =>{
         msgCallback(null, msg, rinfo, listenObj);
-    });
-
-    server.bind(RPORT, function () {
-        listenObj.address = server.address();
     });
 }
 
-function send(to, msg, callback) {
+Driver.prototype.send = function(to, msg, callback) {
+    var client = dgram.createSocket('udp4');
     client.send(msg, to.port, to.address, (err) => {
+        client.close();
         if (callback) callback(err);
     });
 }
 
-exports.listen = listen;
-exports.send = send;
-exports.init = init;
+Driver.prototype.close = function(){
+    this.server.close();
+}
+
+Driver.prototype.close
+
+exports.Driver = Driver;
