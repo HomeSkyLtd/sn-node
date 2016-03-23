@@ -1,8 +1,19 @@
 const dgram = require("dgram");
 
-const RPORT = 4567;
-const SPORT = 4568;
+var RPORT;
 var client = dgram.createSocket('udp4');
+
+/**
+    Sets the parameters for the UDP server
+    @param {Object} params - an object with the following parameters:<br />
+    <ul>
+        <li>rport: The port listened by the server
+    </ul>
+*/
+function init(params){
+    RPORT = params.rport;
+}
+
 
 function listen(msgCallback, listenCallback) {
     
@@ -38,3 +49,4 @@ function send(to, msg, callback) {
 
 exports.listen = listen;
 exports.send = send;
+exports.init = init;
