@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cbor": "^1.0.1",
     "enum": "^2.3.0"
   }
 }
