@@ -1,8 +1,8 @@
 var driver = require("./driver.js");
 
 function test(){
-    udpDriver1 = new driver.Driver({rport:4567});
-    udpDriver2 = new driver.Driver({rport:4568});
+    udpDriver1 = new driver.UdpDriver({rport:4567});
+    udpDriver2 = new driver.UdpDriver({rport:4568});
     udpDriver1.listen(
         (msg, from, server) => msgCallback(msg, from, server, udpDriver1),
         (err, server) => listenCallback(err, server, udpDriver1));

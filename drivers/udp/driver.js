@@ -9,7 +9,7 @@ const dgram = require("dgram");
 */
 function Driver(params){
     this.RPORT = params.rport
-    this.server =dgram.createSocket('udp4');
+    this._server =dgram.createSocket('udp4');
 }
 
 
@@ -18,23 +18,23 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
     var listenObj = {
         port: this.RPORT,
         close: function () {
-            this.server.close(this.RPORT);
+            this._server.close(this.RPORT);
         }
     };
 
-    this.server.bind(this.RPORT, function () {
+    this._server.bind(this.RPORT, function () {
         // listenObj.address = this.server.address(); <-- this.server is undefined!    
     });
 
-    this.server.on('error', (err) =>{
+    this._server.on('error', (err) =>{
         if (listenCallback) listenCallback(err, listenObj);
     });
 
-    this.server.on('listening', () =>{
+    this._server.on('listening', () =>{
         if (listenCallback) listenCallback(null, listenObj);
     });
 
-    this.server.on('message', (msg, rinfo) =>{
+    this._server.on('message', (msg, rinfo) =>{
         msgCallback(msg, rinfo, listenObj);
     });
 }
@@ -48,9 +48,9 @@ Driver.prototype.send = function(to, msg, callback) {
 }
 
 Driver.prototype.close = function(){
-    this.server.close();
+    this._server.close();
 }
 
 Driver.prototype.close
 
-exports.Driver = Driver;
+exports.UdpDriver = Driver;
