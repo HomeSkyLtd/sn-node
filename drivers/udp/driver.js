@@ -53,4 +53,4 @@ Driver.prototype.close = function(){
 
 Driver.prototype.close
 
-exports.UdpDriver = Driver;
+exports.Driver = Driver;
