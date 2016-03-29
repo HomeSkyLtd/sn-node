@@ -46,7 +46,7 @@ function Driver(params) {
 	this._stop_bits = (params.stop_bits === undefined ? 1 : params.stop_bits);
 	this._parity = (params.parity === undefined ? "none" : params.stop_bits);
 
-	this._serialport = new SerialPort("/dev/" + this._tty_port, {
+	this._serialport = new SerialPort(this._tty_port, {
 	    baudrate: this._baud_rate,
 			dataBits: this._data_bits,
 			stopBits: this._stop_bits,
@@ -56,31 +56,39 @@ function Driver(params) {
 };
 
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-	var listenObj = {
-		close: function() {
-			if (_serialport.isOpen()) {
-				_serialport.close(function() {
-					console.log("Error while closing serial port.");
-				});
-			}
-		}
-	};
+	this._serialport.on("open", () => {
+		if (listenCallback) listenCallback();
+	});
+	if (this._serialport.isOpen()) {
+		if (listenCallback) listenCallback();
+	}
 
-
+	this._serialport.on("data", (raw_frame) => {
+		var frame = xbeeAPI.parseFrame(raw_frame);
+		msgCallback(frame);
+	});
 }
 
 Driver.prototype.send = function (to, msg, callback) {
 	var frame_obj = {
-		type: C.FRAME_TYPE.TX_REQUEST_64;
+		type: C.FRAME_TYPE.TX_REQUEST_64,
 		destination64: to.address,
 		data: msg
 	}
 
 	if (_serialport.isOpen()) {
-		_serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
+		this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
 		console.log("Sent XBee frame to serial port.");
 	} else {
 		callback("Serial port isn't open.");
+	}
+}
+
+Driver.prototype.close = function() {
+	if (this._serialport.isOpen()) {
+		this._serialport.close(function() {
+			console.log("Error while closing serial port.");
+		});
 	}
 }
 
