@@ -65,7 +65,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 	}
 
 	xbeeAPI.on("frame_object", function(frame) {
-		msgCallback(frame, xbeeAPI);
+		msgCallback(frame);
 	});
 
 }
@@ -83,8 +83,12 @@ Driver.prototype.send = function (to, msg, callback) {
 
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
-		this._serialport.close(function() {
-			console.log("Error while closing serial port.");
+		this._serialport.close((err) => {
+			if (!err) {
+				console.log("Serial port successfully closed.");
+			} else {
+				console.log("Error while closing serial port.");
+			}
 		});
 	}
 }

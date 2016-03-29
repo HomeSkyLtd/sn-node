@@ -8,11 +8,9 @@ function test() {
 	);
 }
 
-function msgCallback(frame, xbeeAPI, driver) {
-	var new_frame = xbeeAPI.parseFrame(frame);
-
-	console.log("Message received from " + new_frame.remote64 + ":");
-	console.log(new_frame.data);
+function msgCallback(frame, driver) {
+	console.log("Message received from " + frame.remote64 + ":");
+	console.log(frame);
 	driver.close();
 }
 

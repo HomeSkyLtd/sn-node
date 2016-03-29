@@ -9,8 +9,7 @@ function test() {
 }
 
 function msgCallback(frame, driver) {
-	console.log("Message received from " + frame.remote64 + ":");
-	console.log(frame.data);
+	console.log("Status received: " + frame.deliveryStatus);
 	driver.close();
 }
 
