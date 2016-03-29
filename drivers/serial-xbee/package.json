@@ -1,0 +1,15 @@
+{
+  "name": "serial-xbee",
+  "version": "1.0.0",
+  "description": "",
+  "main": "driver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "serialport": "^2.0.6",
+    "xbee-api": "^0.4.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
