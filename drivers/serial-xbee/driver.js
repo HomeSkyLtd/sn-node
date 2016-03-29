@@ -78,7 +78,7 @@ Driver.prototype.send = function (to, msg, callback) {
 	}
 
 	this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
-	console.log("Sent XBee frame to serial port.");
+	console.log("Sent XBee frame to " + to.address);
 }
 
 Driver.prototype.close = function() {

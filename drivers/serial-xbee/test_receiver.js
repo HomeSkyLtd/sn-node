@@ -1,7 +1,7 @@
 var driver = require("./driver.js");
 
 function test() {
-	xbeeDriverReceiver = new driver.Driver({tty_port: "/dev/ttyAMA0"});
+	xbeeDriverReceiver = new driver.Driver({tty_port: "/dev/ttyUSB0"});
 	xbeeDriverReceiver.listen(
 		(frame) => msgCallback(frame, xbeeDriverReceiver),
 		(err) => listenCallback(err, xbeeDriverReceiver)
