@@ -65,7 +65,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 	}
 
 	xbeeAPI.on("frame_object", function(frame) {
-		msgCallback(frame);
+		msgCallback(frame, xbeeAPI);
 	});
 
 }
