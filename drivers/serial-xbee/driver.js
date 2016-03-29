@@ -59,6 +59,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 	this._serialport.on("open", () => {
 		if (listenCallback) listenCallback();
 	});
+
 	if (this._serialport.isOpen()) {
 		if (listenCallback) listenCallback();
 	}
@@ -76,12 +77,8 @@ Driver.prototype.send = function (to, msg, callback) {
 		data: msg
 	}
 
-	if (_serialport.isOpen()) {
-		this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
-		console.log("Sent XBee frame to serial port.");
-	} else {
-		callback("Serial port isn't open.");
-	}
+	this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
+	console.log("Sent XBee frame to serial port.");
 }
 
 Driver.prototype.close = function() {
