@@ -64,10 +64,10 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 		if (listenCallback) listenCallback();
 	}
 
-	this._serialport.on("data", (raw_frame) => {
-		var frame = xbeeAPI.parseFrame(raw_frame);
+	xbeeAPI.on("frame_object", function(frame) {
 		msgCallback(frame);
 	});
+
 }
 
 Driver.prototype.send = function (to, msg, callback) {
