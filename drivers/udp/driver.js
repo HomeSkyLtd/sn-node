@@ -10,14 +10,15 @@ const BROADCAST_ADDR = "255.255.255.255";
         <li>address: The IP address listened by the server
         <li>broadcast_port: The port used when creating a broadcast address
     </ul>
-    @param {function} cb - a callback function called when driver instantiation is finished 
+    @param {function} [cb] - a callback function called when driver instantiation is finished 
 */
 function Driver(params, cb){
     this._rport = params.rport;
     this._address = params.address;
     this.broadcast_port = params.broadcast_port;
     this._server = dgram.createSocket('udp4');
-    cb(null);
+    if (cb)
+        cb(null);
 }
 
 Driver.prototype.listen = function (msgCallback, listenCallback) {
