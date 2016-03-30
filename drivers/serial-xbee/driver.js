@@ -39,7 +39,7 @@ var xbeeAPI = new xbee_api.XBeeAPI({
 		<li>parity: "None" by default
 	</ul>
 */
-function Driver(params) {
+function Driver(params, callback) {
 	this._tty_port = params.tty_port; // ttyAMA0, ttyUSB0, etc.
 	this._baud_rate = (params.baud_rate === undefined ? 9600 : params.baud_rate);
 	this._data_bits = (params.data_bits === undefined ? 8 : params.data_bits);
@@ -53,7 +53,51 @@ function Driver(params) {
 			parity: this._parity,
 	    parser: xbeeAPI.rawParser()
 	});
-};
+
+	this._msgCallback = null;
+
+	this._serialport.on("open", () => {
+		this._getAddress(callback);
+	});
+}
+
+
+Driver.compareAddresses = function(address1, address2) {
+	return address1 === address2;
+}
+
+Driver.prototype._getAddress = function(callback) {
+	if (!this.address) {
+		if (!this._serialport.isOpen()) {
+			var msg = "Address not ready yet. Use driver methods inside a callback.";
+			throw new Error(msg);
+		}
+
+		var frame_obj = {
+			type: C.FRAME_TYPE.AT_COMMAND, // Send a command
+			command: "SH",
+			commandParameter: []
+		};
+
+		xbeeAPI.on("frame_object", (frame) => {
+			if (frame.command === "SH") {
+				this.address = frame.commandData.toString('hex');
+			} else if (frame.command === "SL") {
+				this.address += frame.commandData.toString('hex');
+				if (callback) callback();
+			}
+		});
+
+		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
+		frame_obj["command"] = "SL";
+		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
+	}
+	return this.address;
+}
+
+Driver.prototype.getAddress = function() {
+	return this._getAddress()
+}
 
 Driver.prototype.listen = function (msgCallback, listenCallback) {
 	this._serialport.on("open", () => {
@@ -64,10 +108,15 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 		if (listenCallback) listenCallback();
 	}
 
-	xbeeAPI.on("frame_object", function(frame) {
-		msgCallback(frame);
-	});
+	this._msgCallback = msgCallback;
 
+	xbeeAPI.on("frame_object", (frame) => {
+		this._msgCallback(frame);
+	});
+}
+
+Driver.prototype.getBroadcastAddress = function () {
+	return "000000000000FFFF";
 }
 
 Driver.prototype.send = function (to, msg, callback) {
@@ -83,13 +132,7 @@ Driver.prototype.send = function (to, msg, callback) {
 
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
-		this._serialport.close((err) => {
-			if (!err) {
-				console.log("Serial port successfully closed.");
-			} else {
-				console.log("Error while closing serial port.");
-			}
-		});
+		this._msgCallback = null;
 	}
 }
 

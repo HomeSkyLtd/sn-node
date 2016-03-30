@@ -1,16 +1,17 @@
 var driver = require("./driver.js");
 
 function test() {
-	xbeeDriverReceiver = new driver.Driver({tty_port: "/dev/ttyUSB0"});
-	xbeeDriverReceiver.listen(
-		(frame) => msgCallback(frame, xbeeDriverReceiver),
-		(err) => listenCallback(err, xbeeDriverReceiver)
-	);
+	xbeeDriverReceiver = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function() {
+		xbeeDriverReceiver.listen(
+			(frame) => msgCallback(frame, xbeeDriverReceiver),
+			(err) => listenCallback(err, xbeeDriverReceiver)
+		);
+	});
 }
 
 function msgCallback(frame, driver) {
 	console.log("Message received from " + frame.remote64 + ":");
-	console.log(frame);
+	console.log(String(frame.data));
 	driver.close();
 }
 

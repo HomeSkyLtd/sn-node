@@ -1,0 +1,14 @@
+{
+  "name": "prototype",
+  "version": "1.0.0",
+  "description": "Prototype and documentation for Drivers",
+  "main": "driver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "jsdoc": "*"
+  }, 
+  "author": "",
+  "license": "ISC"
+}
