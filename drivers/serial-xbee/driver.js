@@ -54,19 +54,20 @@ function Driver(params, callback) {
 	    parser: xbeeAPI.rawParser()
 	});
 
+	// Set msgCallback to null, meaning that the device is closed and not listening.
 	this._msgCallback = null;
-
+	// Communication with XBee is enabled just after serial port is opened.
 	this._serialport.on("open", () => {
 		this._getAddress(callback);
 	});
 }
-
 
 Driver.compareAddresses = function(address1, address2) {
 	return address1 === address2;
 }
 
 Driver.prototype._getAddress = function(callback) {
+	// If address is already saved, just return it.
 	if (!this.address) {
 		if (!this._serialport.isOpen()) {
 			var msg = "Address not ready yet. Use driver methods inside a callback.";
@@ -75,31 +76,34 @@ Driver.prototype._getAddress = function(callback) {
 
 		var frame_obj = {
 			type: C.FRAME_TYPE.AT_COMMAND, // Send a command
-			command: "SH",
+			command: "SH",	// Get 32 higher address bits
 			commandParameter: []
 		};
 
+
+		// Waits for some data from XBee
 		xbeeAPI.on("frame_object", (frame) => {
 			if (frame.command === "SH") {
 				this.address = frame.commandData.toString('hex');
 			} else if (frame.command === "SL") {
 				this.address += frame.commandData.toString('hex');
-				if (callback) callback();
+				if (callback) callback(); // After address is ready, execute callback.
 			}
 		});
 
 		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
-		frame_obj["command"] = "SL";
+		frame_obj["command"] = "SL"; // Get 32 lower address bits
 		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
 	}
 	return this.address;
 }
 
 Driver.prototype.getAddress = function() {
-	return this._getAddress()
+	return this._getAddress(); // Call private getAddress without a callback.
 }
 
 Driver.prototype.listen = function (msgCallback, listenCallback) {
+	// Serial port must be open. So waits for it to open or, if is open, call callback.
 	this._serialport.on("open", () => {
 		if (listenCallback) listenCallback();
 	});
@@ -108,15 +112,16 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 		if (listenCallback) listenCallback();
 	}
 
+	// Set private msgCallback so it is not null (XBee is open).
 	this._msgCallback = msgCallback;
 
 	xbeeAPI.on("frame_object", (frame) => {
-		this._msgCallback(frame);
+		if (this._msgCallback) this._msgCallback(frame);
 	});
 }
 
 Driver.prototype.getBroadcastAddress = function () {
-	return "000000000000FFFF";
+	return {address: "000000000000FFFF"}; // Address defined by XBee.
 }
 
 Driver.prototype.send = function (to, msg, callback) {
@@ -132,7 +137,7 @@ Driver.prototype.send = function (to, msg, callback) {
 
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
-		this._msgCallback = null;
+		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
 	}
 }
 
