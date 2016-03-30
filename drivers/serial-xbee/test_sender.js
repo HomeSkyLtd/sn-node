@@ -18,7 +18,7 @@ function listenCallback(err, driver) {
 	if (!err) {
 		console.log("Listening to serial port");
 		console.log("Sending test message...");
-		driver.send({address: "0013A20040A165B1"/*DESTINY_ADDRESS_HERE*/}, "Ola Fabao", function(err) {
+		driver.send(driver.getBroadcastAddress(), "Ola Fabao", function(err) {
 			if (!err) console.log("Data sent!");
 			else console.log(err);
 		});
