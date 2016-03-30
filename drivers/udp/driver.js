@@ -8,21 +8,23 @@ const BROADCAST_ADDR = "255.255.255.255";
     <ul>
         <li>rport: The port listened by the server
         <li>address: The IP address listened by the server
+        <li>broadcast_port: The port used when creating a broadcast address
     </ul>
     @param {function} cb - a callback function called when driver instantiation is finished 
 */
 function Driver(params, cb){
-    this.RPORT = params.rport;
-    this.ADDRESS = params.address;
+    this._rport = params.rport;
+    this._address = params.address;
+    this.broadcast_port = params.broadcast_port;
     this._server = dgram.createSocket('udp4');
     cb(null);
 }
 
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-    if(this.ADDRESS === undefined)
-        this._server.bind(this.RPORT);
+    if(this._address === undefined)
+        this._server.bind(this._rport);
     else
-        this._server.bind(this.RPORT, this.ADDRESS);
+        this._server.bind(this._rport, this._address);
 
     this._server.on('error', (err) =>{
         if (listenCallback) listenCallback(err);
@@ -45,7 +47,7 @@ Driver.prototype.send = function(to, msg, callback) {
 
     client.on('listening', () => {
         if(to.address === BROADCAST_ADDR) client.setBroadcast(true);
-        var listenPort = new Buffer([Number(this.RPORT) >> 8, Number(this.RPORT) & 0xFF]);
+        var listenPort = new Buffer([Number(this._rport) >> 8, Number(this._rport) & 0xFF]);
 
         client.send(Buffer.concat([msg, listenPort]), to.port, to.address, (err) => {
             client.close();
@@ -75,7 +77,7 @@ Driver.compareAdresses = function(a1, a2){
 }
 
 Driver.prototype.getBroadcastAddress = function(){
-    return BROADCAST_ADDR;
+    return {address: BROADCAST_ADDR, port: this.broadcast_port};
 }
 
 exports.Driver = Driver;
