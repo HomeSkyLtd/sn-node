@@ -4,7 +4,9 @@
   "description": "UDP driver",
   "main": "driver.js",
   "devDependencies": {
-    "jsdoc": ">=3.4.0"
+    "jsdoc": ">=3.4.0",
+    "mocha": "^2.4.5",
+    "should": "^8.3.0"
   },
   "scripts": {
     "test": "mocha"
