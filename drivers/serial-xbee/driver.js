@@ -9,28 +9,8 @@ var xbeeAPI = new xbee_api.XBeeAPI({
 });
 
 /**
-  // Something you might want to send to XBee
-	var frame_obj = {
-		type: ,
-		command: ,
-		commandParameter: []
-	};
-
-	// Encode frame to be sent
-	console.log(xbeeAPI.buildFrame(frame_obj));
-
-	// Something you migth receive from an XBee
-	var raw_frame = new Buffer([
-		0x7E, 0x00, 0x13, 0x97, 0x55, 0x00, 0x13, 0xA2, 0x00, 0x40, 0x52, 0x2B,
-		0xAA, 0x7D, 0x84, 0x53, 0x4C, 0x00, 0x40, 0x52, 0x2B, 0xAA, 0xF0
-	]);
-
-	// Decode frame to receive
-	console.log(xbeeAPI.parseFrame(raw_frame));
-*/
-
-/**
- * Creates a driver for xbee
+ 	@class
+ 	Creates a driver for xbee
 	@param {Object} params - an object with the following parameters:<br/>
 	<ul>
 		<li>baud rate: symbols transmitted per second, 9600 by default
@@ -38,6 +18,7 @@ var xbeeAPI = new xbee_api.XBeeAPI({
 		<li>stop bits: 1 bit by default
 		<li>parity: "None" by default
 	</ul>
+	@param {Driver~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
 */
 function Driver(params, callback) {
 	this._tty_port = params.tty_port; // ttyAMA0, ttyUSB0, etc.
@@ -62,10 +43,24 @@ function Driver(params, callback) {
 	});
 }
 
+/**
+	Compare if two XBee addresses are equals.
+	@param {object} - First Xbee address
+	@param {object} - Second Xbee address
+	@returns {boolean} True if address1 is equal to address2, false otherwise.
+*/
 Driver.compareAddresses = function(address1, address2) {
-	return address1 === address2;
+	return address1.address === address2.address;
 }
 
+/**
+	Private method that saves MAC address as this objects' attribute.
+	@param {Driver~onAddressReady} [callback] - Callback function to be executes after address is read from device and saved.
+	@returns {Object} an object with the following parameters:<br/>
+	<ul>
+		<li>address: device's 64 bits MAC address as value in address field.
+	</ul>
+*/
 Driver.prototype._getAddress = function(callback) {
 	// If address is already saved, just return it.
 	if (!this.address) {
@@ -95,13 +90,25 @@ Driver.prototype._getAddress = function(callback) {
 		frame_obj["command"] = "SL"; // Get 32 lower address bits
 		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
 	}
-	return this.address;
+	return {address: this.address};
 }
 
+/**
+	Public method that calls _getAddress but doesn't pass a callback as parameter.
+	@returns {Object} An object with the following parameters:<br/>
+	<ul>
+		<li>address: device's 64 bits MAC address as value in address field.
+	</ul>
+*/
 Driver.prototype.getAddress = function() {
 	return this._getAddress(); // Call private getAddress without a callback.
 }
 
+/**
+ * Listen to serial port, when it is open. When a frame is received form XBee, executes callback msgCallback.
+ * @param {Driver~onListen} [callback] - Callback executed when serial port is open.
+ * @param {Driver~onMessage} [callback] - Callback executed when a XBee delivers a frame.
+ */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
 	// Serial port must be open. So waits for it to open or, if is open, call callback.
 	this._serialport.on("open", () => {
@@ -120,10 +127,24 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 	});
 }
 
+/**
+ * A method to get the broadcast address, which is defined by XBee and constant equals to 0xFFFF.
+ * @returns {Object} An object with the following parameters:<br/>
+ * <ul>
+ *  <li>address: 64 bit MAC address of the broadcast address, defined by XBee and constant.
+ * </ul>
+ */
 Driver.prototype.getBroadcastAddress = function () {
-	return {address: "000000000000FFFF"}; // Address defined by XBee.
+	return {address: "000000000000FFFF"};
 }
 
+/**
+ * Send a message to an destination, and an optional callback is executed after.
+ * @param {Object} to - an object with the following parameters:<br/>
+ * <ul>
+ *  <li>address: 64 bit MAC address of the destination device.
+ * </ul>
+ */
 Driver.prototype.send = function (to, msg, callback) {
 	var frame_obj = {
 		type: C.FRAME_TYPE.TX_REQUEST_64,
@@ -135,6 +156,9 @@ Driver.prototype.send = function (to, msg, callback) {
 	console.log("Sent XBee frame to " + to.address);
 }
 
+/**
+ * Close XBee. Serial port is still open, but XBee no longer responds to delivered frames.
+ */
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
 		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
