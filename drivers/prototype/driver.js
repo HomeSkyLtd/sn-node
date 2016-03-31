@@ -1,7 +1,6 @@
 /**
 	@class
     Driver object for a network protocol
-    @type {Object} Returns a Driver instance
     @param {Object} [params] - An object containing parameters for the specific driver
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 */
@@ -12,7 +11,7 @@ function Driver (params, callback) {
 /**
     Starts listening for messages
     @param {Driver~onMessage} msgCallback - Function to be called when a message arrives
-    @param {Driver~onListening} [listenCallback] - Function to be called when a message arrives
+    @param {Driver~onListening} [listenCallback] - Function to be called driver is listening, or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) { 
     throw Error("Not implemented");
@@ -38,7 +37,7 @@ Driver.prototype.send = function (to, message, callback) {
 
 /**
     Gets the driver network address. Only need to work when "listening" was called
-    @type {Object} Network address
+    @returns {Object} Network address
 */
 Driver.prototype.getAddress = function () {
     throw Error("Not implemented");
@@ -46,7 +45,7 @@ Driver.prototype.getAddress = function () {
 
 /**
     Gets the broadcast network address. Only need to work when "listening" was called
-    @type {Object}  Broadcast network address
+    @returns {Object}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
     throw Error("Not implemented");
@@ -54,7 +53,7 @@ Driver.prototype.getBroadcastAddress = function () {
 
 /**
     Compares two address
-    @type {boolean} true if address1 and adress2 are the same and false otherwise
+    @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
 Driver.compareAddresses = function (address1, address2) {
     throw Error("Not implemented");
