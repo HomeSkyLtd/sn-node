@@ -7,7 +7,7 @@
     "jsdoc": ">=3.4.0"
   },
   "scripts": {
-    "test": "node test"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC"

@@ -1,34 +1,56 @@
 var driver = require("./driver.js");
+var should = require("should");
 
-function test(){
-    udpDriver1 = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
-    udpDriver1.listen(
-        (msg, from) => msgCallback(msg, from, udpDriver1),
-        (err) => listenCallback(err, udpDriver1));
-}
+describe('udp', function(){
+    describe('hooks', function(){
+        var udpDriver;
 
-function msgCallback(msg, from, driver){
-    console.log("Message received from " + from.address + ", port: " + from.port);
-    console.log(new String(msg));
-    driver.close();
-    //process.exit();
-}
-
-function listenCallback(err, driver){
-    if (!err) { 
-        console.log("Listening to port " + driver.RPORT);
-        console.log("Sending test message...")
-        driver.send(driver.getBroadcastAddress(), new Buffer("Test"), function (err) {
-            if (!err) console.log("Sent!");
-            else console.log(err);
+        //clean udpDriver before each test
+        beforeEach('Closing and cleaning udp driver', function(){
+            if(udpDriver) udpDriver.close();
+            udpDriver = null;
         });
-    }
-    else console.log("Error listening");
-}
 
-test();
-// var udpDriver1 = new driver.Driver({address:"192.168.50.133", rport:4567, broadcast_port:4567}, function(err){});
-// udpDriver1.listen(()=>{}, (err)=>{
-//     console.log(udpDriver1.getBroadcastAddress());
-// });
+        describe('#listen()', function(){
+            it('should execute without errors', function(done){
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
+                udpDriver.listen(
+                    ()=>{},
+                    (err) => {
+                        if(err) done(err);
+                        else done();
+                    }
+                );
+            });
+        });
+
+        describe('#send()', function(){
+            it('should send message correctly to server', function(done){
+                function msgCallback(msg, from){
+                    from.port.should.be.exactly(4567);
+                    String(msg).should.be.exactly("Test");
+                    done();
+                }
+
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
+                udpDriver.listen(
+                    msgCallback,
+                    (err) => {
+                        if(err) done(err);
+                        else{
+                            udpDriver.send({address: "localhost", port:4567}, new Buffer("Test"), function (err) {
+                                if (err) done(err);
+                            });
+                        }
+                    }
+                );
+            });
+        })
+    })
+
+
+})
+
+//test();
+
 
