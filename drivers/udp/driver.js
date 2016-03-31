@@ -100,10 +100,10 @@ Driver.prototype.getAddress = function(){
 }
 
 /**
-    Compares two address
+    Compares two addresses
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
-Driver.compareAdresses = function(a1, a2){
+Driver.compareAddresses = function(a1, a2){
     return (a1.address === a2.address);
 }
 

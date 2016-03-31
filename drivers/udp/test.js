@@ -45,12 +45,43 @@ describe('udp', function(){
                     }
                 );
             });
-        })
-    })
+        });
+
+        describe('#send() and #getBroadcastAddress()', function(){
+            it('should broadcast message correctly', function(done){
+                function msgCallback(msg, from){
+                    from.port.should.be.exactly(4567);
+                    String(msg).should.be.exactly("Test");
+                    done();
+                }
+
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
+                udpDriver.listen(
+                    msgCallback,
+                    (err) => {
+                        if(err) done(err);
+                        else{
+                            udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer("Test"), function (err) {
+                                if (err) done(err);
+                            });
+                        }
+                    }
+                );
+            });
+        });
+
+        describe('#compareAddresses()', function(){
+            it('should compare addresses correctly', function(done){
+                a1 = {address: "192.168.1.1", port: 1234};
+                a2 = {address: "192.168.1.1", port: 1235};
+                a3 = {address: "192.168.1.2", port: 1234};
+                driver.Driver.compareAddresses(a1,a2).should.be.equal.true;
+                driver.Driver.compareAddresses(a1,a3).should.be.equal.false;
+                driver.Driver.compareAddresses(a2,a3).should.be.equal.false;
+                done();
+            });
+        });
+    });
 
 
 })
-
-//test();
-
-
