@@ -7,6 +7,7 @@
     "test": "node test"
   },
   "dependencies": {
+    "jsdoc": "^3.4.0",
     "serialport": "^2.0.6",
     "xbee-api": "^0.4.2"
   },
