@@ -19,7 +19,7 @@ function Driver(params, cb){
     this._rport = params.rport;
     this._address = params.address;
     this.broadcast_port = params.broadcast_port;
-    this._server = dgram.createSocket('udp4');
+    this._server = null
     if (cb)
         cb(null);
 }
@@ -31,6 +31,7 @@ function Driver(params, cb){
         or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
+    this._server = dgram.createSocket('udp4');
     if(this._address === undefined)
         this._server.bind(this._rport);
     else
