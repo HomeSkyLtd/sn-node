@@ -13,15 +13,16 @@ const BROADCAST_ADDR = "255.255.255.255";
         <li>broadcast_port: The port used when creating a broadcast address
     </ul>
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
-    
+
 */
 function Driver(params, cb){
     this._rport = params.rport;
     this._address = params.address;
     this.broadcast_port = params.broadcast_port;
-    this._server = null
+    this._server = null;
     if (cb)
         cb(null);
+	this._msgCallback = function(){};
 }
 
 /**
@@ -31,6 +32,8 @@ function Driver(params, cb){
         or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
+	this._msgCallback = msgCallback;
+
     this._server = dgram.createSocket('udp4');
     if(this._address === undefined)
         this._server.bind(this._rport);
@@ -48,12 +51,12 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
     this._server.on('message', (msg, rinfo) =>{
         var rport = msg.readInt16BE(msg.length - 2);
         rinfo.port = rport;
-        msgCallback(msg.slice(0, msg.length - 2), rinfo);
+        this._msgCallback(msg.slice(0, msg.length - 2), rinfo);
     });
 }
 
 /**
-    Sends a UDP packet. 
+    Sends a UDP packet.
     @param {Object} to - Object containing the address object of the recipient. Contains the following fields:<br />
     <ul>
         <li>address: the target IP address
@@ -82,9 +85,16 @@ Driver.prototype.send = function(to, msg, callback) {
     Closes the UDP server, if listen() was called
 */
 Driver.prototype.close = function() {
-    
     this._server.close();
 }
+
+/**
+    Stops the UDP server, if listen() was called
+*/
+Driver.prototype.stop = function() {
+	this._msgCallback = function(){};
+}
+
 
 /**
     Gets the driver network address. Only need to work when "listening" was called beforehands
@@ -121,7 +131,7 @@ exports.Driver = Driver;
 /**
  * Callback used by Driver.
  * @callback Driver~onInitialized
- * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
  */
 
 /**
@@ -134,11 +144,11 @@ exports.Driver = Driver;
 /**
  * Callback used by listen.
  * @callback Driver~onListening
- * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by send.
  * @callback Driver~onSent
- * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null 
- */ 
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */
