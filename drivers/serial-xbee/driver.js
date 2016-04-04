@@ -162,6 +162,7 @@ Driver.prototype.send = function (to, msg, callback) {
 Driver.prototype.stop = function() {
 	if (this._serialport.isOpen()) {
 		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
+	    this._server.on('message', this._msgCallback);
 	}
 }
 

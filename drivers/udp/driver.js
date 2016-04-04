@@ -14,14 +14,14 @@ const BROADCAST_PORT = 2356;
         <li>broadcast_port: The port used when creating a broadcast address
     </ul>
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
-    
+
 */
 function Driver(params, cb){
-    if(params.rport === undefined) this._rport = params.rport
+    if(params.rport !== undefined) this._rport = params.rport
 
-    if(params.broadcast_port)
-        this.broadcast_port = params.broadcast_port;
-    else this.broadcast_port = BROADCAST_PORT;
+    if(params.broadcast_port !== undefined)
+        this._broadcast_port = params.broadcast_port;
+    else this._broadcast_port = BROADCAST_PORT;
 
     this._server = dgram.createSocket('udp4');
     if(this._rport === undefined)
@@ -29,12 +29,16 @@ function Driver(params, cb){
     else
         this._server.bind(this._rport);
 
+    this._msgCallback = function(){};
+
+    this._server.on('message', this._msgCallback);
+
     this._server.on('error', (err) =>{
-        if (listenCallback) cb(err);
+        if (cb) cb(err);
     });
 
     this._server.on('listening', () =>{
-        if (listenCallback) cb(null);
+        if (cb) cb(null);
     });
 }
 
@@ -45,14 +49,13 @@ function Driver(params, cb){
         or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-
-    this._server.on('message', msgCallback});
-
+    this._msgCallback = msgCallback;
+    this._server.on('message', this._msgCallback);
     listenCallback();
 }
 
 /**
-    Sends a UDP packet. 
+    Sends a UDP packet.
     @param {Object} to - Object containing the address object of the recipient. Contains the following fields:<br />
     <ul>
         <li>address: the target IP address
@@ -66,7 +69,7 @@ Driver.prototype.send = function(to, msg, callback) {
 
     this._server.send(msg, to.port, to.address, (err) => {  
         if (callback) callback(err);
-    }
+    });
 
 }
 
@@ -75,6 +78,29 @@ Driver.prototype.send = function(to, msg, callback) {
 */
 Driver.prototype.close = function() {    
     this._server.close();
+}
+
+/**
+    Stops the UDP server, if listen() was called
+*/
+Driver.prototype.stop = function() {
+	this._msgCallback = function(){};
+    this._server.on('message', this._msgCallback);
+}
+
+
+/**
+    Gets the driver network address. Only need to work when "listening" was called beforehands
+    @returns {Object} Network address
+*/
+Driver.prototype.getAddress = function(){
+    try{
+        var address = this._server.address();
+    }
+    catch(err){
+        throw new Error("Failed to retrieve address. Have you called listen()?");
+    }
+    return address;
 }
 
 /**
@@ -90,7 +116,7 @@ Driver.compareAddresses = function(a1, a2){
     @returns {Object}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function(){
-    return {address: BROADCAST_ADDR, port: this.broadcast_port};
+    return {address: BROADCAST_ADDR, port: this._broadcast_port};
 }
 
 exports.Driver = Driver;
@@ -98,7 +124,7 @@ exports.Driver = Driver;
 /**
  * Callback used by Driver.
  * @callback Driver~onInitialized
- * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
  */
 
 /**
@@ -111,11 +137,11 @@ exports.Driver = Driver;
 /**
  * Callback used by listen.
  * @callback Driver~onListening
- * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by send.
  * @callback Driver~onSent
- * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null 
- */ 
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */

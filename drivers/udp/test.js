@@ -13,37 +13,51 @@ describe('udp', function(){
 
         describe('#listen()', function(){
             it('should execute without errors', function(done){
-                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
-                udpDriver.listen(
-                    ()=>{},
-                    (err) => {
-                        if(err) done(err);
-                        else done();
-                    }
-                );
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+                    if (err) err.should.not.be.Error();
+                    udpDriver.listen(
+                        ()=>{},
+                        (err) => {
+                            if(err) done(err);
+                            else done();
+                        }
+                    );
+                });
             });
         });
 
         describe('#send()', function(){
             it('should send message correctly to server', function(done){
                 function msgCallback(msg, from){
-                    from.port.should.be.exactly(4567);
+                    from.port.should.be.exactly(4568);
                     String(msg).should.be.exactly("Test");
                     done();
                 }
 
-                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
-                udpDriver.listen(
-                    msgCallback,
-                    (err) => {
+                function sendMessage(to, msg){
+                    sender = new driver.Driver({rport: 4568, broadcast_port:4568}, (err)=>{
                         if(err) done(err);
-                        else{
-                            udpDriver.send({address: "localhost", port:4567}, new Buffer("Test"), function (err) {
-                                if (err) done(err);
-                            });
+                        sender.send(to, msg, (err)=>{
+                            console.log("Sent!");
+                            if(err) done(err);
+                            sender.close();
+                        });
+                    })
+                }
+
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, (err)=>{
+                    if (err) err.should.not.be.Error();
+                    udpDriver.listen(
+                        msgCallback,
+                        (err) => {
+                            if(err) done(err);
+                            else{
+                                sendMessage({address: "localhost", port:4567}, new Buffer("Test"));
+                            }
                         }
-                    }
-                );
+                    );
+                });
+    
             });
         });
 
@@ -55,18 +69,20 @@ describe('udp', function(){
                     done();
                 }
 
-                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){});
-                udpDriver.listen(
-                    msgCallback,
-                    (err) => {
-                        if(err) done(err);
-                        else{
-                            udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer("Test"), function (err) {
-                                if (err) done(err);
-                            });
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+                    udpDriver.listen(
+                        msgCallback,
+                        (err) => {
+                            if(err) done(err);
+                            else{
+                                udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer("Test"), function (err) {
+                                    if (err) done(err);
+                                });
+                            }
                         }
-                    }
-                );
+                    );
+                });
+    
             });
         });
 
