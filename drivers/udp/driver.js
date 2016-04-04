@@ -1,6 +1,7 @@
 const dgram = require("dgram");
 
 const BROADCAST_ADDR = "255.255.255.255";
+const BROADCAST_PORT = 2356;
 
 /**
     @class
@@ -16,12 +17,25 @@ const BROADCAST_ADDR = "255.255.255.255";
     
 */
 function Driver(params, cb){
-    this._rport = params.rport;
-    this._address = params.address;
-    this.broadcast_port = params.broadcast_port;
-    this._server = null
-    if (cb)
-        cb(null);
+    if(params.rport === undefined) this._rport = params.rport
+
+    if(params.broadcast_port)
+        this.broadcast_port = params.broadcast_port;
+    else this.broadcast_port = BROADCAST_PORT;
+
+    this._server = dgram.createSocket('udp4');
+    if(this._rport === undefined)
+        this._server.bind();
+    else
+        this._server.bind(this._rport);
+
+    this._server.on('error', (err) =>{
+        if (listenCallback) cb(err);
+    });
+
+    this._server.on('listening', () =>{
+        if (listenCallback) cb(null);
+    });
 }
 
 /**
@@ -31,25 +45,10 @@ function Driver(params, cb){
         or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-    this._server = dgram.createSocket('udp4');
-    if(this._address === undefined)
-        this._server.bind(this._rport);
-    else
-        this._server.bind(this._rport, this._address);
 
-    this._server.on('error', (err) =>{
-        if (listenCallback) listenCallback(err);
-    });
+    this._server.on('message', msgCallback});
 
-    this._server.on('listening', () =>{
-        if (listenCallback) listenCallback(null);
-    });
-
-    this._server.on('message', (msg, rinfo) =>{
-        var rport = msg.readInt16BE(msg.length - 2);
-        rinfo.port = rport;
-        msgCallback(msg.slice(0, msg.length - 2), rinfo);
-    });
+    listenCallback();
 }
 
 /**
@@ -63,41 +62,19 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 
 */
 Driver.prototype.send = function(to, msg, callback) {
-    var client = dgram.createSocket('udp4');
-    client.bind();
+    if(to.address === BROADCAST_ADDR) this._server.setBroadcast(true);
 
-    client.on('listening', () => {
-        if(to.address === BROADCAST_ADDR) client.setBroadcast(true);
-        var listenPort = new Buffer([Number(this._rport) >> 8, Number(this._rport) & 0xFF]);
-
-        client.send(Buffer.concat([msg, listenPort]), to.port, to.address, (err) => {
-            client.close();
-            if (callback) callback(err);
-        });
-    });
+    this._server.send(msg, to.port, to.address, (err) => {  
+        if (callback) callback(err);
+    }
 
 }
 
 /**
     Closes the UDP server, if listen() was called
 */
-Driver.prototype.close = function() {
-    
+Driver.prototype.close = function() {    
     this._server.close();
-}
-
-/**
-    Gets the driver network address. Only need to work when "listening" was called beforehands
-    @returns {Object} Network address
-*/
-Driver.prototype.getAddress = function(){
-    try{
-        var address = this._server.address();
-    }
-    catch(err){
-        throw new Error("Failed to retrieve address. Have you called listen()?");
-    }
-    return address;
 }
 
 /**
