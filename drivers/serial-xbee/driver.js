@@ -1,6 +1,6 @@
 var xbee_api = require('xbee-api');
 var SerialPort = require('serialport').SerialPort;
-var C = xbee_api.constants;
+var C = xbee_api.constants
 
 var xbeeAPI = new xbee_api.XBeeAPI({
 	api_mode: 1,       // [1, 2]; 1 is default, 2 is with escaping (set ATAP=2)
@@ -157,11 +157,23 @@ Driver.prototype.send = function (to, msg, callback) {
 }
 
 /**
- * Close XBee. Serial port is still open, but XBee no longer responds to delivered frames.
+ * Stop XBee. Serial port is still open, but XBee no longer responds to delivered frames.
+ */
+Driver.prototype.stop = function() {
+	if (this._serialport.isOpen()) {
+		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
+	}
+}
+
+/**
+ * Close XBee. Serial port is closed and XBee no longer responds to delivered frames.
  */
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
-		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
+		_serialport.close(function(err) {
+			if (err) console.log(err);
+			else console.log("Port successfully closed");
+		});
 	}
 }
 
