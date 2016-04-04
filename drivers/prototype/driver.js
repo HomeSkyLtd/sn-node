@@ -5,7 +5,7 @@
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 */
 function Driver (params, callback) {
-    throw Error("not implemented")
+    throw Error("Not implemented")
 }
 
 /**
@@ -18,7 +18,14 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 }
 
 /**
-	Stops listening for messages
+	Stops listening for messages. But, if you start listening again, this instance must work
+*/
+Driver.prototype.stop = function () {
+    throw Error("Not implemented");
+}
+
+/**
+    Closes driver. After that call, the driver don't need to work anymore and should stop any assync task
 */
 Driver.prototype.close = function () {
     throw Error("Not implemented");
