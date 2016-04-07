@@ -55,6 +55,9 @@ function Driver(params, cb){
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
     this._msgCallback = msgCallback;
+
+    //must remove callbacks defined previously, otherwise they are still going to get called!
+    this._server.removeAllListeners('message');
     this._server.on('message', this._msgCallback);
     listenCallback();
 };
@@ -79,7 +82,7 @@ Driver.prototype.send = function(to, msg, callback) {
 };
 
 /**
-    Closes the UDP server, if listen() was called
+    Closes the UDP socket. This driver should not be used anmore.
 */
 Driver.prototype.close = function() {
     this._server.close();
@@ -90,6 +93,8 @@ Driver.prototype.close = function() {
 */
 Driver.prototype.stop = function() {
 	this._msgCallback = function(){};
+    //must remove callbacks defined previously, otherwise they are still going to get called!
+    this._server.removeAllListeners('message');
     this._server.on('message', this._msgCallback);
 };
 

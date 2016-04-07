@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var driver = require("./driver.js");
 var should = require("should");
 
@@ -34,6 +36,7 @@ describe('udp', function(){
                     done();
                 }
 
+                //use this function if you want to test sending with a different socket
                 function sendMessage(to, msg){
                     sender = new driver.Driver({rport: 4568, broadcast_port:4568}, (err)=>{
                         if(err) done(err);
@@ -41,7 +44,7 @@ describe('udp', function(){
                             if(err) done(err);
                             sender.close();
                         });
-                    })
+                    });
                 }
 
                 udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, (err)=>{
@@ -87,6 +90,36 @@ describe('udp', function(){
             });
         });
 
+        describe('#stop()', function(){
+            it('server should stop listening', function(done){
+                function msgCallback(msg, from){
+                    done(new Error("Unexpected call to msgCallback"));
+                }
+
+                function successCallback(){
+                    done();
+                }
+
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+                    udpDriver.listen(
+                        msgCallback,
+                        (err) => {
+                            if(err) done(err);
+                            else{
+                                udpDriver.stop();
+                                udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer("Test"), function (err) {
+                                    if (err) done(err);
+                                });
+                                //should not get any calls to msgCallback
+                                //wait one second for response to ensure correctness
+                                setTimeout(successCallback, 1000);
+                            }
+                        }
+                    );
+                });
+            });
+        });
+
         describe('#compareAddresses()', function(){
             it('should compare addresses correctly', function(done){
                 a1 = {address: "192.168.1.1", port: 1234};
@@ -101,4 +134,4 @@ describe('udp', function(){
     });
 
 
-})
+});
