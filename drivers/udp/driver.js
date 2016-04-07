@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 const dgram = require("dgram");
 
 const BROADCAST_ADDR = "255.255.255.255";
@@ -18,7 +20,7 @@ const BROADCAST_PORT = 2356;
 */
 function Driver(params, cb){
     //sets listening port, if defined
-    if(params.rport !== undefined) this._rport = params.rport
+    if(params.rport !== undefined) this._rport = params.rport;
 
     //sets broadcast port, if defined
     if(params.broadcast_port !== undefined)
@@ -55,7 +57,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
     this._msgCallback = msgCallback;
     this._server.on('message', this._msgCallback);
     listenCallback();
-}
+};
 
 /**
     Sends a UDP packet.
@@ -74,14 +76,14 @@ Driver.prototype.send = function(to, msg, callback) {
         if (callback) callback(err);
     });
 
-}
+};
 
 /**
     Closes the UDP server, if listen() was called
 */
 Driver.prototype.close = function() {
     this._server.close();
-}
+};
 
 /**
     Stops the UDP server, if listen() was called
@@ -89,7 +91,7 @@ Driver.prototype.close = function() {
 Driver.prototype.stop = function() {
 	this._msgCallback = function(){};
     this._server.on('message', this._msgCallback);
-}
+};
 
 
 /**
@@ -97,14 +99,15 @@ Driver.prototype.stop = function() {
     @returns {Object} Network address
 */
 Driver.prototype.getAddress = function(){
+    var address;
     try{
-        var address = this._server.address();
+        address = this._server.address();
     }
     catch(err){
         throw new Error("Failed to retrieve address. Have you called listen()?");
     }
     return address;
-}
+};
 
 /**
     Compares two addresses
@@ -112,7 +115,7 @@ Driver.prototype.getAddress = function(){
 */
 Driver.compareAddresses = function(a1, a2){
     return (a1.address === a2.address);
-}
+};
 
 /**
     Gets the broadcast network address. Only need to work when "listening" was called beforehands
@@ -120,7 +123,7 @@ Driver.compareAddresses = function(a1, a2){
 */
 Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port};
-}
+};
 
 exports.Driver = Driver;
 

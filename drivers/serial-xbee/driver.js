@@ -1,6 +1,8 @@
+/*jshint esversion: 6 */
+
 var xbee_api = require('xbee-api');
 var SerialPort = require('serialport').SerialPort;
-var C = xbee_api.constants
+var C = xbee_api.constants;
 
 var xbeeAPI = new xbee_api.XBeeAPI({
 	api_mode: 1,       // [1, 2]; 1 is default, 2 is with escaping (set ATAP=2)
@@ -51,7 +53,7 @@ function Driver(params, callback) {
 */
 Driver.compareAddresses = function(address1, address2) {
 	return address1.address === address2.address;
-}
+};
 
 /**
 	Private method that saves MAC address as this objects' attribute.
@@ -87,11 +89,11 @@ Driver.prototype._getAddress = function(callback) {
 		});
 
 		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
-		frame_obj["command"] = "SL"; // Get 32 lower address bits
+		frame_obj.command = "SL"; // Get 32 lower address bits
 		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
 	}
 	return {address: this.address};
-}
+};
 
 /**
 	Public method that calls _getAddress but doesn't pass a callback as parameter.
@@ -102,7 +104,7 @@ Driver.prototype._getAddress = function(callback) {
 */
 Driver.prototype.getAddress = function() {
 	return this._getAddress(); // Call private getAddress without a callback.
-}
+};
 
 /**
  * Listen to serial port, when it is open. When a frame is received form XBee, executes callback msgCallback.
@@ -125,7 +127,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 	xbeeAPI.on("frame_object", (frame) => {
 		if (this._msgCallback) this._msgCallback(frame);
 	});
-}
+};
 
 /**
  * A method to get the broadcast address, which is defined by XBee and constant equals to 0xFFFF.
@@ -136,7 +138,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
  */
 Driver.prototype.getBroadcastAddress = function () {
 	return {address: "000000000000FFFF"};
-}
+};
 
 /**
  * Send a message to an destination, and an optional callback is executed after.
@@ -150,11 +152,11 @@ Driver.prototype.send = function (to, msg, callback) {
 		type: C.FRAME_TYPE.TX_REQUEST_64,
 		destination64: to.address,
 		data: msg
-	}
+	};
 
 	this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
 	console.log("Sent XBee frame to " + to.address);
-}
+};
 
 /**
  * Stop XBee. Serial port is still open, but XBee no longer responds to delivered frames.
@@ -164,7 +166,7 @@ Driver.prototype.stop = function() {
 		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
 	    this._server.on('message', this._msgCallback);
 	}
-}
+};
 
 /**
  * Close XBee. Serial port is closed and XBee no longer responds to delivered frames.
@@ -176,6 +178,6 @@ Driver.prototype.close = function() {
 			else console.log("Port successfully closed");
 		});
 	}
-}
+};
 
-exports.Driver = Driver
+exports.Driver = Driver;
