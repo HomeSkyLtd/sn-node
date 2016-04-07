@@ -29,7 +29,7 @@ describe('udp', function(){
         describe('#send()', function(){
             it('should send message correctly to server', function(done){
                 function msgCallback(msg, from){
-                    from.port.should.be.exactly(4568);
+                    from.port.should.be.exactly(4567);
                     String(msg).should.be.exactly("Test");
                     done();
                 }
@@ -38,7 +38,6 @@ describe('udp', function(){
                     sender = new driver.Driver({rport: 4568, broadcast_port:4568}, (err)=>{
                         if(err) done(err);
                         sender.send(to, msg, (err)=>{
-                            console.log("Sent!");
                             if(err) done(err);
                             sender.close();
                         });
@@ -52,12 +51,14 @@ describe('udp', function(){
                         (err) => {
                             if(err) done(err);
                             else{
-                                sendMessage({address: "localhost", port:4567}, new Buffer("Test"));
+                                udpDriver.send({address: "localhost", port:4567}, new Buffer("Test"), (err)=>{
+                                    if(err) done(err);
+                                });
                             }
                         }
                     );
                 });
-    
+
             });
         });
 
@@ -82,7 +83,7 @@ describe('udp', function(){
                         }
                     );
                 });
-    
+
             });
         });
 

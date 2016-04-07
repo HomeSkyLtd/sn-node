@@ -8,29 +8,32 @@ const BROADCAST_PORT = 2356;
     Creates a driver for a UDP socket
     @param {Object} params - an object with the following parameters:<br />
     <ul>
-        <li>rport: The port listened by the server
-        <li>address: Optional. The IP address listened by the server. If not specified, the operating system
-            will attempt to listen on all addresses
-        <li>broadcast_port: The port used when creating a broadcast address
+        <li>[rport]: The port listened by the server. If undefined, server will listen on
+            arbitrary port
+        <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,
+            a default value will be used
     </ul>
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 
 */
 function Driver(params, cb){
+    //sets listening port, if defined
     if(params.rport !== undefined) this._rport = params.rport
 
+    //sets broadcast port, if defined
     if(params.broadcast_port !== undefined)
         this._broadcast_port = params.broadcast_port;
     else this._broadcast_port = BROADCAST_PORT;
 
+    //instantiate socket and associate it to a port
     this._server = dgram.createSocket('udp4');
     if(this._rport === undefined)
         this._server.bind();
     else
         this._server.bind(this._rport);
 
+    //ignore any messages received for now
     this._msgCallback = function(){};
-
     this._server.on('message', this._msgCallback);
 
     this._server.on('error', (err) =>{
@@ -67,7 +70,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 Driver.prototype.send = function(to, msg, callback) {
     if(to.address === BROADCAST_ADDR) this._server.setBroadcast(true);
 
-    this._server.send(msg, to.port, to.address, (err) => {  
+    this._server.send(msg, to.port, to.address, (err) => {
         if (callback) callback(err);
     });
 
@@ -76,7 +79,7 @@ Driver.prototype.send = function(to, msg, callback) {
 /**
     Closes the UDP server, if listen() was called
 */
-Driver.prototype.close = function() {    
+Driver.prototype.close = function() {
     this._server.close();
 }
 
