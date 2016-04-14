@@ -4,7 +4,7 @@
   "description": "",
   "main": "driver.js",
   "scripts": {
-    "test": "node test"
+    "test": "mocha test/test.js"
   },
   "dependencies": {
     "jsdoc": "^3.4.0",

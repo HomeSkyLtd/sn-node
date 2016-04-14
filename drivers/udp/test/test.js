@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 
-var driver = require("./driver.js");
+var driver = require("../driver.js");
 var should = require("should");
 
 describe('udp', function(){
@@ -125,9 +125,9 @@ describe('udp', function(){
                 a1 = {address: "192.168.1.1", port: 1234};
                 a2 = {address: "192.168.1.1", port: 1235};
                 a3 = {address: "192.168.1.2", port: 1234};
-                driver.Driver.compareAddresses(a1,a2).should.be.equal.true;
-                driver.Driver.compareAddresses(a1,a3).should.be.equal.false;
-                driver.Driver.compareAddresses(a2,a3).should.be.equal.false;
+                driver.Driver.compareAddresses(a1,a2).should.be.true();
+                driver.Driver.compareAddresses(a1,a3).should.be.false();
+                driver.Driver.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });
