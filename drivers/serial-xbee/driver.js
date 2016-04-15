@@ -173,8 +173,8 @@ Driver.prototype.stop = function() {
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
 		this._serialport.close(function(err) {
-			// if (err) console.log(err);
-			// else console.log("Port successfully closed");
+			if (err) console.log(err);
+			else console.log("Port successfully closed");
 		});
 	}
 };

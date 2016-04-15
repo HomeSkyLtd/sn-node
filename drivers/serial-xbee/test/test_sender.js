@@ -1,4 +1,4 @@
-var driver = require("./driver.js");
+var driver = require("../driver.js");
 
 function test() {
 	xbeeDriverSender = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function() {
@@ -18,7 +18,7 @@ function listenCallback(err, driver) {
 	if (!err) {
 		console.log("Listening to serial port");
 		console.log("Sending test message...");
-		driver.send(driver.getBroadcastAddress(), new Buffer("Ola Fabao"), function(err) {
+		driver.send(driver.getBroadcastAddress(), new Buffer("__TEST__"), function(err) {
 			if (!err) console.log("Data sent!");
 			else console.log(err);
 		});
