@@ -1,4 +1,4 @@
-var driver = require("./driver.js");
+var driver = require("../driver.js");
 
 function test() {
 	xbeeDriverSender = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function() {
