@@ -4,6 +4,7 @@ var driver = require("../driver.js");
 var should = require("should");
 
 describe('serial-xbee', function(){
+    this.timeout(3000);
     describe('hooks', function(){
         var xbeeDriver;
 

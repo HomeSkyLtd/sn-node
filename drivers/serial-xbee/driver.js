@@ -29,6 +29,10 @@ function Driver(params, callback) {
 		raw_frames: false  // [true, false]; If set to true, only raw byte frames are emitted (after validation) but not parsed to objects.
 	});
 
+
+	// Set msgCallback to null, meaning that the device is closed and not listening.
+	this._msgCallback = null;
+
 	this._serialport = new SerialPort(this._tty_port, {
 	    baudrate: this._baud_rate,
 		dataBits: this._data_bits,
@@ -37,8 +41,6 @@ function Driver(params, callback) {
 	    parser: this._xbeeAPI.rawParser()
 	});
 
-	// Set msgCallback to null, meaning that the device is closed and not listening.
-	this._msgCallback = null;
 	// Communication with XBee is enabled just after serial port is opened.
 	this._serialport.on("open", () => {
 		this._getAddress(callback);
@@ -52,7 +54,9 @@ function Driver(params, callback) {
 	@returns {boolean} True if address1 is equal to address2, false otherwise.
 */
 Driver.compareAddresses = function(address1, address2) {
-	return address1.address === address2.address;
+	var addr1Pad = "0".repeat(64).concat(address1.address).substr(-64);
+	var addr2Pad = "0".repeat(64).concat(address2.address).substr(-64);
+	return addr1Pad === addr2Pad;
 };
 
 /**
@@ -173,8 +177,8 @@ Driver.prototype.stop = function() {
 Driver.prototype.close = function() {
 	if (this._serialport.isOpen()) {
 		this._serialport.close(function(err) {
-			if (err) console.log(err);
-			else console.log("Port successfully closed");
+			// if (err) console.log(err);
+			// else console.log("Port successfully closed");
 		});
 	}
 };
