@@ -4,12 +4,6 @@ var xbee_api = require('xbee-api');
 var SerialPort = require('serialport').SerialPort;
 var C = xbee_api.constants;
 
-var xbeeAPI = new xbee_api.XBeeAPI({
-	api_mode: 1,       // [1, 2]; 1 is default, 2 is with escaping (set ATAP=2)
-	module: "802.15.4",// ["802.15.4", "ZNet", "ZigBee", "Any"]; This does nothing, yet!
-	raw_frames: false  // [true, false]; If set to true, only raw byte frames are emitted (after validation) but not parsed to objects.
-});
-
 /**
  	@class
  	Creates a driver for xbee
@@ -29,12 +23,18 @@ function Driver(params, callback) {
 	this._stop_bits = (params.stop_bits === undefined ? 1 : params.stop_bits);
 	this._parity = (params.parity === undefined ? "none" : params.stop_bits);
 
+	this._xbeeAPI = new xbee_api.XBeeAPI({
+		api_mode: 1,       // [1, 2]; 1 is default, 2 is with escaping (set ATAP=2)
+		module: "802.15.4",// ["802.15.4", "ZNet", "ZigBee", "Any"]; This does nothing, yet!
+		raw_frames: false  // [true, false]; If set to true, only raw byte frames are emitted (after validation) but not parsed to objects.
+	});
+
 	this._serialport = new SerialPort(this._tty_port, {
 	    baudrate: this._baud_rate,
-			dataBits: this._data_bits,
-			stopBits: this._stop_bits,
-			parity: this._parity,
-	    parser: xbeeAPI.rawParser()
+		dataBits: this._data_bits,
+		stopBits: this._stop_bits,
+		parity: this._parity,
+	    parser: this._xbeeAPI.rawParser()
 	});
 
 	// Set msgCallback to null, meaning that the device is closed and not listening.
@@ -79,18 +79,19 @@ Driver.prototype._getAddress = function(callback) {
 
 
 		// Waits for some data from XBee
-		xbeeAPI.on("frame_object", (frame) => {
+		this._xbeeAPI.on("frame_object", (frame) => {
 			if (frame.command === "SH") {
 				this.address = frame.commandData.toString('hex');
 			} else if (frame.command === "SL") {
 				this.address += frame.commandData.toString('hex');
+				this._xbeeAPI.removeAllListeners("frame_object");
 				if (callback) callback(); // After address is ready, execute callback.
 			}
 		});
 
-		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
+		this._serialport.write(this._xbeeAPI.buildFrame(frame_obj));
 		frame_obj.command = "SL"; // Get 32 lower address bits
-		this._serialport.write(xbeeAPI.buildFrame(frame_obj));
+		this._serialport.write(this._xbeeAPI.buildFrame(frame_obj));
 	}
 	return {address: this.address};
 };
@@ -113,20 +114,19 @@ Driver.prototype.getAddress = function() {
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
 	// Serial port must be open. So waits for it to open or, if is open, call callback.
-	this._serialport.on("open", () => {
-		if (listenCallback) listenCallback();
+	// this._serialport.on("open", () => {
+	// 	if (listenCallback) listenCallback();
+	// });
+
+	// Set private msgCallback so it is not null (XBee is open).
+	this._msgCallback = msgCallback;
+	this._xbeeAPI.on("frame_object", (frame) => {
+		if (this._msgCallback) this._msgCallback(frame);
 	});
 
 	if (this._serialport.isOpen()) {
 		if (listenCallback) listenCallback();
 	}
-
-	// Set private msgCallback so it is not null (XBee is open).
-	this._msgCallback = msgCallback;
-
-	xbeeAPI.on("frame_object", (frame) => {
-		if (this._msgCallback) this._msgCallback(frame);
-	});
 };
 
 /**
@@ -154,8 +154,8 @@ Driver.prototype.send = function (to, msg, callback) {
 		data: msg
 	};
 
-	this._serialport.write(xbeeAPI.buildFrame(frame_obj), callback);
-	console.log("Sent XBee frame to " + to.address);
+	this._serialport.write(this._xbeeAPI.buildFrame(frame_obj), callback);
+	// console.log("Sent XBee frame to " + to.address);
 };
 
 /**
@@ -164,7 +164,6 @@ Driver.prototype.send = function (to, msg, callback) {
 Driver.prototype.stop = function() {
 	if (this._serialport.isOpen()) {
 		this._msgCallback = null; // If XBee is closed, then it doesn't execute a messsage callback.
-	    this._server.on('message', this._msgCallback);
 	}
 };
 
