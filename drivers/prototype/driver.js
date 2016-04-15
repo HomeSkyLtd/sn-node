@@ -51,7 +51,8 @@ Driver.prototype.getAddress = function () {
 };
 
 /**
-    Gets the broadcast network address. Only need to work when "listening" was called
+    Gets the broadcast network address. Only needs to work when "listening" was called.
+    It should return an object in the same format as the "to" argument in Driver.send
     @returns {Object}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
