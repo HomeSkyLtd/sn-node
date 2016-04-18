@@ -50,6 +50,47 @@ var cbor = require("cbor");
             }
         ]
     }
+
+    Package examples:
+    
+    Getting controller address
+    {
+        packageType: PACKAGE_TYPES.whoiscontroller
+    }
+    Controller declaring himself and sending sensor/actuator id
+    {
+        packageType: PACKAGE_TYPES.iamcontroller,
+        yourid: 19
+    }
+    Controller sending lifetime (always in milliseconds)
+    {
+        packageType: PACKAGE_TYPES.lifetime,
+        lifetime: 1000
+    }
+    Controller asking for description
+    {
+        packageType: PACKAGE_TYPES.describeyourself
+    }
+    Termometer sensor describing himself
+    {
+        packageType: PACKAGE_TYPES.description,
+        id: 19,
+        nodeClass: NODE_CLASSES.sensor,
+        nodeCategory: NODE_CATEGORIES.termometer,
+        dataType: [
+            {
+                id: 0,
+                type: "int",
+                range: { start: -100, end: 100},
+                measureStrategy: "event",
+                category: "temperature"
+            }
+        ]
+    }
+    Termometer sending data
+    {
+        packageType: PACKAGE_TYPES
+    }
 */
 
 
@@ -89,7 +130,7 @@ const FIELDS = new Enum([
     Defines values for the "packageType" field
 */
 const PACKAGE_TYPES = new Enum([
-    'whoiscontroller', 'iamcontroller', 'lifetime', 'describeyourself', 'description', 'command', 'data', 'keepalive'
+    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description', 'data', 'command', 'lifetime', 'keepalive'
 ]);
 
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
