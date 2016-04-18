@@ -1,0 +1,19 @@
+{
+  "name": "leaf",
+  "version": "1.0.0",
+  "description": "Leaf class representing sensor or actuator",
+  "main": "leaf.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HomeSkyLtd/sn-node/leaf"
+  },
+  "keywords": [
+    "leaf",
+    "homesky"
+  ],
+  "author": "HomeSkyLtd",
+  "license": "ISC"
+}
