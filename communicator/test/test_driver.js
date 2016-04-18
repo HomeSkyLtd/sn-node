@@ -9,8 +9,8 @@ var connections = [];
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 */
 function Driver (params, callback) {
-    this._id = connections.length;
-    connections.push(this);
+    this._id = params.id;
+    connections[params.id] = this;
     if (callback) callback(null);
 }
 
@@ -72,14 +72,6 @@ Driver.prototype.send = function (to, message, callback) {
         //Target not listening: do nothing
     }
     if (callback) callback();
-}
-
-/**
-    Gets the driver network address. Only need to work when "listening" was called
-    @returns {Object} Network address
-*/
-Driver.prototype.getAddress = function () {
-    return this._id;
 }
 
 /**
