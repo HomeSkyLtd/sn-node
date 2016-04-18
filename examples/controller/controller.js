@@ -8,7 +8,7 @@ function startTimer(node_id, id) {
 	if (id !== undefined)
 		clearTimeout(id);
 	setTimeout(() => {
-		console.log("Removing node with id " + node_id + " due to timeout...");
+		console.log("Removing node with id " + node_id + " due to timeout.");
 		node[node_id] = null 
 	}, keepAliveTime);
 }
