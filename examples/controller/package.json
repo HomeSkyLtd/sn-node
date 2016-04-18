@@ -1,0 +1,19 @@
+{
+  "name": "controller",
+  "version": "1.0.0",
+  "description": "",
+  "main": "controller.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+   "devDependencies": {
+    "mocha": "^2.4.5",
+    "should": "^8.3.0"
+  },
+  "dependencies": {
+    "communicator": "file:../../communicator",
+    "udp": "file:../../drivers/udp"
+  }
+}
