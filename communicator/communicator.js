@@ -25,6 +25,31 @@ var cbor = require("cbor");
         type: "data",
         temperature: 25
     }
+    data = [
+        {
+            id: 
+            value:
+        }
+    ]
+    pkt = {
+        dataTypes: [
+            {
+                id: 0, 
+                type: int | float | boolean,
+                range: { start: 0, end: 1 } | [1,2],
+                measureStrategy: "event" | "periodic",
+                category: temperature | presence | open door | humidity | light 
+            }
+        ],
+        commandTypes: [ 
+            {
+                id: 0 
+                type: int | float | boolean,
+                range: { start: 0, end: 1 } | [1,2],
+                category: temperature | light on | light intensity | fan speed | ...
+            }
+        ]
+    }
 */
 
 
@@ -46,10 +71,16 @@ const FIELDS = new Enum([
     'nodeClass',
     // Category of the node (switch, termometer)
     'nodeCategory',
+    // How the data is expressed
+    'dataType',
+    'id', 'type', 'range', 'measureStrategy', 'category',
+    'commandType',
     // Data field
     'data',
     // Command field
-    'command'
+    'command',
+    'value',
+    'lifetime'
 ]);
 
 
@@ -57,7 +88,7 @@ const FIELDS = new Enum([
     Defines values for the "packageType" field
 */
 const PACKAGE_TYPES = new Enum([
-    'data', 'hello', 'whoisController', 'IamController', 'command'
+    'whoiscontroller', 'iamcontroller', 'lifetime', 'describeyourself', 'description', 'command', 'data', 'keepalive'
 ]);
 
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
@@ -66,6 +97,7 @@ exports.PACKAGE_TYPES = PACKAGE_TYPES;
 */
 const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
 
+exports.NODE_CLASSES = NODE_CLASSES;
 /** Defines values for the "category" field
 */
 const NODE_CATEGORIES = new Enum({
@@ -75,6 +107,8 @@ const NODE_CATEGORIES = new Enum({
     'doorSwitch':    3,
     'airController': 4
 });
+
+exports.NODE_CATEGORIES = NODE_CATEGORIES;
 
 // List of previous defined fields
 // Values in brackets [] can accept lists of values
@@ -169,7 +203,7 @@ function encode(object) {
 function decode (rawPackage, callback) {
     cbor.decodeFirst(rawPackage, (err, pkt) => {
         callback(err, err === null ? exchangeKeys(pkt, (key) => FIELDS.get(Number(key)).key,
-            (key, value) => getAndCheckValue(FIELDS.get(Number(key)).key, value, true)) : null);
+            (key, value) => getAndCheckValue(FIELDS.get(Number(key)).key, value, false)) : null);
     });
 }
 
@@ -334,7 +368,6 @@ Communicator.prototype.close = function () {
 };
 
 exports.Communicator = Communicator;
-
 
 /**
  * Callback used by listen.
