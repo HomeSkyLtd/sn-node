@@ -137,6 +137,63 @@ describe('networkDriver', function(){
         });
 
         /*
+            Check if it is possible to reply to a received message. In other words,
+            it should be possible to call send() using as destination the "from" parameter
+            received in the msgCallback of listen(). In this test, we keep the naming of
+            both receiverDriver and senderDriver, but they will both be used to send and
+            receive messages.
+            -receiverDriver will send a message to senderDriver;
+            -senderDriver will reply to this message based on the "from" parameter
+            -receiverDriver will check the reply, terminating the test
+        */
+        describe('#send() as a reply to a received message', function(){
+            it('should reply to messages correctly', function(done){
+                function msgCallback(msg, from){
+                    /*
+                        Check if the reply was received correctly, for instance:
+                        from.port.should.be.exactly(4567);
+                        String(msg).should.be.exactly("Reply");
+                    */
+                    done();
+                }
+
+                receiverDriver = new driver.Driver(receiverParams, function(err){
+                    if(err) done(err);
+                    receiverDriver.listen(
+                        msgCallback,
+                        (err) => {
+                            if(err) done(err);
+                            else{
+                                var senderDriver = new driver.Driver(senderParams, (err)=>{
+                                    if(err) done(err);
+                                    var msgCallback2 = function(msg, from){
+                                        senderDriver.send(from, new Buffer("Reply"), (err)=>{
+                                            if(err) done(err);
+                                            senderDriver.close();
+                                            senderDriver = null;
+                                        });
+                                    };
+                                    senderDriver.listen(
+                                        msgCallback2,
+                                        (err) => {
+                                            if(err) done(err);
+                                            else{
+                                                senderDriver.send(serverAddress, new Buffer("Test"), function (err) {
+                                                    if (err) done(err);
+                                                });
+                                            }
+                                        }
+                                    );
+                                });
+                            }
+                        }
+                    );
+                });
+
+            });
+        });
+
+        /*
             Calling stop() should make the callback passed in listen() not be
             called when a message arrives
         */
