@@ -4,6 +4,7 @@ var driver = require("../driver.js");
 var should = require("should");
 
 describe('serial-xbee', function(){
+    this.timeout(3000);
     describe('hooks', function(){
         var xbeeDriver;
 
@@ -76,7 +77,7 @@ describe('serial-xbee', function(){
                             else{
                                 xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
                                     if(err) done(err);
-                                    xbeeSender.send(xbeeSender.getBroadcastAddress(), new Buffer("Test"), (err)=>{
+                                    xbeeSender.send(xbeeDriver.getBroadcastAddress(), new Buffer("Test"), (err)=>{
                                         if(err) done(err);
                                         xbeeSender.close();
                                         xbeeSender = null;
