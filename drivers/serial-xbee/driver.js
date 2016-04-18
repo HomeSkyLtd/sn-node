@@ -117,15 +117,14 @@ Driver.prototype.getAddress = function() {
  * @param {Driver~onMessage} [callback] - Callback executed when a XBee delivers a frame.
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-	// Serial port must be open. So waits for it to open or, if is open, call callback.
-	// this._serialport.on("open", () => {
-	// 	if (listenCallback) listenCallback();
-	// });
 
 	// Set private msgCallback so it is not null (XBee is open).
 	this._msgCallback = msgCallback;
+
 	this._xbeeAPI.on("frame_object", (frame) => {
-		if (this._msgCallback) this._msgCallback(frame);
+		//only consider messages that have a "data" field
+		if(frame.data)
+			if (this._msgCallback) this._msgCallback(frame.data, {address: frame.remote64});
 	});
 
 	if (this._serialport.isOpen()) {
