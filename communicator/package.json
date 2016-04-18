@@ -1,8 +1,8 @@
 {
-  "name": "lib",
+  "name": "communicator",
   "version": "1.0.0",
   "description": "API",
-  "main": "lib.js",
+  "main": "communicator.js",
   "scripts": {
     "test": "mocha"
   },

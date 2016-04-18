@@ -80,7 +80,8 @@ const FIELDS = new Enum([
     // Command field
     'command',
     'value',
-    'lifetime'
+    'lifetime',
+    'yourid'
 ]);
 
 
@@ -373,7 +374,7 @@ exports.Communicator = Communicator;
  * Callback used by listen.
  * @callback Communicator~onMessage
  * @returns {boolean} False if server should stop listening. Otherwise it will keep listening.
- * @param {Buffer} message - Json object containing the received object
+ * @param {Object} message - Json object containing the received object
  * @param {Object} from - Object containing the address object of the transmitter
  */
 
