@@ -90,6 +90,48 @@ describe('udp', function(){
             });
         });
 
+        describe('#send() as a reply to a received message', function(){
+            it('should reply to messages correctly', function(done){
+                function msgCallback(msg, from){
+                    from.port.should.be.exactly(4568);
+                    String(msg).should.be.exactly("Reply");
+                    done();
+                }
+
+                udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+                    udpDriver.listen(
+                        msgCallback,
+                        (err) => {
+                            if(err) done(err);
+                            else{
+                                var udpDriver2 = new driver.Driver({rport:4568, broadcast_port: 4567});
+                                var msgCallback2 = function(msg, from){
+                                    from.port.should.be.exactly(4567);
+                                    String(msg).should.be.exactly("Test");
+                                    udpDriver2.send(from, new Buffer("Reply"), (err)=>{
+                                        if(err) done(err);
+                                    });
+                                };
+                                udpDriver2.listen(
+                                    msgCallback2,
+                                    (err) => {
+                                        if(err) done(err);
+                                        else{
+                                            udpDriver.send({address:"localhost", port:4568}, new Buffer("Test"), function (err) {
+                                                if (err) done(err);
+                                            });
+                                        }
+                                    }
+                                )
+
+                            }
+                        }
+                    );
+                });
+
+            });
+        });
+
         describe('#stop()', function(){
             it('server should stop listening', function(done){
                 function msgCallback(msg, from){
