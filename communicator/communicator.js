@@ -15,28 +15,14 @@ var cbor = require("cbor");
     a specific enum.
 
     Examples:
-    pkt = {
-        type: "control",
-        class: "sensor",
-        category: "temperature"
-    }
 
     pkt = {
-        type: "data",
-        temperature: 25
-    }
-    data = [
-        {
-            id:
-            value:
-        }
-    ]
-    pkt = {
+        packageType: "description",
         dataTypes: [
             {
                 id: 0,
                 type: int | float | boolean,
-                range: { start: 0, end: 1 } | [1,2],
+                range: [1,2],
                 measureStrategy: "event" | "periodic",
                 category: temperature | presence | open door | humidity | light
             }
@@ -76,12 +62,11 @@ var cbor = require("cbor");
         packageType: PACKAGE_TYPES.description,
         id: 19,
         nodeClass: NODE_CLASSES.sensor,
-        nodeCategory: NODE_CATEGORIES.termometer,
         dataType: [
             {
                 id: 0,
                 type: "int",
-                range: { start: -100, end: 100},
+                range: [-100, 100],
                 measureStrategy: "event",
                 category: "temperature"
                 unit: "°C"
@@ -90,7 +75,9 @@ var cbor = require("cbor");
     }
     Termometer sending data
     {
-        packageType: PACKAGE_TYPES
+        packageType: PACKAGE_TYPES.data,
+        id: 0,
+        data: 20
     }
 */
 
@@ -396,7 +383,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 }
             });
         }, (err) => {
-            if (err)
+            if (err !== null)
                 this._listening = false;
             if (listenCallback)
                 listenCallback(err);
