@@ -117,14 +117,15 @@ Driver.prototype.getAddress = function() {
  * @param {Driver~onMessage} [callback] - Callback executed when a XBee delivers a frame.
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-
 	// Set private msgCallback so it is not null (XBee is open).
 	this._msgCallback = msgCallback;
 
 	this._xbeeAPI.on("frame_object", (frame) => {
 		//only consider messages that have a "data" field
 		if(frame.data)
-			if (this._msgCallback) this._msgCallback(frame.data, {address: frame.remote64});
+			if (this._msgCallback) {
+				this._msgCallback(frame.data, {address: frame.remote64});
+			}
 	});
 
 	if (this._serialport.isOpen()) {
@@ -160,7 +161,7 @@ Driver.prototype.send = function (to, msg, callback) {
 	};
 
 	this._serialport.write(this._xbeeAPI.buildFrame(frame_obj), callback);
-	// console.log("Sent XBee frame to " + to.address);
+	 //console.log("Sent XBee frame to " + to.address);
 };
 
 /**

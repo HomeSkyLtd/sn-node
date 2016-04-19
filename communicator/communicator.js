@@ -27,23 +27,23 @@ var cbor = require("cbor");
     }
     data = [
         {
-            id: 
+            id:
             value:
         }
     ]
     pkt = {
         dataTypes: [
             {
-                id: 0, 
+                id: 0,
                 type: int | float | boolean,
                 range: { start: 0, end: 1 } | [1,2],
                 measureStrategy: "event" | "periodic",
-                category: temperature | presence | open door | humidity | light 
+                category: temperature | presence | open door | humidity | light
             }
         ],
-        commandTypes: [ 
+        commandTypes: [
             {
-                id: 0 
+                id: 0
                 type: int | float | boolean,
                 range: { start: 0, end: 1 } | [1,2],
                 category: temperature | light on | light intensity | fan speed | ...
@@ -52,7 +52,7 @@ var cbor = require("cbor");
     }
 
     Package examples:
-    
+
     Getting controller address
     {
         packageType: PACKAGE_TYPES.whoiscontroller
@@ -395,7 +395,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 }
             });
         }, (err) => {
-            if (err !== null)
+            if (err)
                 this._listening = false;
             if (listenCallback)
                 listenCallback(err);
