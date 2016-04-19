@@ -199,7 +199,7 @@ describe('Communicator', function() {
             });
         });
 
-         it('should receive only one message (filtering by package type and address)', (done) => {
+        it('should receive only one message (filtering by package type and address)', (done) => {
 
             node1.listen((msg, from) => {
                 should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value);
@@ -220,6 +220,39 @@ describe('Communicator', function() {
                         }); 
                     });    
                 });
+            });
+        });
+
+        it('should call two callbacks from package of two types', (done) => {
+            var listened = false;
+            console.log("EITA");
+            node1.listen((msg, from) => {
+                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                should(from).be.equal(getDriver2Address());
+                should(msg.data).be.equal("Test");
+                if (listened)
+                    done();
+                else
+                    listened = true;
+            }, Communicator.PACKAGE_TYPES.description, null, (err) => {
+                console.log("EITA2");
+                should(err).not.be.Error();    
+                node1.listen((msg, from) => {
+                    should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                    should(from).be.equal(getDriver2Address());
+                    should(msg.data).be.equal("Test");
+                    if (listened)
+                        done();
+                    else
+                        listened = true;
+                }, Communicator.PACKAGE_TYPES.data, null, (err) => {
+                    console.log("EITA3");
+                    should(err).not.be.Error();    
+                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, 'data': 'Test'}, (err) => {
+                        should(err).not.be.Error();  
+                        console.log("SEND");
+                    }); 
+                });    
             });
         });
     });
