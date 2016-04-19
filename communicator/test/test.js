@@ -48,6 +48,20 @@ describe('Communicator', function() {
                 done();  
             });
         });
+        it('should allow packages with multiple package types', (done) => {
+            node1.send(getDriver2Address(), { 'packageType': Communicator.PACKAGE_TYPES.data | 
+            Communicator.PACKAGE_TYPES.command }, (err) => {
+                should(err).not.be.Error();
+                done();
+            });
+        });
+        it('should allow packages with multiple package types as array', (done) => {
+            node1.send(getDriver2Address(), { 'packageType': [Communicator.PACKAGE_TYPES.data,
+                Communicator.PACKAGE_TYPES.command] }, (err) => {
+                should(err).not.be.Error();
+                done();
+            });
+        });
     });
 
      describe('#sendBroadcast()', () => {
