@@ -18,12 +18,15 @@ function Leaf (driver, nodeClass, nodeCategory, callback) {
 	this._comm = new Communicator.Communicator(this._driver);
 
 	this._comm.listen((msg, from) => {
+				console.log("LEAF: Message iamcontroller received");
 			    this._controllerAddress = from;
 			    this._myId = msg.yourid;
-			    return false;
+			    //return false;
 		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, callback);
 
 	this._comm.listen((msg, from) => {
+			console.log("LEAF: Message lifetime received");
+
 			this._controllerAddress = from;
 			this._lifetime = msg.lifetime;
 
@@ -32,7 +35,8 @@ function Leaf (driver, nodeClass, nodeCategory, callback) {
 					{
 						packageType: Communicator.PACKAGE_TYPES.keepalive,
 						id: this._myId
-					}, function (err) { console.log(err); });
+					}, function (err) { if (err) console.log(err); });
+				console.log("LEAF: Message keep alive sent to CONTROLLER.");
 				}, this._lifetime);
 			},
 			Communicator.PACKAGE_TYPES.lifetime,
