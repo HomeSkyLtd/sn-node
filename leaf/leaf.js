@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var Communicator = require("../communicator");
 
 /**
@@ -24,7 +26,7 @@ function Leaf (driver, nodeClass, nodeCategory, callback) {
 	this._comm.listen((msg, from) => {
 			this._controllerAddress = from;
 			this._lifetime = msg.lifetime;
-			return false;
+
 			setInterval(() => {
 				this._comm.send(from,
 					{
@@ -62,7 +64,7 @@ Leaf.prototype.sendData = function (object, callback) {
 	object.id	   = this._myId;
 
 	this._comm.send(this._controllerAddress, object, callback);
-}
+};
 
 /**
  * Listen a message with command from actuator to controller.
@@ -76,6 +78,6 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 	}
 
 	this._comm.listen(objectCallback, Communicator.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
-}
+};
 
 exports.Leaf = Leaf;
