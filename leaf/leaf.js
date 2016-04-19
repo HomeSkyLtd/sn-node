@@ -17,26 +17,33 @@ function Leaf (driver, nodeClass, nodeCategory, callback) {
 
 	this._comm = new Communicator.Communicator(this._driver);
 
-	comm.listen((msg, from) => {
+	this._comm.listen((msg, from) => {
+				console.log("LEAF: Message iamcontroller received");
 			    this._controllerAddress = from;
 			    this._myId = msg.yourid;
-			    return false;
+			    //return false;
 		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, callback);
 
-	comm.listen((msg, from) => {
-			this._lifetime = msg.lifetime;
-			return false;
-		    }, Communicator.PACKAGE_TYPES.lifetime, null, () => {
-			setInterval(function() {
-				comm.send(from,
-					  {
-						  packageType: Communicator.PACKAGE_TYPES.keepalive,
-						  id: this._myId
-					  }, function (err) { console.log(err); });
-			}, this._lifetime);
-		    });
+	this._comm.listen((msg, from) => {
+			console.log("LEAF: Message lifetime received");
 
-	comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
+			this._controllerAddress = from;
+			this._lifetime = msg.lifetime;
+
+			setInterval(() => {
+				this._comm.send(from,
+					{
+						packageType: Communicator.PACKAGE_TYPES.keepalive,
+						id: this._myId
+					}, function (err) { if (err) console.log(err); });
+				console.log("LEAF: Message keep alive sent to CONTROLLER.");
+				}, this._lifetime);
+			},
+			Communicator.PACKAGE_TYPES.lifetime,
+			null,
+			null);
+
+	this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
 		if (err) console.log(err);
 	});
 }
@@ -76,3 +83,5 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 
 	this._comm.listen(objectCallback, Communicator.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
 };
+
+exports.Leaf = Leaf;

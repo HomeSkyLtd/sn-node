@@ -4,7 +4,7 @@
   "description": "Leaf class representing sensor or actuator",
   "main": "leaf.js",
   "scripts": {
-    "test": "node test"
+    "test": "node test/test"
   },
   "repository": {
     "type": "git",

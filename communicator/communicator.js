@@ -396,7 +396,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 }
             });
         }, (err) => {
-            if (err !== null)
+            if (err)
                 this._listening = false;
             if (listenCallback)
                 listenCallback(err);

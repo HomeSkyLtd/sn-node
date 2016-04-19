@@ -17,7 +17,7 @@ var C = xbee_api.constants;
 	@param {Driver~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
 */
 function Driver(params, callback) {
-	this._tty_port = params.tty_port; // ttyAMA0, ttyUSB0, etc.
+	this._tty_port = params.tty_port; // /dev/ttyAMA0, /dev/ttyUSB0, etc.
 	this._baud_rate = (params.baud_rate === undefined ? 9600 : params.baud_rate);
 	this._data_bits = (params.data_bits === undefined ? 8 : params.data_bits);
 	this._stop_bits = (params.stop_bits === undefined ? 1 : params.stop_bits);
@@ -117,14 +117,15 @@ Driver.prototype.getAddress = function() {
  * @param {Driver~onMessage} [callback] - Callback executed when a XBee delivers a frame.
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-
 	// Set private msgCallback so it is not null (XBee is open).
 	this._msgCallback = msgCallback;
 
 	this._xbeeAPI.on("frame_object", (frame) => {
 		//only consider messages that have a "data" field
 		if(frame.data)
-			if (this._msgCallback) this._msgCallback(frame.data, {address: frame.remote64});
+			if (this._msgCallback) {
+				this._msgCallback(frame.data, {address: frame.remote64});
+			}
 	});
 
 	if (this._serialport.isOpen()) {
@@ -160,7 +161,7 @@ Driver.prototype.send = function (to, msg, callback) {
 	};
 
 	this._serialport.write(this._xbeeAPI.buildFrame(frame_obj), callback);
-	// console.log("Sent XBee frame to " + to.address);
+	 //console.log("Sent XBee frame to " + to.address);
 };
 
 /**
