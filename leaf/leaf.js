@@ -10,10 +10,10 @@ var Communicator = require("../communicator");
  * @param {Enum} NODE_CATEGORY define the category, e.g. termometer, lightSensor, lightSwitch, etc.
  * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized
  */
-function Leaf (driver, nodeClass, nodeCategory, callback) {
+function Leaf (driver, dataList, commandList, callback) {
 	this._driver = driver;
-	this._nodeClass = nodeClass;
-	this._nodeCategory = nodeCategory;
+	this._nodeClass = parseClass(dataList, commandList);
+	this._nodeCategory = parseCategory(dataList, commandList);
 
 	this._comm = new Communicator.Communicator(this._driver);
 
@@ -30,18 +30,34 @@ function Leaf (driver, nodeClass, nodeCategory, callback) {
 			this._controllerAddress = from;
 			this._lifetime = msg.lifetime;
 
-			setInterval(() => {
-				this._comm.send(from,
-					{
+			if (this._lifetime !== 0) {
+				setInterval(() => {
+					var object = {
 						packageType: Communicator.PACKAGE_TYPES.keepalive,
 						id: this._myId
-					}, function (err) { if (err) console.log(err); });
-				console.log("LEAF: Message keep alive sent to CONTROLLER.");
+					};
+					this._comm.send(from, object, function (err) { if (err) console.log(err); });
+
+					console.log("LEAF: Message keep alive sent to CONTROLLER.");
 				}, this._lifetime);
-			},
-			Communicator.PACKAGE_TYPES.lifetime,
-			null,
-			null);
+			}
+			return false;
+		}, Communicator.PACKAGE_TYPES.lifetime, null, null);
+
+	this._comm.listen((msg, from) => {
+		console.log("LEAF: Message describeyourself received");
+
+		var object = {
+			packageType: Communicator.PACKAGE_TYPES.description,
+			id: this._myId,
+			nodeClass: this._nodeClass,
+			nodeCategory: this._nodeCategory
+		};
+
+		this._comm.send(from, object, function (err) { if (err) console.log(err); })
+
+		return false;
+	}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
 
 	this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
 		if (err) console.log(err);
@@ -82,6 +98,17 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 	}
 
 	this._comm.listen(objectCallback, Communicator.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
+};
+
+var parseClass = function(dataList, commandList) {
+	(
+		(dataList ? Communicator.NODE_CLASSES.sensor : 0) |
+		(commandList ? Communicator.NODE_CLASSES.actuator : 0)
+	);
+};
+
+var parseCategory = function(dataList, commandList) {
+	Communicator.NODE_CATEGORIES.termometer;
 };
 
 exports.Leaf = Leaf;
