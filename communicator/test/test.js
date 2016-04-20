@@ -223,10 +223,11 @@ describe('Communicator', function() {
             });
         });
 
-        it('should call two callbacks from package of two types', (done) => {
+        it.only('should call two callbacks from package of two types', (done) => {
             var listened = false;
             console.log("EITA");
             node1.listen((msg, from) => {
+                console.log("RECEIVE 1");
                 should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data).be.equal("Test");
@@ -238,6 +239,7 @@ describe('Communicator', function() {
                 console.log("EITA2");
                 should(err).not.be.Error();    
                 node1.listen((msg, from) => {
+                    console.log("RECEIVE 2");
                     should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data).be.equal("Test");

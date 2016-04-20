@@ -21,11 +21,9 @@ function Driver (params, callback) {
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) { 
     if (this._listen) {
-        console.log("Error!");
         if (listenCallback) listenCallback(Error("Already listening"));
         return;
     }
-
     this._listen = msgCallback;
     if (listenCallback) listenCallback(null);
 
