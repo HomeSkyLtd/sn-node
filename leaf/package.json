@@ -15,5 +15,8 @@
     "homesky"
   ],
   "author": "HomeSkyLtd",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "enum": "^2.3.0"
+  }
 }

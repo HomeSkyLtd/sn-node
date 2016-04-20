@@ -176,7 +176,7 @@ function getAndCheckValue(key, value, getEnum) {
             }
             if (getEnum)
                 value = possibleValues.get(retValue);
-            else    
+            else
                 value = retValue;
         }
         else if (acceptArrays && possibleValues.get(value).key.indexOf("|") !== -1) {
@@ -221,7 +221,7 @@ function exchangeKeys(object, convertKey, extractValue) {
         else {
             if (typeof value === 'object')  {
                 newObject[key] = value.value;
-                
+
             }
             else if (!Array.isArray(value)) {
                 newObject[key] = extractValue(FIELDS.get(key).value, value);
@@ -400,7 +400,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 }
             });
         }, (err) => {
-            if (err !== null)
+            if (err)
                 this._listening = false;
             if (listenCallback)
                 listenCallback(err);

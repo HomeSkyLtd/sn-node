@@ -1,28 +1,30 @@
 /*jshint esversion: 6 */
-
+var Enum = require('enum');
 var Communicator = require("../communicator");
 
 /**
  * Construct instance of Leaf and get controller address.
  * @class
  * @param {Object} Driver object
- * @param {Enum} NODE_CLASSES define between sensor, actuator or controller
- * @param {Enum} NODE_CATEGORY define the category, e.g. termometer, lightSensor, lightSwitch, etc.
+ * @param {Array} dataList list of dataTypes to specify data.
+ * @param {Array} commandList list of commandTypes to specify commands.
  * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized
  */
 function Leaf (driver, dataList, commandList, callback) {
 	this._driver = driver;
 	this._nodeClass = parseClass(dataList, commandList);
-	this._nodeCategory = parseCategory(dataList, commandList);
+
+	this._dataList = dataList;
+	this._commandList = commandList;
 
 	this._comm = new Communicator.Communicator(this._driver);
-
 	this._comm.listen((msg, from) => {
-				console.log("LEAF: Message iamcontroller received");
+				console.log("LEAF: Message iamcontroller received from:");
+				console.log(from);
 			    this._controllerAddress = from;
 			    this._myId = msg.yourid;
-			    //return false;
-		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, callback);
+				callback();
+		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
 
 	this._comm.listen((msg, from) => {
 			console.log("LEAF: Message lifetime received");
@@ -51,10 +53,13 @@ function Leaf (driver, dataList, commandList, callback) {
 			packageType: Communicator.PACKAGE_TYPES.description,
 			id: this._myId,
 			nodeClass: this._nodeClass,
-			nodeCategory: this._nodeCategory
+			dataType: this._dataList,
+			commandType: this._commandList
 		};
 
 		this._comm.send(from, object, function (err) { if (err) console.log(err); })
+		console.log("LEAF: message description sent: ");
+		console.log(object);
 
 		return false;
 	}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
@@ -68,20 +73,23 @@ function Leaf (driver, dataList, commandList, callback) {
  * Send a message with data from sensor to controller.
  * @param {Object} object
  * <ul>
- * 	<li>Node category: define wich sensor it is
- * 	<li>Data: value captured by sensor
+ * 		<li>Data ID: which of its parameters he is sending.
+ * 		<li>Data: value captured by sensor.
  * </ul>
  * @param {Leaf~onDataSent} [callback] function executed after data is sent
  */
 Leaf.prototype.sendData = function (object, callback) {
-	if (!this._nodeClass.has(Communicator.NODE_CLASSES.sensor)) {
+	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
+
+	if (!enumClass.has(Communicator.NODE_CLASSES.sensor)) {
 		var msg = "This leaf is not a sensor. Data cannot be sent.";
 		throw new Error(msg);
 	}
 
 	object.packageType = Communicator.PACKAGE_TYPES.data;
-	object.nodeClass   = Communicator.NODE_CLASSES.sensor;
 	object.id	   = this._myId;
+
+	console.log("Controller Address: " + this._controllerAddress);
 
 	this._comm.send(this._controllerAddress, object, callback);
 };
@@ -98,17 +106,25 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 	}
 
 	this._comm.listen(objectCallback, Communicator.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
+	console.log("LEAF: Listening command from controller.");
 };
 
+/**
+ * Decide if class is Sensor, Actuator or both.
+ * @param {Array} dataList list of dataTypes to specify data.
+ * @param {Array} commandList list of commandTypes to specify commands.
+ * @returns {Enum} NODE_CLASSES sensor or actuator.
+ */
 var parseClass = function(dataList, commandList) {
-	(
-		(dataList ? Communicator.NODE_CLASSES.sensor : 0) |
-		(commandList ? Communicator.NODE_CLASSES.actuator : 0)
-	);
-};
+	var result = 0;
 
-var parseCategory = function(dataList, commandList) {
-	Communicator.NODE_CATEGORIES.termometer;
+	if (dataList !== null && dataList.length !== 0)
+		result |= Communicator.NODE_CLASSES.sensor;
+
+	if (commandList !== null && commandList.length !== 0)
+		result |= Communicator.NODE_CLASSES.actuator;
+
+	return result;
 };
 
 exports.Leaf = Leaf;
