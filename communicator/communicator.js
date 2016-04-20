@@ -15,28 +15,14 @@ var cbor = require("cbor");
     a specific enum.
 
     Examples:
-    pkt = {
-        type: "control",
-        class: "sensor",
-        category: "temperature"
-    }
 
     pkt = {
-        type: "data",
-        temperature: 25
-    }
-    data = [
-        {
-            id:
-            value:
-        }
-    ]
-    pkt = {
+        packageType: "description",
         dataTypes: [
             {
                 id: 0,
                 type: int | float | boolean,
-                range: { start: 0, end: 1 } | [1,2],
+                range: [1,2],
                 measureStrategy: "event" | "periodic",
                 category: temperature | presence | open door | humidity | light
             }
@@ -76,20 +62,22 @@ var cbor = require("cbor");
         packageType: PACKAGE_TYPES.description,
         id: 19,
         nodeClass: NODE_CLASSES.sensor,
-        nodeCategory: NODE_CATEGORIES.termometer,
         dataType: [
             {
                 id: 0,
                 type: "int",
-                range: { start: -100, end: 100},
+                range: [-100, 100],
                 measureStrategy: "event",
                 category: "temperature"
+                unit: "°C"
             }
         ]
     }
     Termometer sending data
     {
-        packageType: PACKAGE_TYPES
+        packageType: PACKAGE_TYPES.data,
+        id: 0,
+        data: 20
     }
 */
 
@@ -114,7 +102,7 @@ const FIELDS = new Enum([
     'nodeCategory',
     // How the data is expressed
     'dataType',
-    'id', 'type', 'range', 'measureStrategy', 'category',
+    'id', 'type', 'range', 'measureStrategy', 'category', 'unit',
     'commandType',
     // Data field
     'data',
@@ -130,7 +118,8 @@ const FIELDS = new Enum([
     Defines values for the "packageType" field
 */
 const PACKAGE_TYPES = new Enum([
-    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description', 'data', 'command', 'lifetime', 'keepalive'
+    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description',
+    'data', 'command', 'lifetime', 'keepalive'
 ]);
 
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
@@ -177,16 +166,25 @@ function getAndCheckValue(key, value, getEnum) {
 
     if (possibleValues !== undefined) {
         if (Array.isArray(value) && acceptArrays) {
+            var retValue = 0;
             for (var i in value) {
                 var val = value[i];
                 var enumVal = possibleValues.get(val);
                 if (enumVal === undefined || enumVal.key.indexOf("|") !== -1)
                     throw new Error("Invalid value (" + val + ")" + " in key '" + FIELDS.get(key).key + "'");
-                if (getEnum)
-                    value[i] = enumVal;
-                else
-                    value[i] = enumVal.value;
+                retValue = retValue | enumVal.value;
             }
+            if (getEnum)
+                value = possibleValues.get(retValue);
+            else    
+                value = retValue;
+        }
+        else if (acceptArrays && possibleValues.get(value).key.indexOf("|") !== -1) {
+            if (value !== possibleValues.get(value).value)
+                throw new Error("Invalid value (" + value + ")" + " in key '" + FIELDS.get(key).key+ "'");
+            if (getEnum)
+                value = possibleValues.get(value);
+
         }
         else if (Array.isArray(value))
             throw new Error("Arrays don't accepted in key '" + FIELDS.get(key).key + "'");
@@ -209,28 +207,35 @@ function getAndCheckValue(key, value, getEnum) {
 // It also replaces enum values for its values
 function exchangeKeys(object, convertKey, extractValue) {
     var newObject = {};
-
     // Function to iterate over object keys
     function iterateOverObj(key, value, newObject) {
         // If it is an object, iterate over keys and call this funciton for each entry
         if (typeof value === 'object' && !Array.isArray(value) && !value.constructor.isEnumItem) {
             var tempObject = {};
             for (var innerKey in value) {
-                iterateOverObj(innerKey, value[innerKey], tempObject);
+                iterateOverObj(convertKey(innerKey), value[innerKey], tempObject);
             }
-            newObject[convertKey(key)] = tempObject;
+            newObject[key] = tempObject;
         }
         // Otherwise, check the value and updates object
         else {
-            if (typeof value === 'object')
-                value = value.value;
-            newObject[convertKey(key)] = extractValue(key, value);
+            if (typeof value === 'object')  {
+                newObject[key] = value.value;
+                
+            }
+            else if (!Array.isArray(value)) {
+                newObject[key] = extractValue(FIELDS.get(key).value, value);
+            }
+            else {
+                for (var innerKey in object)
+                    iterateOverObj(innerKey, object[innerKey], newObject);
+            }
         }
     }
 
     //Iterate over all object keys
     for (var innerKey in object)
-        iterateOverObj(innerKey, object[innerKey], newObject);
+        iterateOverObj(convertKey(innerKey), object[innerKey], newObject);
 
     return newObject;
 }
@@ -395,7 +400,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 }
             });
         }, (err) => {
-            if (err)
+            if (err !== null)
                 this._listening = false;
             if (listenCallback)
                 listenCallback(err);
