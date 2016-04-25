@@ -430,6 +430,27 @@ describe('Communicator', function() {
                 });    
             });
         });
+
+        it('should receive two messages from different types on the same callback', (done) => {
+            var listened = false;
+            node1.listen((msg, from) => {
+                should(msg.id).be.equal(1);
+                if (listened)
+                    done();
+                else
+                    listened = true;
+            }, Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, null, (err) => {
+                var tempDriver = new Driver.Driver({id: 2});
+                var tempNode =  new Communicator.Communicator(tempDriver); 
+                should(err).not.be.Error();    
+                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, nodeClass: 1, id: 1, 'dataType': [ ]}, (err) => {
+                    should(err).not.be.Error();
+                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                        should(err).not.be.Error();   
+                    });    
+                });
+            });
+        });
     });
 
     describe("#sendBroadcast() and #listen()", () => {

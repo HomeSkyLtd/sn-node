@@ -501,6 +501,18 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     else if (packageTypes.length === 0)
         packageTypes = null; 
 
+    //Transform packageTypes in values
+    for (var p in packageTypes) {
+        if (packageTypes[p].constructor.isEnumItem)
+            continue;
+        var temp = PACKAGE_TYPES.get(packageTypes[p]);
+        if (temp.value !== packageTypes[p]) {
+            listenCallback(new Error("Invalid 'packageType' " + packageTypes[p]));
+            return;
+        }
+        packageTypes[p] = temp;
+    }
+
     if (!addresses)
         var addresses = null;
     else if (!Array.isArray(addresses))
@@ -539,7 +551,8 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 /* Function to scan all callbacks, searching for mathcing package */
                 var scanPackages = (callback) => {
                     for (var i in cmpCallback.packageType) {
-                        if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i])) {
+                        if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i])
+                            || cmpCallback.packageType[i].has(PACKAGE_TYPES.get(pkt.packageType))) {
                             callback();
                         }
                     }
