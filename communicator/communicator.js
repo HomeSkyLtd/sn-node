@@ -162,8 +162,8 @@ exports.PACKAGE_TYPES = PACKAGE_TYPES;
 const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
 const DATA_TYPES = new Enum([ "int", "real", "string" ]);
 const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
-const COMMAND_CATEGORIES = new Enum(["fan", "air"]);
-const DATA_CATEGORIES = new Enum(['temperature', 'humidity']);
+const COMMAND_CATEGORIES = new Enum({"fan": 1, "air": 2});
+const DATA_CATEGORIES = new Enum(['temperature', 'umidity']);
 
 
 exports.NODE_CLASSES = NODE_CLASSES;
