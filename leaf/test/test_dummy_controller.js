@@ -1,7 +1,7 @@
 var Xbee = require("../../drivers/serial-xbee/driver.js");
 var Comm = require("../../communicator/communicator.js")
 
-var driver_control = new Xbee.Driver({tty_port: "/dev/ttyUSB1"}, () => {
+var driver_control = new Xbee.Driver({tty_port: "/dev/ttyUSB0"}, () => {
 	var comm = new Comm.Communicator(driver_control);
 
 	console.log("New communicator");
