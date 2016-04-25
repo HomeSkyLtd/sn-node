@@ -92,6 +92,85 @@ function Communicator (driver) {
     this._listening = false;
 }
 
+
+const PACKAGE_TYPES = new Enum([
+    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description',
+    'data', 'command', 'lifetime', 'keepalive'
+]);
+
+/**
+    Enum containing all possible node classes. They can be chained, in other words:
+    a node can be a sensor and an actuator.
+    @constant
+    @type { Enum }
+    @property { EnumItem } sensor - Node is a sensor (value: 1)
+    @property { EnumItem } actuator - Node is an actuator (value: 2)
+    @property { EnumItem } controller - Node is a controller (value: 4)
+**/
+const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
+
+/**
+    Enum containing all possible types (can be used either inside a dataType or commandType).
+    @constant
+    @type { Enum }
+    @property { EnumItem } int - Data or command value is an integer (value: 1)
+    @property { EnumItem } bool - Data or command value is an boolean (value: 2)
+    @property { EnumItem } real - Data or command value is a real number (value: 3)
+    @property { EnumItem } string - Data or command value is a string (value: 4)
+**/
+const DATA_TYPES = new Enum({"int": 1, "bool": 2, "real": 3, "string": 4 });
+
+/**
+    Enum containing all possible measure strategies. It is the way the sensor send data.
+    @constant
+    @type { Enum }
+    @property { EnumItem } event - Data is send when an event that changes sensor measures happens (value: 1)
+    @property { EnumItem } periodic - Data is send at an fixed interval of time (value: 2)
+**/
+const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
+
+/**
+    Enum containing all possible command categories, it is used do define which category of command that the 
+    actuator accepts.
+    @constant
+    @type { Enum }
+    @property { EnumItem } toggle - Simple switch that can be on or off (value: 1)
+    @property { EnumItem } temperature - Controls the temperature of the air conditioning (value: 2)
+    @property { EnumItem } fan - Controls the speed of the fan (value: 3)
+    @property { EnumItem } lightswitch - Controls if the light is on or off (value: 4)
+    @property { EnumItem } acmode - Model of the air conditioning (value: 5)
+    @property { EnumItem } lightintensity - Controls the light intensity (value: 6)
+    @property { EnumItem } lightcolor - Controls the light color (value: 7)
+**/
+const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "lightswitch": 4, "acmode": 5, 
+        "lightintensity": 6, "lightcolor": 7});
+/**
+    Enum containing all possible data categories, it is used do define which category of data that the 
+    sensor sends.
+    @constant
+    @type { Enum }
+    @property { EnumItem } temperature - Indicates the temperature of the environment (value: 1)
+    @property { EnumItem } luminance - Indicates how luminous is the environment (value: 2)
+    @property { EnumItem } presence - Indicates it someone is in the environment or not (value: 3)
+    @property { EnumItem } humidity - Indicates the humidity of the environment (value: 4)
+    @property { EnumItem } pressure - Indicates the pressure of the environment (value: 5)
+    @property { EnumItem } windspeed - Indicates the speed of the wind of the environment (value: 6)
+    @property { EnumItem } smoke - Indicates if any smoke is present (value: 7)
+**/
+const DATA_CATEGORIES = new Enum({"temperature": 1, "luminance": 2, "presence": 3, "humidity": 4, "pressure": 5, 
+        "windspeed": 6, "smoke": 7 });
+
+exports.PACKAGE_TYPES = PACKAGE_TYPES;
+exports.NODE_CLASSES = NODE_CLASSES;
+exports.DATA_TYPES = DATA_TYPES;
+exports.MEASURE_STRATEGIES = MEASURE_STRATEGIES;
+exports.COMMAND_CATEGORIES = COMMAND_CATEGORIES;
+exports.DATA_CATEGORIES = DATA_CATEGORIES;
+
+/*
+    Internal Variables
+*/
+
 //Defines the fields of the packets
 const FIELDS = new Enum({
     // Type of the package
@@ -102,32 +181,22 @@ const FIELDS = new Enum({
     'dataType': 'a'.charCodeAt(0),
     'id': 'i'.charCodeAt(0), 'type': 't'.charCodeAt(0), 'range': 'r'.charCodeAt(0), 
     'measureStrategy': 's'.charCodeAt(0), 'dataCategory': 'g'.charCodeAt(0), 'commandCategory': 'e'.charCodeAt(0),
-    'commandType': 'm'.charCodeAt(0),
+    'commandType': 'm'.charCodeAt(0), 'unit': 'u'.charCodeAt(0),
     // Data field
     'data': 'd'.charCodeAt(0),
     // Command field
     'command': 'c'.charCodeAt(0),
     'value': 'v'.charCodeAt(0),
     'lifetime': 'l'.charCodeAt(0),
-    'yourid': 'y'.charCodeAt(0)
+    'yourId': 'y'.charCodeAt(0)
 });
-
-/**
-    Defines values for the "packageType" field
-*/
-const PACKAGE_TYPES = new Enum([
-    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description',
-    'data', 'command', 'lifetime', 'keepalive'
-]);
-
-
-/**
+/*
     This object contains some rules about package values and which fields must be defines based on these package values
-**/
+*/
 const PACKAGE_FIELDS = {
     packageType: {
         whoiscontroller: [],
-        iamcontroller: ['yourid'],
+        iamcontroller: ['yourId'],
         describeyourself: [],
         description: ['id', 'nodeClass'],
         data: ['id', 'data'],
@@ -141,23 +210,6 @@ const PACKAGE_FIELDS = {
     }
 }
 
-exports.PACKAGE_TYPES = PACKAGE_TYPES;
-
-/** Defines values for the "class" field
-*/
-const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
-const DATA_TYPES = new Enum([ "int", "real", "string" ]);
-const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
-const COMMAND_CATEGORIES = new Enum({"fan": 1, "air": 2});
-const DATA_CATEGORIES = new Enum(['temperature', 'umidity']);
-
-
-exports.NODE_CLASSES = NODE_CLASSES;
-exports.DATA_TYPES = DATA_TYPES;
-exports.MEASURE_STRATEGIES = MEASURE_STRATEGIES;
-exports.COMMAND_CATEGORIES = COMMAND_CATEGORIES;
-exports.DATA_CATEGORIES = DATA_CATEGORIES;
-
 // List of previous defined fields
 // Values in brackets [] can accept lists of values
 const VALUES = {
@@ -169,10 +221,9 @@ const VALUES = {
     commandCategory: COMMAND_CATEGORIES
 };
 
-/**
+/*
     Fields definition
     Each field must have a type, which is either list, object, int, double, string, any (string, int or double)
-
 */
 const FIELDS_DEFINITION = {
     packageType: {
@@ -189,7 +240,7 @@ const FIELDS_DEFINITION = {
     id: {
         type: "int"
     },
-    'yourid': {
+    'yourId': {
         type: "int"
     },
     data: {
@@ -245,6 +296,9 @@ const FIELDS_DEFINITION = {
                 dataCategory: {
                     type: "int",
                     enum: DATA_CATEGORIES
+                },
+                unit: {
+                    type: "string"
                 }
             }
         }
@@ -271,6 +325,9 @@ const FIELDS_DEFINITION = {
                 commandCategory: {
                     type: "int",
                     enum: COMMAND_CATEGORIES
+                },
+                unit: {
+                    type: "string"
                 }
             }
         }
@@ -278,6 +335,14 @@ const FIELDS_DEFINITION = {
 
 };
 
+
+/*
+    Internal Utility Functions
+*/
+
+/*
+    Exchange keys on object, compress if asked or convert to natural name
+*/
 function exchangeKeys(object, compress) {
     function getNewKey(oldKey, isArray) {
         if (isArray) return oldKey;
@@ -310,16 +375,11 @@ function exchangeKeys(object, compress) {
     return newObject;
 }
 
-
-/**
-    Internal Utility Functions
-*/
-
-/**
+/*
     Function that checkes package fields types (and replace enums by its value)
     Throws error if not valid
     First check on package: its types
-**/
+*/
 function checkTypes(object) {
     if (!object || typeof object !== 'object')
         throw new Error("Invalid package. It must be an object");
@@ -375,7 +435,7 @@ function checkTypes(object) {
         checkDefinition(key, object[key], FIELDS_DEFINITION[key], object);
 }
 
-/**
+/*
     Checks package fields. Must run after types are checked
 */
 function checkPackage(pkt) {
@@ -434,7 +494,7 @@ function decode (rawPackage, callback) {
 
 /**
     Sends a json object to address
-    @param {Object} to - Object containing the address object of the recipient
+    @param {Object} to - Object containing the address object of the recipient, depends on the driver
     @param {Object} object - Json object containing the message to be sent
     @param {Communicator~onSent} [callback] - Function to be called when the object was sent
 */

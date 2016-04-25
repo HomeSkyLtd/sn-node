@@ -70,7 +70,7 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in iamcontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourid: 10 }, (err) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourId: 10 }, (err) => {
                     should(err).not.be.Error();     
                     done();
                 });
@@ -82,7 +82,7 @@ describe('Communicator', function() {
                 });
             });
             it('should check not required fields in iamcontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourid: 20, data: []}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourId: 20, data: []}, (err) => {
                     should(err).be.Error();     
                     done();
                 });
@@ -95,7 +95,7 @@ describe('Communicator', function() {
                 });
             });
             it('should check not required fields in describeyourself', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.describeyourself, yourid: 20, data: []}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.describeyourself, yourId: 20, data: []}, (err) => {
                     should(err).be.Error();     
                     done();
                 });
@@ -342,7 +342,7 @@ describe('Communicator', function() {
                 done();
             }, [Communicator.PACKAGE_TYPES.data], null, (err) => {
                 should(err).not.be.Error();    
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourid: 2}, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourId: 2}, (err) => {
                     should(err).not.be.Error();
                     node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
                         should(err).not.be.Error();   
@@ -365,7 +365,7 @@ describe('Communicator', function() {
                 var tempDriver = new Driver.Driver({id: 2});
                 var tempNode =  new Communicator.Communicator(tempDriver); 
                 should(err).not.be.Error();    
-                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourid: 3 }, (err) => {
+                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourId: 3 }, (err) => {
                     should(err).not.be.Error();
                     node1.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
                         should(err).not.be.Error();   
