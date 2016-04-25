@@ -133,8 +133,6 @@ const PACKAGE_TYPES = new Enum([
 ]);
 
 
-
-
 /**
     This object contains some rules about package values and which fields must be defines based on these package values
 **/
@@ -502,7 +500,6 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
         packageTypes = [packageTypes];
     else if (packageTypes.length === 0)
         packageTypes = null; 
-
 
     if (!addresses)
         var addresses = null;

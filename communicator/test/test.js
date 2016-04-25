@@ -34,7 +34,7 @@ describe('Communicator', function() {
     });
 
 
-    describe.only('#send()', () => {
+    describe('#send()', () => {
 
         it('should execute without error', (done) => {
             node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, (err) => {
@@ -103,7 +103,7 @@ describe('Communicator', function() {
 
             it('should check required fields in description for sensor', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
-                    nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
+                    id: 0, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
                         id:  5, measureStrategy: 1, type: 1, range: [0, 50], dataCategory: 1
                     }] }, (err) => {
                     should(err).not.be.Error();     
@@ -112,16 +112,140 @@ describe('Communicator', function() {
             });
             it('should check missing fields in description for sensor', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                nodeClass: Communicator.NODE_CLASSES.sensor }, (err) => {
+                id: 3, nodeClass: Communicator.NODE_CLASSES.sensor }, (err) => {
                     should(err).be.Error();     
                     done();
                 });
             });
             it('should check not required fields in description for sensor', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
-                    nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
+                    id: 3, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
                         id:  5, measureStrategy: 1, type: 1, range: [0, 50], dataCategory: 1
-                    }] data: []}, (err) => {
+                    }], commandType: []}, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+
+            it('should check required fields in description for actuator', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
+                    id: 0, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
+                        id:  5, type: 1, range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
+                    should(err).not.be.Error();     
+                    done();
+                });
+            });
+            it('should check missing fields in description for actuator', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
+                id: 3, nodeClass: Communicator.NODE_CLASSES.actuator }, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+            it('should check not required fields in description for actuator', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
+                    id: 3, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
+                        id:  5, type: 1, range: [0, 50], commandCategory: 1
+                    }], dataType: []}, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+
+            it('should check required fields in data', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data, 
+                    id: 0, data: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).not.be.Error();     
+                    done();
+                });
+            });
+            it('should check missing fields in data', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data,
+                data: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+            it('should check not required fields in data', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data, 
+                    id: 3, nodeClass: Communicator.NODE_CLASSES.actuator, data: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+
+            it('should check required fields in command', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command, 
+                    command: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).not.be.Error();     
+                    done();
+                });
+            });
+            it('should check missing fields in command', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command
+                }, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+            it('should check not required fields in command', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command, 
+                    id: 3, command: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+
+            it('should check required fields in lifetime', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime, 
+                    lifetime: 500}, (err) => {
+                    should(err).not.be.Error();     
+                    done();
+                });
+            });
+            it('should check missing fields in lifetime', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime
+                }, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+            it('should check not required fields in lifetime', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime, 
+                    id: 3, lifetime: 100 }, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+
+            it('should check required fields in keepalive', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive, 
+                    id: 500}, (err) => {
+                    should(err).not.be.Error();     
+                    done();
+                });
+            });
+            it('should check missing fields in keepalive', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive
+                }, (err) => {
+                    should(err).be.Error();     
+                    done();
+                });
+            });
+            it('should check not required fields in keepalive', (done) => {
+                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive, 
+                    id: 3, lifetime: 100 }, (err) => {
                     should(err).be.Error();     
                     done();
                 });
@@ -134,7 +258,7 @@ describe('Communicator', function() {
      describe('#sendBroadcast()', () => {
 
         it('should execute without error', (done) => {
-            node1.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data}, (err) => {
+            node1.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller}, (err) => {
                 should(err).not.be.Error();    
                 done();
             });
@@ -160,21 +284,9 @@ describe('Communicator', function() {
                 done();  
             });
         });
-        it('should not allow invalid packageType', (done) => {
-            node1.listen(() => {}, -1, null, (err) => {
-                should(err).be.Error();    
-                done();
-            });
-        });
         it('should allow multiple packageTypes', (done) => {
             node1.listen(() => {}, [Communicator.PACKAGE_TYPES.data, Communicator.PACKAGE_TYPES.description], null, (err) => {
                 should(err).not.be.Error();    
-                done();
-            });
-        });
-        it('should not allow multiple invalid packageTypes', (done) => {
-            node1.listen(() => {}, [Communicator.PACKAGE_TYPES.data, -7], null, (err) => {
-                should(err).be.Error();    
                 done();
             });
         });
@@ -202,7 +314,7 @@ describe('Communicator', function() {
                 done();
             }, null, null, (err) => {
                 should(err).not.be.Error();    
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();    
                 });
             });
@@ -216,7 +328,7 @@ describe('Communicator', function() {
                 done();
             }, Communicator.PACKAGE_TYPES.data, null, (err) => {
                 should(err).not.be.Error();    
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();    
                 });
             });
@@ -230,11 +342,11 @@ describe('Communicator', function() {
                 done();
             }, [Communicator.PACKAGE_TYPES.data], null, (err) => {
                 should(err).not.be.Error();    
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourid: 2}, (err) => {
                     should(err).not.be.Error();
-                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.command, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
                         should(err).not.be.Error();   
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, 'data': [ { 'id': 0, 'value': 'Test Data2'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, 'data': [ { 'id': 0, 'value': 'Test Data2'}] }, (err) => {
                             should(err).not.be.Error();    
                         }); 
                     });
@@ -245,7 +357,7 @@ describe('Communicator', function() {
         it('should receive only one message (filtering by address)', (done) => {
 
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value);
+                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 done();
@@ -253,11 +365,11 @@ describe('Communicator', function() {
                 var tempDriver = new Driver.Driver({id: 2});
                 var tempNode =  new Communicator.Communicator(tempDriver); 
                 should(err).not.be.Error();    
-                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourid: 3 }, (err) => {
                     should(err).not.be.Error();
-                    node1.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.command, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                    node1.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
                         should(err).not.be.Error();   
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 3, data: [ { id: 0, value: 'Test'}] }, (err) => {
                             should(err).not.be.Error();  
                             tempNode.close();  
                         }); 
@@ -269,19 +381,19 @@ describe('Communicator', function() {
         it('should receive only one message (filtering by package type and address)', (done) => {
 
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value);
+                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 done();
-            }, Communicator.PACKAGE_TYPES.description, getDriver2Address(), (err) => {
+            }, Communicator.PACKAGE_TYPES.data, getDriver2Address(), (err) => {
                 var tempDriver = new Driver.Driver({id: 2});
                 var tempNode =  new Communicator.Communicator(tempDriver); 
                 should(err).not.be.Error();    
-                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, nodeClass: 1, id: 0, 'dataType': [ ]}, (err) => {
                     should(err).not.be.Error();
-                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.command, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.command, 'command': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                         should(err).not.be.Error();   
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
                             should(err).not.be.Error();  
                             tempNode.close();  
                         }); 
@@ -292,9 +404,7 @@ describe('Communicator', function() {
 
         it('should call two callbacks from package of two types', (done) => {
             var listened = false;
-            console.log("EITA");
             node1.listen((msg, from) => {
-                console.log("RECEIVE 1");
                 should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
@@ -303,10 +413,8 @@ describe('Communicator', function() {
                 else
                     listened = true;
             }, Communicator.PACKAGE_TYPES.description, null, (err) => {
-                console.log("EITA2");
                 should(err).not.be.Error();    
                 node1.listen((msg, from) => {
-                    console.log("RECEIVE 2");
                     should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data[0].value).be.equal("Test");
@@ -315,11 +423,9 @@ describe('Communicator', function() {
                     else
                         listened = true;
                 }, Communicator.PACKAGE_TYPES.data, null, (err) => {
-                    console.log("EITA3");
                     should(err).not.be.Error();    
-                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
-                        should(err).not.be.Error();  
-                        console.log("SEND");
+                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                        should(err).not.be.Error();
                     }); 
                 });    
             });
@@ -336,7 +442,7 @@ describe('Communicator', function() {
                 done();
             }, null, null, (err) => {
                 should(err).not.be.Error();    
-                node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();    
                 });
             });
@@ -347,7 +453,7 @@ describe('Communicator', function() {
             var tempNode =  new Communicator.Communicator(tempDriver); 
             var called = false;
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value);
+                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 if (!called)
@@ -357,7 +463,7 @@ describe('Communicator', function() {
             }, null, null, (err) => {
                 should(err).not.be.Error();    
                 tempNode.listen((msg, from) => {
-                    should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value);
+                    should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data[0].value).be.equal("Test");
                     if (!called)
@@ -365,7 +471,8 @@ describe('Communicator', function() {
                     else
                         done();
                 }, null, null, (err) => {
-                        node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.description, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                        node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                            should(err).not.be.Error();    
                     });
                 });
             });
