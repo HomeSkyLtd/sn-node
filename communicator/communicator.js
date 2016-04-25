@@ -93,26 +93,24 @@ function Communicator (driver) {
 }
 
 //Defines the fields of the packets
-const FIELDS = new Enum([
+const FIELDS = new Enum({
     // Type of the package
-    'packageType',
+    'packageType': 'p'.charCodeAt(0),
     // Class of the node (actuator, sensor)
-    'nodeClass',
-    // Category of the node (switch, termometer)
-    'nodeCategory',
+    'nodeClass': 'n'.charCodeAt(0),
     // How the data is expressed
-    'dataType',
-    'id', 'type', 'range', 'measureStrategy', 'category', 'unit',
-    'commandType',
+    'dataType': 'a'.charCodeAt(0),
+    'id': 'i'.charCodeAt(0), 'type': 't'.charCodeAt(0), 'range': 'r'.charCodeAt(0), 
+    'measureStrategy': 's'.charCodeAt(0), 'dataCategory': 'g'.charCodeAt(0), 'commandCategory': 'e'.charCodeAt(0),
+    'commandType': 'm'.charCodeAt(0),
     // Data field
-    'data',
+    'data': 'd'.charCodeAt(0),
     // Command field
-    'command',
-    'value',
-    'lifetime',
-    'yourid'
-]);
-
+    'command': 'c'.charCodeAt(0),
+    'value': 'v'.charCodeAt(0),
+    'lifetime': 'l'.charCodeAt(0),
+    'yourid': 'y'.charCodeAt(0)
+});
 
 /**
     Defines values for the "packageType" field
@@ -122,139 +120,311 @@ const PACKAGE_TYPES = new Enum([
     'data', 'command', 'lifetime', 'keepalive'
 ]);
 
+
+/**
+    This object contains some rules about package values and which fields must be defines based on these package values
+**/
+const PACKAGE_FIELDS = {
+    packageType: {
+        whoiscontroller: [],
+        iamcontroller: ['yourid'],
+        describeyourself: [],
+        description: ['id', 'nodeClass'],
+        data: ['id', 'data'],
+        command: ['command'],
+        lifetime: [ 'lifetime' ],
+        keepalive: [ 'id']
+    },
+    nodeClass: {
+        sensor: ['dataType'],
+        actuator: ['commandType']
+    }
+}
+
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
 
 /** Defines values for the "class" field
 */
 const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
+const DATA_TYPES = new Enum([ "int", "real", "string" ]);
+const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
+const COMMAND_CATEGORIES = new Enum({"fan": 1, "air": 2});
+const DATA_CATEGORIES = new Enum(['temperature', 'umidity']);
+
 
 exports.NODE_CLASSES = NODE_CLASSES;
-/** Defines values for the "category" field
-*/
-const NODE_CATEGORIES = new Enum({
-    'termometer':    0,
-    'lightSensor':   1,
-    'lightSwitch':   2,
-    'doorSwitch':    3,
-    'airController': 4
-});
-
-exports.NODE_CATEGORIES = NODE_CATEGORIES;
+exports.DATA_TYPES = DATA_TYPES;
+exports.MEASURE_STRATEGIES = MEASURE_STRATEGIES;
+exports.COMMAND_CATEGORIES = COMMAND_CATEGORIES;
+exports.DATA_CATEGORIES = DATA_CATEGORIES;
 
 // List of previous defined fields
 // Values in brackets [] can accept lists of values
 const VALUES = {
-	packageType: [ PACKAGE_TYPES ],
-	nodeClass: [ NODE_CLASSES ],
-	nodeCategory: [ NODE_CATEGORIES ]
+	packageType: PACKAGE_TYPES,
+	nodeClass: NODE_CLASSES,
+    type: DATA_TYPES,
+    measureStrategy: MEASURE_STRATEGIES,
+    dataCategory: DATA_CATEGORIES,
+    commandCategory: COMMAND_CATEGORIES
 };
+
+/**
+    Fields definition
+    Each field must have a type, which is either list, object, int, double, string, any (string, int or double)
+
+*/
+const FIELDS_DEFINITION = {
+    packageType: {
+        type: "int",
+        enum: PACKAGE_TYPES
+    },
+    nodeClass: {
+        type: "int",
+        enum: NODE_CLASSES
+    },
+    'lifetime': {
+        type: "int"
+    },
+    id: {
+        type: "int"
+    },
+    'yourid': {
+        type: "int"
+    },
+    data: {
+        type: "list",
+        items: {
+            type: "object",
+            value: {
+                id: {
+                    type: "int"
+                },
+                value: {
+                    type: "any"
+                }
+            }
+        }
+    },
+    command: {
+        type: "list",
+        items: {
+            type: "object",
+            value: {
+                id: {
+                    type: "int"
+                },
+                value: {
+                    type: "any"
+                }
+            }
+        }
+    },
+     dataType: {
+        type: "list",
+        items: {
+            type: "object",
+            value: {
+                id: {
+                    type: "int"
+                },
+                measureStrategy: {
+                    type: "int",
+                    enum: MEASURE_STRATEGIES,
+                },
+                type: {
+                    type: "int",
+                    enum: DATA_TYPES
+                },
+                range: {
+                    type: "list",
+                    items: { 
+                        type: "any"
+                    }
+                },
+                dataCategory: {
+                    type: "int",
+                    enum: DATA_CATEGORIES
+                }
+            }
+        }
+    },
+
+     commandType: {
+        type: "list",
+        items: {
+            type: "object",
+            value: {
+                id: {
+                    type: "int"
+                },
+                type: {
+                    type: "int",
+                    enum: DATA_TYPES
+                },
+                range: {
+                    type: "list",
+                    items: { 
+                        type: "any"
+                    }
+                },
+                commandCategory: {
+                    type: "int",
+                    enum: COMMAND_CATEGORIES
+                }
+            }
+        }
+    },
+
+};
+
+function exchangeKeys(object, compress) {
+    function getNewKey(oldKey, isArray) {
+        if (isArray) return oldKey;
+        return compress ? String.fromCharCode(FIELDS.get(oldKey).value) : FIELDS.get(oldKey.charCodeAt(0)).key;
+    }
+
+    function replaceKeys(key, oldOject, newObject, isArray) {
+        var value = oldOject[key];
+        var newKey = getNewKey(key, isArray);
+        //If it is object, call this function for all keys in that object
+        if (value.constructor === Object) {
+            newObject[newKey] = {};
+            for (var k in value)
+                replaceKeys(k, value, newObject[newKey], false);
+        } 
+        //If it is an array, copy array
+        else if (Array.isArray(value)) {
+            newObject[newKey] = [];
+            for (var i in value) {
+                replaceKeys(i, value, newObject[newKey], true);
+            }
+        }
+        else {
+            newObject[newKey] = value;
+        }
+    }
+    var newObject = {};
+    for (var key in object)
+        replaceKeys(key, object, newObject, false);
+    return newObject;
+}
+
 
 /**
     Internal Utility Functions
 */
 
-// Given a key, it checks if the passed value is valid based on possible values.
-// Then it returns the enum item (if getEnum is true) or the enum item value (otherwise)
-function getAndCheckValue(key, value, getEnum) {
-    var possibleValues = VALUES[key];
-    var acceptArrays = false;
+/**
+    Function that checkes package fields types (and replace enums by its value)
+    Throws error if not valid
+    First check on package: its types
+**/
+function checkTypes(object) {
+    if (!object || typeof object !== 'object')
+        throw new Error("Invalid package. It must be an object");
+    function checkDefinition(key, value, def, obj) {
+        if (def === undefined)
+            throw new Error("Non existing field '" + key + "' specified");
+        switch (def.type) {
+            case "int":
+                if (def.enum && value.constructor.isEnumItem)
+                    obj[key] = value = value.value;
+                if (!isNaN(value))
+                    obj[key] = value = parseInt(value, 10);
+                if (typeof value !== 'number' || isNaN(value))
+                    throw new Error("Expected int (got '" + value + "') in field '" + key + "'");
+                if (def.enum && (!def.enum.get(value) || def.enum.get(value).value !== value))
+                    throw new Error("Invalid value '" + value + "' in field '" + key + "'");
+                break;
+            case "double":
+                if (!isNaN(value))
+                    obj[key] = value = Number(value);
+                if (typeof value !== 'number' || isNaN(value))
+                    throw new Error("Expected double (got '" + value + "') in field '" + key + "'");
+                break;
+            case "list": 
+                if (!Array.isArray(value))
+                    throw new Error("Expected array (got '" + value + "') in field '" + key + "'");
+                for (var i = 0; i < value.length; i++)
+                    checkDefinition(i, value[i], def.items, value);
+                break;
+            case "string":
+                obj[key] = value = String(value); 
+                break;
+            case "any":
+                if (!isNaN(value))
+                    obj[key] = value = Number(value);
+                else
+                    obj[key] = value = String(value);
+                break;
+            case "object":
+                //Check field by field
+                for (var key in def.value) {
+                    if (value[key] === undefined)
+                        throw new Error("Missing key '" + key + "' in '" + key + "'");
+                    checkDefinition(key, value[key], def.value[key], value);
+                }
+                break;
 
-    if (Array.isArray(possibleValues)) {
-        acceptArrays = true;
-        possibleValues = possibleValues[0];
+            default:
+                throw new Error("Invalid type ('" + def.type + ") of field " + key);
+        }
     }
-
-    if (possibleValues !== undefined) {
-        if (Array.isArray(value) && acceptArrays) {
-            var retValue = 0;
-            for (var i in value) {
-                var val = value[i];
-                var enumVal = possibleValues.get(val);
-                if (enumVal === undefined || enumVal.key.indexOf("|") !== -1)
-                    throw new Error("Invalid value (" + val + ")" + " in key '" + FIELDS.get(key).key + "'");
-                retValue = retValue | enumVal.value;
-            }
-            if (getEnum)
-                value = possibleValues.get(retValue);
-            else
-                value = retValue;
-        }
-        else if (acceptArrays && possibleValues.get(value).key.indexOf("|") !== -1) {
-            if (value !== possibleValues.get(value).value)
-                throw new Error("Invalid value (" + value + ")" + " in key '" + FIELDS.get(key).key+ "'");
-            if (getEnum)
-                value = possibleValues.get(value);
-
-        }
-        else if (Array.isArray(value))
-            throw new Error("Arrays don't accepted in key '" + FIELDS.get(key).key + "'");
-        else if (possibleValues.get(value) === undefined || possibleValues.get(value).key.indexOf("|") !== -1)
-            throw new Error("Invalid value (" + value + ")" + " in key '" + FIELDS.get(key).key+ "'");
-        else {
-            var enumVal = possibleValues.get(value);
-            if (getEnum)
-                value = enumVal;
-            else
-                value = enumVal.value;
-        }
-    }
-
-    return value;
+    for (var key in object)
+        checkDefinition(key, object[key], FIELDS_DEFINITION[key], object);
 }
 
-// Function to iterate over all object keys, replacing keys with convertKey function,
-// which receives a key and returns the respective mapped key
-// It also replaces enum values for its values
-function exchangeKeys(object, convertKey, extractValue) {
-    var newObject = {};
-    // Function to iterate over object keys
-    function iterateOverObj(key, value, newObject) {
-        // If it is an object, iterate over keys and call this funciton for each entry
-        if (typeof value === 'object' && !Array.isArray(value) && !value.constructor.isEnumItem) {
-            var tempObject = {};
-            for (var innerKey in value) {
-                iterateOverObj(convertKey(innerKey), value[innerKey], tempObject);
-            }
-            newObject[key] = tempObject;
-        }
-        // Otherwise, check the value and updates object
-        else {
-            if (typeof value === 'object')  {
-                newObject[key] = value.value;
-
-            }
-            else if (!Array.isArray(value)) {
-                newObject[key] = extractValue(FIELDS.get(key).value, value);
-            }
-            else {
-                for (var innerKey in object)
-                    iterateOverObj(innerKey, object[innerKey], newObject);
+/**
+    Checks package fields. Must run after types are checked
+*/
+function checkPackage(pkt) {
+    if (pkt.packageType === undefined)
+        throw new Error("Missing field 'packageType' in package");
+    //Required fields in package
+    var fields = {'packageType': 1 };
+    //See which package fields are defined and make rules about required fields based on values
+    for (var fieldKey in PACKAGE_FIELDS) {
+        var values = PACKAGE_FIELDS[fieldKey]
+        if (pkt[fieldKey] !== undefined && VALUES[fieldKey] !== undefined) {
+            //Value of field on package
+            var value = VALUES[fieldKey].get(pkt[fieldKey]);
+            //See how many values are defined (can be 1, 2, ...)
+            for (var key in VALUES[fieldKey].enums) {
+                var enumVal = VALUES[fieldKey].enums[key];
+                if (value.has(enumVal)) {
+                    //If it is defined, add all required fields do fields
+                    var newFields = PACKAGE_FIELDS[fieldKey][enumVal];
+                    for (var i = 0; i < newFields.length; i++)
+                        fields[newFields[i]] = 1;
+                }
             }
         }
     }
-
-    //Iterate over all object keys
-    for (var innerKey in object)
-        iterateOverObj(convertKey(innerKey), object[innerKey], newObject);
-
-    return newObject;
+    //Check if all defined fields are required
+    for (var key in pkt) {
+        if (fields[key] !== 1) {
+            throw new Error("Unexpected field '" + key + "' in package");
+        }
+    }
+    //Check if all required fields are defined
+    for (var key in fields)
+        if (!(key in pkt))
+            throw new Error("Missing field '" + key + "' in package");
 }
+
 
 // Function to encode json object into Buffer
 function encode(object) {
-    return cbor.encode(exchangeKeys(object, (key) => FIELDS.get(key).value,
-        (key, value) => getAndCheckValue(key, value, false)));
+    return cbor.encode(exchangeKeys(object, true));
 }
 
 // Function to decode Buffer into json object into Buffer. Calls callback after it is done
 function decode (rawPackage, callback) {
     cbor.decodeFirst(rawPackage, (err, pkt) => {
-        callback(err, err === null ? exchangeKeys(pkt, (key) => FIELDS.get(Number(key)).key,
-            (key, value) => getAndCheckValue(FIELDS.get(Number(key)).key, value, false)) : null);
+        callback(err, err === null ? exchangeKeys(pkt, false) : null);
     });
 }
-
-
 
 
 /**
@@ -269,11 +439,17 @@ function decode (rawPackage, callback) {
     @param {Communicator~onSent} [callback] - Function to be called when the object was sent
 */
 Communicator.prototype.send = function (to, object, callback) {
-    //Package need to have a type:
-    if (object.packageType === undefined) {
-        callback(Error("The object to be sent need to have 'packageType' field"));
+    //Check package
+
+    try {
+        checkTypes(object);
+        checkPackage(object);
+    }
+    catch (err) {
+        callback(err);
         return;
     }
+    //Package ok! Encode and send
     this._driver.send(to, encode(object), (err) => {
         if (callback)
             callback(err);
@@ -286,15 +462,7 @@ Communicator.prototype.send = function (to, object, callback) {
     @param {Communicator~onSent} [callback] - Function to be called when the object was sent
 */
 Communicator.prototype.sendBroadcast = function (object, callback) {
-    //Package need to have a type:
-    if (object.packageType === undefined) {
-        callback(Error("The object to be sent need to have 'packageType' field"));
-        return;
-    }
-    this._driver.send(this._driver.getBroadcastAddress(), encode(object), (err) => {
-        if (callback)
-            callback(err);
-    });
+    this.send(this._driver.getBroadcastAddress(), object, callback);
 };
 
 /**
@@ -319,16 +487,18 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     else if (!Array.isArray(packageTypes))
         packageTypes = [packageTypes];
     else if (packageTypes.length === 0)
-        packageTypes = null;
+        packageTypes = null; 
 
-    if (packageTypes !== null) {
-        try {
-            getAndCheckValue(FIELDS.packageType, packageTypes);
-        }
-        catch (err) {
-            listenCallback(err);
+    //Transform packageTypes in values
+    for (var p in packageTypes) {
+        if (packageTypes[p].constructor.isEnumItem)
+            continue;
+        var temp = PACKAGE_TYPES.get(packageTypes[p]);
+        if (temp.value !== packageTypes[p]) {
+            listenCallback(new Error("Invalid 'packageType' " + packageTypes[p]));
             return;
         }
+        packageTypes[p] = temp;
     }
 
     if (!addresses)
@@ -357,10 +527,20 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     console.log(err);
                     return;
                 }
+                try {
+                    checkTypes(pkt);
+                    checkPackage(pkt);
+                }
+                catch (err) {
+                    console.log("[Communicator.listen] Package with error received. Silent ignoring...");
+                    console.log(err);
+                    return;
+                }
                 /* Function to scan all callbacks, searching for mathcing package */
                 var scanPackages = (callback) => {
                     for (var i in cmpCallback.packageType) {
-                        if (cmpCallback.packageType[i] == pkt.packageType) {
+                        if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i])
+                            || cmpCallback.packageType[i].has(PACKAGE_TYPES.get(pkt.packageType))) {
                             callback();
                         }
                     }
@@ -407,6 +587,8 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
 
         });
     }
+    else if (listenCallback)
+        listenCallback(null);
 };
 
 Communicator.prototype.close = function () {

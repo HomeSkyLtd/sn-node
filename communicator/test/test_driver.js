@@ -24,7 +24,6 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
         if (listenCallback) listenCallback(Error("Already listening"));
         return;
     }
-
     this._listen = msgCallback;
     if (listenCallback) listenCallback(null);
 
