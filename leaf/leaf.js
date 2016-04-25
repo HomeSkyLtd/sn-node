@@ -5,20 +5,24 @@ var Communicator = require("../communicator");
 /**
  * Construct instance of Leaf and get controller address.
  * @class
- * @param {Object} Driver object
- * @param {Array} dataList list of dataTypes to specify data.
- * @param {Array} commandList list of commandTypes to specify commands.
+ * @param {Object} driver Driver object
+ * @param {Object} args Arguments object: </br>
+ * <ul>
+ * 		<li> {Array} dataList list of dataTypes to specify data.
+ * 		<li> {Array} commandList list of commandList to specify data.
+ * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
+ * 		<li> {Integer} limitOfPackets number of attempts before stoping.
+ * </ul>
  * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
  */
-function Leaf (driver, dataList, commandList, callback) {
+function Leaf (driver, args, callback) {
 	nPackagesSent = 0;
-	LIMIT_OF_PACKAGES_SENT = 3;
 
 	this._driver = driver;
-	this._nodeClass = parseClass(dataList, commandList);
+	this._nodeClass = parseClass(args.dataList, args.commandList);
 
-	this._dataList = dataList;
-	this._commandList = commandList;
+	this._dataList = args.dataList;
+	this._commandList = args.commandList;
 
 	this._comm = new Communicator.Communicator(this._driver);
 	this._comm.listen((msg, from) => {
@@ -62,8 +66,8 @@ function Leaf (driver, dataList, commandList, callback) {
 			packageType: Communicator.PACKAGE_TYPES.description,
 			id: this._myId,
 			nodeClass: this._nodeClass,
-			dataType: this._dataList,
-			commandType: this._commandList
+			dataList: this._dataList,
+			commandList: this._commandList
 		};
 
 		this._comm.send(from, object, function (err) { if (err) console.log(err); })
@@ -81,8 +85,8 @@ function Leaf (driver, dataList, commandList, callback) {
 
 	timerknock = setInterval(() => {
 		++nPackagesSent;
-		if (nPackagesSent > LIMIT_OF_PACKAGES_SENT) {
-			callback(new Error("Package sent " + LIMIT_OF_PACKAGES_SENT + " times. Stoping connection"));
+		if (nPackagesSent > args.limitOfPackets) {
+			callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"));
 			clearInterval(timerknock);
 		} else {
 			this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
@@ -90,7 +94,7 @@ function Leaf (driver, dataList, commandList, callback) {
 			});
 			console.log("[leaf.sending] message whoiscontroller sent in broadcast. " + nPackagesSent + " attempt(s).");
 		}
-	}, 5*1000);
+	}, args.timeout);
 }
 
 /**
@@ -105,7 +109,7 @@ function Leaf (driver, dataList, commandList, callback) {
 Leaf.prototype.sendData = function (object, callback) {
 	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
 
-	if (!enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+	if (enumClass && !enumClass.has(Communicator.NODE_CLASSES.sensor)) {
 		var msg = "[leaf.sendData] This leaf is not a sensor. Data cannot be sent.";
 		throw new Error(msg);
 	}
@@ -124,7 +128,9 @@ Leaf.prototype.sendData = function (object, callback) {
  * @param {Leaf~onListening} [callback] function to be called when it starts listening
  */
 Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
-	if (!this._nodeClass.has(Communicator.NODE_CLASSES.actuator)) {
+	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
+
+	if (enumClass && !enumClass.has(Communicator.NODE_CLASSES.actuator)) {
 		var msg = "[leaf.listenCommand] This leaf is not a actuator. Command cannot be received.";
 		throw new Error(msg);
 	}
@@ -142,10 +148,10 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 var parseClass = function(dataList, commandList) {
 	var result = 0;
 
-	if (dataList !== null && dataList.length !== 0)
+	if (dataList && dataList.length !== 0)
 		result |= Communicator.NODE_CLASSES.sensor;
 
-	if (commandList !== null && commandList.length !== 0)
+	if (commandList && commandList.length !== 0)
 		result |= Communicator.NODE_CLASSES.actuator;
 
 	return result;
