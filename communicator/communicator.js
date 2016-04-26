@@ -506,7 +506,8 @@ Communicator.prototype.send = function (to, object, callback) {
         checkPackage(object);
     }
     catch (err) {
-        callback(err);
+        if (callback)
+            callback(err);
         return;
     }
     //Package ok! Encode and send
@@ -555,7 +556,8 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
             continue;
         var temp = PACKAGE_TYPES.get(packageTypes[p]);
         if (temp.value !== packageTypes[p]) {
-            listenCallback(new Error("Invalid 'packageType' " + packageTypes[p]));
+            if (listenCallback)
+                listenCallback(new Error("Invalid 'packageType' " + packageTypes[p]));
             return;
         }
         packageTypes[p] = temp;
