@@ -384,7 +384,7 @@ function exchangeKeys(object, compress) {
 function checkTypes(object) {
     if (!object || typeof object !== 'object')
         throw new Error("Invalid package. It must be an object");
-    function checkDefinition(key, value, def, obj) {
+    function checkDefinition(key, value, def, obj, parent) {
         if (def === undefined)
             throw new Error("Non existing field '" + key + "' specified");
         switch (def.type) {
@@ -420,7 +420,7 @@ function checkTypes(object) {
                 if (!Array.isArray(value))
                     throw new Error("Expected array (got '" + value + "') in field '" + key + "'");
                 for (var i = 0; i < value.length; i++)
-                    checkDefinition(i, value[i], def.items, value);
+                    checkDefinition(i, value[i], def.items, value, key);
                 break;
             case "string":
                 obj[key] = value = String(value);
@@ -433,10 +433,10 @@ function checkTypes(object) {
                 break;
             case "object":
                 //Check field by field
-                for (var key in def.value) {
-                    if (value[key] === undefined)
-                        throw new Error("Missing key '" + key + "' in '" + key + "'");
-                    checkDefinition(key, value[key], def.value[key], value);
+                for (var innerKey in def.value) {
+                    if (value[innerKey] === undefined)
+                        throw new Error("Missing key '" + innerKey + "' in '" + parent + "'");
+                    checkDefinition(innerKey, value[innerKey], def.value[innerKey], value, key);
                 }
                 break;
 
@@ -445,7 +445,7 @@ function checkTypes(object) {
         }
     }
     for (var key in object)
-        checkDefinition(key, object[key], FIELDS_DEFINITION[key], object);
+        checkDefinition(key, object[key], FIELDS_DEFINITION[key], object, 'package');
 }
 
 /*
@@ -713,7 +713,8 @@ exports.Communicator = Communicator;
     know which node is sending the message. Defined by the controller in the yourId field.
     @property {Communicator~data[]} data - List of data. Sent by the sensor to the controller.
     @property {Communicator~data[]} command - List of commands. Sent by the controller to the actuator.
-    @property {Number} lifetime - The life
+    @property {Number} lifetime - The period of time between keepalive messages sent by the node
+    @property {}
 */
 
 /**
