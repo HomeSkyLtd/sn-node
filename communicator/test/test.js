@@ -129,7 +129,7 @@ describe('Communicator', function() {
 
             it('should check required fields in description for actuator', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
-                    id: 0, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
+                    id: 0, nodeClass: "actuator", commandType: [{
                         id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }] }, (err) => {
                     should(err).not.be.Error();     
@@ -279,7 +279,7 @@ describe('Communicator', function() {
             });
         });
         it('should allow one packageType', (done) => {
-            node1.listen(() => {}, Communicator.PACKAGE_TYPES.data, null, (err) => {
+            node1.listen(() => {}, 'data', null, (err) => {
                 should(err).not.be.Error();  
                 done();  
             });
@@ -326,7 +326,7 @@ describe('Communicator', function() {
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test Data");
                 done();
-            }, Communicator.PACKAGE_TYPES.data, null, (err) => {
+            }, 'data', null, (err) => {
                 should(err).not.be.Error();    
                 node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();    
