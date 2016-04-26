@@ -33,6 +33,8 @@ function Leaf (driver, args, callback) {
 			    this._controllerAddress = from;
 			    this._myId = msg.yourid;
 				callback();
+				
+				return false;
 		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
 
 	this._comm.listen((msg, from) => {
