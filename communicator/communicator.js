@@ -81,17 +81,6 @@ var cbor = require("cbor");
     }
 */
 
-
-/**
-    @class
-    @param {Object} Driver object
-*/
-function Communicator (driver) {
-    this._driver = driver;
-    this._listeningCallbacks = [];
-    this._listening = false;
-}
-
 /**
     Enum containing all possible message fields. They can be chained, in other words:
     a message can be of type "whoiscontroller" and "iamcontroller"
@@ -316,8 +305,7 @@ const FIELDS_DEFINITION = {
             }
         }
     },
-
-     commandType: {
+    commandType: {
         type: "list",
         items: {
             type: "object",
@@ -401,14 +389,26 @@ function checkTypes(object) {
             throw new Error("Non existing field '" + key + "' specified");
         switch (def.type) {
             case "int":
-                if (def.enum && value.constructor.isEnumItem)
-                    obj[key] = value = value.value;
-                if (!isNaN(value))
-                    obj[key] = value = parseInt(value, 10);
-                if (typeof value !== 'number' || isNaN(value))
-                    throw new Error("Expected int (got '" + value + "') in field '" + key + "'");
-                if (def.enum && (!def.enum.get(value) || def.enum.get(value).value !== value))
-                    throw new Error("Invalid value '" + value + "' in field '" + key + "'");
+                if (def.enum) {
+                    if (value.constructor.isEnumItem)
+                        obj[key] = value = value.value;
+                    if (!isNaN(value))
+                        obj[key] = value = parseInt(value, 10);
+                    if (typeof value !== 'number' || isNaN(value)) {
+                        var tempValue = def.enum.get(value);
+                        if (tempValue === undefined)
+                            throw new Error("Invalid value '" + value + "' in field '" + key + "'");
+                        value = tempValue.value;
+                    }
+                    if (!def.enum.get(value) || def.enum.get(value).value !== value)
+                        throw new Error("Invalid value '" + value + "' in field '" + key + "'");
+                }
+                else {
+                    if (!isNaN(value))
+                        obj[key] = value = parseInt(value, 10);
+                    if (typeof value !== 'number' || isNaN(value))
+                        throw new Error("Expected int (got '" + value + "') in field '" + key + "'");
+                }
                 break;
             case "double":
                 if (!isNaN(value))
@@ -505,15 +505,33 @@ function decode (rawPackage, callback) {
 **/
 
 
+
+/**
+    @class
+    @param {Object} Driver object
+*/
+function Communicator (driver) {
+    if (!driver)
+        throw new Error("Invalid driver");
+    this._driver = driver;
+    this._listeningCallbacks = [];
+    this._listening = false;
+}
+
+
 /**
     Sends a json object to address
     @param {Object} to - Object containing the address object of the recipient, depends on the driver
-    @param {Object} object - Json object containing the message to be sent
+    @param {Message} object - Json object containing the message to be sent
     @param {Communicator~onSent} [callback] - Function to be called when the object was sent
 */
 Communicator.prototype.send = function (to, object, callback) {
+    if (!this._driver) {
+        if (callback)
+            callback(new Error("Can't send message using closed instance"));
+        return;
+    }
     //Check package
-
     try {
         checkTypes(object);
         checkPackage(object);
@@ -532,7 +550,7 @@ Communicator.prototype.send = function (to, object, callback) {
 
 /**
     Sends a json object to broadcast address
-    @param {Object} object - Json object containing the message to be sent
+    @param {Message} object - Json object containing the message to be sent
     @param {Communicator~onSent} [callback] - Function to be called when the object was sent
 */
 Communicator.prototype.sendBroadcast = function (object, callback) {
@@ -545,16 +563,20 @@ Communicator.prototype.sendBroadcast = function (object, callback) {
 
     @param {Communicator~onMessage} objectCallback - Function to be called when a object arrives
 
-    @param {Array|Object|null} [packageTypes] - Package types that will issue the callback. It is null if listening
+    @param {PACKAGE_TYPES[]|PACKAGE_TYPES|String[]|String} [packageTypes] - Package types that will issue the callback. It is null if listening
     for all package types
 
-    @param {Array|Object|null} [addresses] - Addresses that will issue the callback. It is null if listening
+    @param {Object[]|Object} [addresses] - Addresses that will issue the callback. It is null if listening
     for or all package types
 
     @param {Communicator~onListening} [listenCallback] - Function to be called when it starts listening
 */
 Communicator.prototype.listen = function (objectCallback, packageTypes, addresses, listenCallback) {
-
+    if (!this._driver) {
+        if (listenCallback)
+            listenCallback(new Error("Can't listen using closed instance"));
+        return;
+    }
     // Adjust arguments (packageTypes and addresses)
     if (!packageTypes)
         var packageTypes = null;
@@ -568,7 +590,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
         if (packageTypes[p].constructor.isEnumItem)
             continue;
         var temp = PACKAGE_TYPES.get(packageTypes[p]);
-        if (temp.value !== packageTypes[p]) {
+        if (!isNaN(packageTypes[p]) && temp.value !== packageTypes[p]) {
             if (listenCallback)
                 listenCallback(new Error("Invalid 'packageType' " + packageTypes[p]));
             return;
@@ -635,7 +657,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     if (cmpCallback.callback(pkt, from) === false) {
                         that._listeningCallbacks.splice(i, 1);
                         if (that._listeningCallbacks.length === 0) {
-                            that._driver.close();
+                            that._driver.stop();
                             this._listening = false;
                         }
                     }
@@ -666,17 +688,45 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
         listenCallback(null);
 };
 
+/**
+    Closes the Communicator. After this call, can't listen or send messages.
+*/
 Communicator.prototype.close = function () {
-    if (this._listening)
-        this._driver.close();
+    this._driver.close();
+    this._driver = null;
+    this._listeningCallbacks = [];
+    this._listening = false;
 };
 
 exports.Communicator = Communicator;
 
+/** 
+    The message object. It is a regular javascript object with certain fields.
+    Depending on the packageType (which is obligatory) and on nodeClass (when present).
+    To define enums you can use the enum item or a string with the key. Flaggable enums
+    accept multiple values (like packageType and nodeClass)
+    @typedef {Object} Communicator~Message
+    @property {PACKAGE_TYPES|String} packageType - Defines which package it is. Required field
+    and the presence or absence of other fields depends on this value.
+    @property {NODE_CLASSES|String} [nodeClass] - Field to define which class the node is
+    @property {Number} [id] - Field defining the node id. It is useful to the controller to
+    know which node is sending the message. Defined by the controller in the yourId field.
+    @property {Communicator~data[]} data - List of data. Sent by the sensor to the controller.
+    @property {Communicator~data[]} command - List of commands. Sent by the controller to the actuator.
+    @property {Number} lifetime - The life
+*/
+
+/**
+    Data object. Used by sensor to send collected data. 
+    @typedef {Object} Communicator~data
+    @property {Number} [id] - Id of the data. Defined by the sensor.
+*/
+
+
 /**
  * Callback used by listen.
  * @callback Communicator~onMessage
- * @returns {boolean} False if server should stop listening. Otherwise it will keep listening.
+ * @returns {boolean|undefined} False if server should stop listening. Otherwise it will keep listening.
  * @param {Object} message - Json object containing the received object
  * @param {Object} from - Object containing the address object of the transmitter
  */

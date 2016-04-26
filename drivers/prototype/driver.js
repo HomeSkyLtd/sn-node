@@ -33,7 +33,7 @@ Driver.prototype.close = function () {
 
 /**
 	Sends a message to address
-  	@param {Object} to - Object containing the address object of the recipient
+  	@param {Driver~Address} to - Object containing the address object of the recipient
   	@param {Buffer} message - Buffer containing the message to be sent
   	@param {Driver~onSent} [callback] - Function to be called when the message was sent
 
@@ -44,7 +44,7 @@ Driver.prototype.send = function (to, message, callback) {
 
 /**
     Gets the driver network address. Only need to work when "listening" was called
-    @returns {Object} Network address
+    @returns {Driver~Address} Network address
 */
 Driver.prototype.getAddress = function () {
     throw Error("Not implemented");
@@ -53,7 +53,7 @@ Driver.prototype.getAddress = function () {
 /**
     Gets the broadcast network address. Only needs to work when "listening" was called.
     It should return an object in the same format as the "to" argument in Driver.send
-    @returns {Object}  Broadcast network address
+    @returns {Driver~Address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
     throw Error("Not implemented");
@@ -61,6 +61,8 @@ Driver.prototype.getBroadcastAddress = function () {
 
 /**
     Compares two address
+    @param {Driver~Address} address1 - First address to compare
+    @param {Driver~Address} address2 - Second address to compare
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
 Driver.compareAddresses = function (address1, address2) {
@@ -68,6 +70,12 @@ Driver.compareAddresses = function (address1, address2) {
 };
 
 exports.Driver = Driver;
+
+/**
+    Actually anything used by the driver do identify the address of
+    the node. For example, in UDP it is the port and the ip address of the node.
+    @typedef Driver~Address
+*/
 
 /**
  * Callback used by Driver.
@@ -79,7 +87,7 @@ exports.Driver = Driver;
  * Callback used by listen.
  * @callback Driver~onMessage
  * @param {Buffer} message - Buffer containing the buffer received from the network
- * @param {Object} from - Object containing the address object of the transmitter
+ * @param {Driver~Address} from - Object containing the address object of the transmitter
  */
 
 /**
