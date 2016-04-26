@@ -104,7 +104,7 @@ describe('Communicator', function() {
             it('should check required fields in description for sensor', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
                     id: 0, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
-                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], dataCategory: 1
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
                     }] }, (err) => {
                     should(err).not.be.Error();     
                     done();
@@ -120,7 +120,7 @@ describe('Communicator', function() {
             it('should check not required fields in description for sensor', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
                     id: 3, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
-                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], dataCategory: 1
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: "m", dataCategory: 1
                     }], commandType: []}, (err) => {
                     should(err).be.Error();     
                     done();
@@ -130,7 +130,7 @@ describe('Communicator', function() {
             it('should check required fields in description for actuator', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
                     id: 0, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
-                        id:  5, type: 1, range: [0, 50], commandCategory: 1
+                        id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }] }, (err) => {
                     should(err).not.be.Error();     
                     done();
@@ -146,7 +146,7 @@ describe('Communicator', function() {
             it('should check not required fields in description for actuator', (done) => {
                 node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description, 
                     id: 3, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
-                        id:  5, type: 1, range: [0, 50], commandCategory: 1
+                        id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }], dataType: []}, (err) => {
                     should(err).be.Error();     
                     done();
