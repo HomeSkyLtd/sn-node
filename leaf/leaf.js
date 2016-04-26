@@ -8,8 +8,8 @@ var Communicator = require("../communicator");
  * @param {Object} driver Driver object
  * @param {Object} args Arguments object: </br>
  * <ul>
- * 		<li> {Array} dataList list of dataTypes to specify data.
- * 		<li> {Array} commandList list of commandList to specify data.
+ * 		<li> {Array} dataType list of dataTypes to specify data.
+ * 		<li> {Array} commandType list of commandList to specify data.
  * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
  * 		<li> {Integer} limitOfPackets number of attempts before stoping.
  * </ul>
@@ -19,21 +19,20 @@ function Leaf (driver, args, callback) {
 	nPackagesSent = 0;
 
 	this._driver = driver;
-	this._nodeClass = parseClass(args.dataList, args.commandList);
+	this._nodeClass = parseClass(args.dataType, args.commandType);
 
-	this._dataList = args.dataList;
-	this._commandList = args.commandList;
+	this._dataType = args.dataType;
+	this._commandType = args.commandType;
 
 	this._comm = new Communicator.Communicator(this._driver);
 	this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
 
-				console.log("[leaf.listening] Message iamcontroller received from:");
-				console.log(from);
+				console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from));
 			    this._controllerAddress = from;
-			    this._myId = msg.yourid;
+			    this._myId = msg.yourId;
 				callback();
-				
+
 				return false;
 		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
 
@@ -64,26 +63,34 @@ function Leaf (driver, args, callback) {
 
 		console.log("[leaf.listening] Message describeyourself received");
 
+		var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
 		var object = {
 			packageType: Communicator.PACKAGE_TYPES.description,
 			id: this._myId,
 			nodeClass: this._nodeClass,
-			dataList: this._dataList,
-			commandList: this._commandList
 		};
 
+		if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+			object.dataType = this._dataType;
+			object.commandType = this._commandType;
+		} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
+			object.commandType = this._commandType;
+		} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+			object.dataType = this._dataType;
+		}
+
 		this._comm.send(from, object, function (err) { if (err) console.log(err); })
-		console.log("[leaf.listening] message description sent: ");
-		console.log(object);
+		console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 
 		return false;
 	}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
 
-	this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
+	var obj = {packageType: Communicator.PACKAGE_TYPES.whoiscontroller};
+	this._comm.sendBroadcast(obj, function (err) {
 		if (err) console.log(err);
 	});
 	++nPackagesSent;
-	console.log("[leaf.sending] message whoiscontroller sent in broadcast. " + nPackagesSent + " attempt(s).");
+	console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 
 	timerknock = setInterval(() => {
 		++nPackagesSent;
@@ -94,21 +101,22 @@ function Leaf (driver, args, callback) {
 			this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
 				if (err) console.log(err);
 			});
-			console.log("[leaf.sending] message whoiscontroller sent in broadcast. " + nPackagesSent + " attempt(s).");
+			console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 		}
 	}, args.timeout);
 }
 
 /**
  * Send a message with data from sensor to controller.
- * @param {Object} object
+ * @param {Object|Array} data Array of objects or one object with this fields
  * <ul>
- * 		<li>Data ID: which of its parameters he is sending.
- * 		<li>Data: value captured by sensor.
+ * 		<li>id: which of its parameters he is sending.
+ * 		<li>value: value captured by sensor.
  * </ul>
  * @param {Leaf~onDataSent} [callback] function executed after data is sent
  */
-Leaf.prototype.sendData = function (object, callback) {
+Leaf.prototype.sendData = function (data, callback) {
+	if (!data) throw Error("[leaf.sendData] Can't send undefined object.");
 	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
 
 	if (enumClass && !enumClass.has(Communicator.NODE_CLASSES.sensor)) {
@@ -116,10 +124,17 @@ Leaf.prototype.sendData = function (object, callback) {
 		throw new Error(msg);
 	}
 
-	object.packageType = Communicator.PACKAGE_TYPES.data;
-	object.id	   = this._myId;
+	var object = {
+		packageType: Communicator.PACKAGE_TYPES.data,
+		id: this._myId
+	};
 
-	console.log("[leaf.sendData] Controller Address: " + this._controllerAddress);
+	if (!Array.isArray(data)) {
+		data = [data];
+	}
+
+	object.data = data;
+	console.log("[leaf.sendData] data sent " + JSON.stringify(object));
 
 	this._comm.send(this._controllerAddress, object, callback);
 };
@@ -143,17 +158,17 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 
 /**
  * Decide if class is Sensor, Actuator or both.
- * @param {Array} dataList list of dataTypes to specify data.
+ * @param {Array} dataType list of dataTypes to specify data.
  * @param {Array} commandList list of commandTypes to specify commands.
  * @returns {Enum} NODE_CLASSES sensor or actuator.
  */
-var parseClass = function(dataList, commandList) {
+var parseClass = function(dataType, commandType) {
 	var result = 0;
 
-	if (dataList && dataList.length !== 0)
+	if (dataType && dataType.length !== 0)
 		result |= Communicator.NODE_CLASSES.sensor;
 
-	if (commandList && commandList.length !== 0)
+	if (commandType && commandType.length !== 0)
 		result |= Communicator.NODE_CLASSES.actuator;
 
 	return result;

@@ -8,21 +8,21 @@ var driver_control = new Xbee.Driver({tty_port: "/dev/ttyUSB0"}, () => {
 	var to = driver_control.getBroadcastAddress();
 	var msg = {
 		packageType: Comm.PACKAGE_TYPES.iamcontroller,
-		yourid: 1
+		yourId: 1
 	};
-	comm.send(to, msg, function(err) {console.log(err)});
+	comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err)});
 	console.log("Message iamcontroller sent.");
 
 	var msg = {
 		packageType: Comm.PACKAGE_TYPES.lifetime,
 		lifetime: 5*1000
 	};
-	comm.send(to, msg, function(err) {console.log(err)});
+	comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err)});
 	console.log("Message lifetime sent.");
 
 	var msg = {
 		packageType: Comm.PACKAGE_TYPES.describeyourself
 	};
-	comm.send(to, msg, function(err) {console.log(err)});
+	comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err)});
 	console.log("Message describeyourself sent.");
 });
