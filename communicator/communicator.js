@@ -92,11 +92,24 @@ function Communicator (driver) {
     this._listening = false;
 }
 
-
-const PACKAGE_TYPES = new Enum([
-    'whoiscontroller', 'iamcontroller', 'describeyourself', 'description',
-    'data', 'command', 'lifetime', 'keepalive'
-]);
+/**
+    Enum containing all possible message fields. They can be chained, in other words:
+    a message can be of type "whoiscontroller" and "iamcontroller"
+    @constant
+    @type { Enum }
+    @property { EnumItem } whoiscontroller - requests controller information (value: 1)
+    @property { EnumItem } iamcontroller - response for <tt>whoiscontroller</tt> (value: 2)
+    @property { EnumItem } describeyourself - requests node description (value: 4)
+    @property { EnumItem } description - contains node description (value: 8)
+    @property { EnumItem } data - contains sensor data (value: 16)
+    @property { EnumItem } command - contains actuator command (value: 32)
+    @property { EnumItem } lifetime - heartbeat interval definition (value: 64)
+    @property { EnumItem } keepalive - contains heartbeat signal (value: 128)
+**/
+const PACKAGE_TYPES = new Enum({
+    'whoiscontroller':1, 'iamcontroller':2, 'describeyourself':4, 'description':8,
+    'data':16, 'command':32, 'lifetime':64, 'keepalive':128
+});
 
 /**
     Enum containing all possible node classes. They can be chained, in other words:
@@ -107,7 +120,7 @@ const PACKAGE_TYPES = new Enum([
     @property { EnumItem } actuator - Node is an actuator (value: 2)
     @property { EnumItem } controller - Node is a controller (value: 4)
 **/
-const NODE_CLASSES = new Enum(["sensor", "actuator", "controller"]);
+const NODE_CLASSES = new Enum({"sensor":1, "actuator":2, "controller":4});
 
 /**
     Enum containing all possible types (can be used either inside a dataType or commandType).
@@ -130,7 +143,7 @@ const DATA_TYPES = new Enum({"int": 1, "bool": 2, "real": 3, "string": 4 });
 const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
 
 /**
-    Enum containing all possible command categories, it is used do define which category of command that the 
+    Enum containing all possible command categories, it is used do define which category of command that the
     actuator accepts.
     @constant
     @type { Enum }
@@ -142,10 +155,10 @@ const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
     @property { EnumItem } lightintensity - Controls the light intensity (value: 6)
     @property { EnumItem } lightcolor - Controls the light color (value: 7)
 **/
-const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "lightswitch": 4, "acmode": 5, 
+const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "lightswitch": 4, "acmode": 5,
         "lightintensity": 6, "lightcolor": 7});
 /**
-    Enum containing all possible data categories, it is used do define which category of data that the 
+    Enum containing all possible data categories, it is used do define which category of data that the
     sensor sends.
     @constant
     @type { Enum }
@@ -157,7 +170,7 @@ const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "l
     @property { EnumItem } windspeed - Indicates the speed of the wind of the environment (value: 6)
     @property { EnumItem } smoke - Indicates if any smoke is present (value: 7)
 **/
-const DATA_CATEGORIES = new Enum({"temperature": 1, "luminance": 2, "presence": 3, "humidity": 4, "pressure": 5, 
+const DATA_CATEGORIES = new Enum({"temperature": 1, "luminance": 2, "presence": 3, "humidity": 4, "pressure": 5,
         "windspeed": 6, "smoke": 7 });
 
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
@@ -179,7 +192,7 @@ const FIELDS = new Enum({
     'nodeClass': 'n'.charCodeAt(0),
     // How the data is expressed
     'dataType': 'a'.charCodeAt(0),
-    'id': 'i'.charCodeAt(0), 'type': 't'.charCodeAt(0), 'range': 'r'.charCodeAt(0), 
+    'id': 'i'.charCodeAt(0), 'type': 't'.charCodeAt(0), 'range': 'r'.charCodeAt(0),
     'measureStrategy': 's'.charCodeAt(0), 'dataCategory': 'g'.charCodeAt(0), 'commandCategory': 'e'.charCodeAt(0),
     'commandType': 'm'.charCodeAt(0), 'unit': 'u'.charCodeAt(0),
     // Data field
@@ -289,7 +302,7 @@ const FIELDS_DEFINITION = {
                 },
                 range: {
                     type: "list",
-                    items: { 
+                    items: {
                         type: "any"
                     }
                 },
@@ -318,7 +331,7 @@ const FIELDS_DEFINITION = {
                 },
                 range: {
                     type: "list",
-                    items: { 
+                    items: {
                         type: "any"
                     }
                 },
@@ -357,7 +370,7 @@ function exchangeKeys(object, compress) {
             newObject[newKey] = {};
             for (var k in value)
                 replaceKeys(k, value, newObject[newKey], false);
-        } 
+        }
         //If it is an array, copy array
         else if (Array.isArray(value)) {
             newObject[newKey] = [];
@@ -403,14 +416,14 @@ function checkTypes(object) {
                 if (typeof value !== 'number' || isNaN(value))
                     throw new Error("Expected double (got '" + value + "') in field '" + key + "'");
                 break;
-            case "list": 
+            case "list":
                 if (!Array.isArray(value))
                     throw new Error("Expected array (got '" + value + "') in field '" + key + "'");
                 for (var i = 0; i < value.length; i++)
                     checkDefinition(i, value[i], def.items, value);
                 break;
             case "string":
-                obj[key] = value = String(value); 
+                obj[key] = value = String(value);
                 break;
             case "any":
                 if (!isNaN(value))
@@ -548,7 +561,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     else if (!Array.isArray(packageTypes))
         packageTypes = [packageTypes];
     else if (packageTypes.length === 0)
-        packageTypes = null; 
+        packageTypes = null;
 
     //Transform packageTypes in values
     for (var p in packageTypes) {
