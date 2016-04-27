@@ -46,7 +46,7 @@ describe('serial-xbee', function(){
                             else{
                                 xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
                                     if(err) done(err);
-                                    xbeeSender.send({address: "0013A20040B0783F"}, new Buffer("Test"), (err)=>{
+                                    xbeeSender.send({address: "0013A20040B0783F"}, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         xbeeSender.close();
                                         xbeeSender = null;
@@ -77,7 +77,7 @@ describe('serial-xbee', function(){
                             else{
                                 xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
                                     if(err) done(err);
-                                    xbeeSender.send(xbeeDriver.getBroadcastAddress(), new Buffer("Test"), (err)=>{
+                                    xbeeSender.send(xbeeDriver.getBroadcastAddress(), new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         xbeeSender.close();
                                         xbeeSender = null;
@@ -111,7 +111,7 @@ describe('serial-xbee', function(){
                                     var msgCallback2 = function(msg, from){
                                         from.address.toUpperCase().should.be.exactly("0013A20040B0783F");
                                         String(msg).should.be.exactly("Test");
-                                        xbeeDriver2.send(from, new Buffer("Reply"), (err)=>{
+                                        xbeeDriver2.send(from, new Buffer.from("Reply"), (err)=>{
                                             if(err) done(err);
                                             xbeeDriver2.close();
                                             xbeeDriver2 = null;
@@ -122,7 +122,7 @@ describe('serial-xbee', function(){
                                         (err) => {
                                             if(err) done(err);
                                             else{
-                                                xbeeDriver.send({address: "0013A20040A165B1"}, new Buffer("Test"), function (err) {
+                                                xbeeDriver.send({address: "0013A20040A165B1"}, new Buffer.from("Test"), function (err) {
                                                     if (err) done(err);
                                                 });
                                             }
@@ -158,7 +158,7 @@ describe('serial-xbee', function(){
                                 xbeeDriver.stop();
                                 xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
                                     if(err) done(err);
-                                    xbeeSender.send({address: "0013A20040B0783F"}, new Buffer("Test"), (err)=>{
+                                    xbeeSender.send({address: "0013A20040B0783F"}, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         xbeeSender.close();
                                         xbeeSender = null;

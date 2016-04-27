@@ -80,7 +80,7 @@ describe('networkDriver', function(){
                             else{
                                 var senderDriver = new driver.Driver(senderParams, (err)=>{
                                     if(err) done(err);
-                                    senderDriver.send(serverAddress, new Buffer("Test"), (err)=>{
+                                    senderDriver.send(serverAddress, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         senderDriver.close();
                                         senderDriver = null;
@@ -122,7 +122,7 @@ describe('networkDriver', function(){
                             else{
                                 senderDriver = new driver.Driver(senderParams, (err)=>{
                                     if(err) done(err);
-                                    senderDriver.send(receiverDriver.getBroadcastAddress(), new Buffer("Test"), (err)=>{
+                                    senderDriver.send(receiverDriver.getBroadcastAddress(), new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         senderDriver.close();
                                         senderDriver = null;
@@ -167,7 +167,7 @@ describe('networkDriver', function(){
                                 var senderDriver = new driver.Driver(senderParams, (err)=>{
                                     if(err) done(err);
                                     var msgCallback2 = function(msg, from){
-                                        senderDriver.send(from, new Buffer("Reply"), (err)=>{
+                                        senderDriver.send(from, new Buffer.from("Reply"), (err)=>{
                                             if(err) done(err);
                                             senderDriver.close();
                                             senderDriver = null;
@@ -178,7 +178,7 @@ describe('networkDriver', function(){
                                         (err) => {
                                             if(err) done(err);
                                             else{
-                                                senderDriver.send(serverAddress, new Buffer("Test"), function (err) {
+                                                senderDriver.send(serverAddress, new Buffer.from("Test"), function (err) {
                                                     if (err) done(err);
                                                 });
                                             }
@@ -220,7 +220,7 @@ describe('networkDriver', function(){
                                 receiverDriver.stop();
                                 senderDriver = new driver.Driver(senderParams, (err)=>{
                                     if(err) done(err);
-                                    senderDriver.send(serverAddress, new Buffer("Test"), (err)=>{
+                                    senderDriver.send(serverAddress, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
                                         senderDriver.close();
                                         senderDriver = null;
