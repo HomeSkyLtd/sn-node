@@ -1,6 +1,8 @@
+/*jshint esversion: 6 */
+
 var Leaf = require("../leaf.js");
 var Xbee = require("../../drivers/serial-xbee/driver.js");
-var Comm = require("../../communicator/communicator.js")
+var Comm = require("../../communicator/communicator.js");
 
 var driver_sensor = new Xbee.Driver({tty_port: "/dev/ttyUSB1"}, () => {
 	var sensor = new Leaf.Leaf(

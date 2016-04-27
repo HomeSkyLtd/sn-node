@@ -1,4 +1,5 @@
 /*jshint esversion: 6 */
+
 var Enum = require('enum');
 var Communicator = require("../communicator");
 
@@ -79,7 +80,7 @@ function Leaf (driver, args, callback) {
 			object.dataType = this._dataType;
 		}
 
-		this._comm.send(from, object, function (err) { if (err) console.log(err); })
+		this._comm.send(from, object, function (err) { if (err) console.log(err); });
 		console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 
 		return false;

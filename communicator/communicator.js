@@ -87,8 +87,8 @@ var cbor = require("cbor");
     @constant
     @type { Enum }
     @property { EnumItem } whoiscontroller - requests controller information (value: 1)
-    @property { EnumItem } iamcontroller - response for <tt>whoiscontroller</tt> (value: 2). 
-    Required fields: yourId  
+    @property { EnumItem } iamcontroller - response for <tt>whoiscontroller</tt> (value: 2).
+    Required fields: yourId
     @property { EnumItem } describeyourself - requests node description (value: 4).
     @property { EnumItem } description - contains node description (value: 8).
     Required fields: id, dataType (for sensor), commandType (for actuator).
@@ -216,7 +216,7 @@ const PACKAGE_FIELDS = {
         sensor: ['dataType'],
         actuator: ['commandType']
     }
-}
+};
 
 // List of previous defined fields
 // Values in brackets [] can accept lists of values
@@ -464,7 +464,7 @@ function checkPackage(pkt) {
     var fields = {'packageType': 1 };
     //See which package fields are defined and make rules about required fields based on values
     for (var fieldKey in PACKAGE_FIELDS) {
-        var values = PACKAGE_FIELDS[fieldKey]
+        var values = PACKAGE_FIELDS[fieldKey];
         if (pkt[fieldKey] !== undefined && VALUES[fieldKey] !== undefined) {
             //Value of field on package
             var value = VALUES[fieldKey].get(pkt[fieldKey]);
@@ -642,8 +642,8 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                 /* Function to scan all callbacks, searching for mathcing package */
                 var scanPackages = (callback) => {
                     for (var i in cmpCallback.packageType) {
-                        if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i])
-                            || cmpCallback.packageType[i].has(PACKAGE_TYPES.get(pkt.packageType))) {
+                        if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i]) ||
+                            cmpCallback.packageType[i].has(PACKAGE_TYPES.get(pkt.packageType))) {
                             callback();
                         }
                     }
@@ -706,14 +706,14 @@ Communicator.prototype.close = function () {
 
 exports.Communicator = Communicator;
 
-/** 
+/**
     The message object. It is a regular javascript object with certain fields.
     Depending on the packageType (which is obligatory) and on nodeClass (when present).
     To define enums you can use the enum item or a string with the key. Flaggable enums
     accept multiple values (like packageType and nodeClass)
-    
+
     @typedef {Object} Communicator~Message
-    
+
     @property {PACKAGE_TYPES|String} packageType - Defines which package it is. Required field
     and the presence or absence of other fields depends on this value.
     @property {NODE_CLASSES|String} [nodeClass] - Field to define which class the node is
@@ -723,21 +723,21 @@ exports.Communicator = Communicator;
     @property {Communicator~data[]} [data] - List of data. Sent by the sensor to the controller.
     @property {Communicator~data[]} [command] - List of commands. Sent by the controller to the actuator.
     @property {Number} [lifetime] - The period of time between keepalive messages sent by the node
-    @property {Communicator~dataType[]} [dataType] - Field used by the sensor to inform the controller the data it 
+    @property {Communicator~dataType[]} [dataType] - Field used by the sensor to inform the controller the data it
     will send
-    @property {Communicator~commandType[]} [commandType] - Field used by the actautor to inform the controller 
+    @property {Communicator~commandType[]} [commandType] - Field used by the actautor to inform the controller
     the commands it accepts
 */
 
 /**
-    Data object. Used by sensor to send collected data. 
+    Data object. Used by sensor to send collected data.
     @typedef {Object} Communicator~data
     @property {Number} id - Id of the data. Defined by the sensor.
     @property {String|Number} value: Value of the measure.
 */
 
 /**
-    Data type object. Used by sensor to inform the controller the collected data. 
+    Data type object. Used by sensor to inform the controller the collected data.
     @typedef {Object} Communicator~dataType
     @property {Number} id - Id of the data. Defined by the sensor.
     @property {DATA_TYPES|String} type - The format of the data sent.
