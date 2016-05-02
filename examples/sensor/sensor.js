@@ -1,7 +1,8 @@
 var Leaf = require("../../leaf/leaf.js");
-var Driver = require("./test_driver.js");
+var Driver = require("../../communicator/test/test_driver.js");
 var Comm = require("../../communicator/communicator.js");
 
+// This driver represents a sensor that listens controller messages.
 Driver.createDriver({id: 0}, function(err, driver) {
 	Leaf.createLeaf(
 		driver,
@@ -28,6 +29,7 @@ Driver.createDriver({id: 0}, function(err, driver) {
 		});
 });
 
+// This driver represents the controller that sends messages to the sensor above.
 Driver.createDriver({id: 1}, (err, driver) => {
 	var comm = new Comm.Communicator(driver);
 
