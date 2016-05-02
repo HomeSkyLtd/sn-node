@@ -25,6 +25,18 @@ function Leaf (driver, args, callback) {
 	this._dataType = args.dataType;
 	this._commandType = args.commandType;
 
+	if (args.timeout) {
+		var timeout = args.timeout;
+	} else {
+		var timeout = 30*1000;
+	}
+
+	if (args.limitOfPackets) {
+		var limitOfPackets = args.limitOfPackets;
+	} else {
+		var limitOfPackets = 3;
+	}
+
 	this._comm = new Communicator.Communicator(this._driver);
 	this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
@@ -95,7 +107,7 @@ function Leaf (driver, args, callback) {
 
 	timerknock = setInterval(() => {
 		++nPackagesSent;
-		if (nPackagesSent > args.limitOfPackets) {
+		if (nPackagesSent > limitOfPackets) {
 			callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"));
 			clearInterval(timerknock);
 		} else {
@@ -104,7 +116,7 @@ function Leaf (driver, args, callback) {
 			});
 			console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 		}
-	}, args.timeout);
+	}, timeout);
 }
 
 /**
