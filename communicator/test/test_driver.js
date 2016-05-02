@@ -11,7 +11,17 @@ var connections = [];
 function Driver (params, callback) {
     this._id = params.id;
     connections[params.id] = this;
-    if (callback) callback(null);
+    if (callback) callback(null, this);
+}
+
+/**
+    The client should call this function to instantiate the driver. The new driver is passed in the callback function.
+    The implementation is very example, just copy and paste the code bellow.
+    @param {Object} [params] - An object containing parameters for the specific driver
+    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
+**/
+function createDriver(params, callback) {
+    new Driver(params, callback);
 }
 
 /**
@@ -89,12 +99,13 @@ Driver.compareAddresses = function (address1, address2) {
     return address1 == address2;
 }
 
-exports.Driver = Driver;
+exports.createDriver = createDriver;
 
 /**
  * Callback used by Driver.
  * @callback Driver~onInitialized
  * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null 
+ * @param {Driver} driver - The new driver instance
  */
 
 /**
