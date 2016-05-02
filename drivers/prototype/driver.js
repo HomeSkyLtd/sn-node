@@ -1,11 +1,21 @@
 /**
 	@class
-    Driver object for a network protocol
+    Driver object for a network protocol. This function can't be called directly by the client. The client
+    will call createDriver
     @param {Object} [params] - An object containing parameters for the specific driver
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 */
 function Driver (params, callback) {
     throw Error("Not implemented");
+}
+/**
+    The client should call this function to instantiate the driver. The new driver is passed in the callback function.
+    The implementation is very example, just copy and paste the code bellow.
+    @param {Object} [params] - An object containing parameters for the specific driver
+    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
+**/
+function createDriver(params, callback) {
+    new Driver(params, callback);
 }
 
 /**
@@ -69,7 +79,7 @@ Driver.compareAddresses = function (address1, address2) {
     throw Error("Not implemented");
 };
 
-exports.Driver = Driver;
+exports.createDriver = createDriver;
 
 /**
     Actually anything used by the driver do identify the address of
@@ -81,6 +91,7 @@ exports.Driver = Driver;
  * Callback used by Driver.
  * @callback Driver~onInitialized
  * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
+ * @param {Driver} driver - The new driver instance
  */
 
 /**

@@ -25,6 +25,18 @@ function Leaf (driver, args, callback) {
 	this._dataType = args.dataType;
 	this._commandType = args.commandType;
 
+	if (args.timeout) {
+		var timeout = args.timeout;
+	} else {
+		var timeout = 30*1000;
+	}
+
+	if (args.limitOfPackets) {
+		var limitOfPackets = args.limitOfPackets;
+	} else {
+		var limitOfPackets = 3;
+	}
+
 	this._comm = new Communicator.Communicator(this._driver);
 	this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
@@ -32,7 +44,7 @@ function Leaf (driver, args, callback) {
 				console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from));
 			    this._controllerAddress = from;
 			    this._myId = msg.yourId;
-				callback();
+				callback(null, this);
 
 				return false;
 		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
@@ -95,8 +107,8 @@ function Leaf (driver, args, callback) {
 
 	timerknock = setInterval(() => {
 		++nPackagesSent;
-		if (nPackagesSent > args.limitOfPackets) {
-			callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"));
+		if (nPackagesSent > limitOfPackets) {
+			callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"), this);
 			clearInterval(timerknock);
 		} else {
 			this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
@@ -104,7 +116,24 @@ function Leaf (driver, args, callback) {
 			});
 			console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 		}
-	}, args.timeout);
+	}, timeout);
+}
+
+/**
+ * Factories instance of Leaf and get controller address.
+ * @class
+ * @param {Object} driver Driver object
+ * @param {Object} args Arguments object: </br>
+ * <ul>
+ * 		<li> {Array} dataType list of dataTypes to specify data.
+ * 		<li> {Array} commandType list of commandList to specify data.
+ * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
+ * 		<li> {Integer} limitOfPackets number of attempts before stoping.
+ * </ul>
+ * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
+ */
+function createLeaf(driver, args, callback) {
+	new Leaf(driver, args, callback);
 }
 
 /**
@@ -175,4 +204,4 @@ var parseClass = function(dataType, commandType) {
 	return result;
 };
 
-exports.Leaf = Leaf;
+exports.createLeaf = createLeaf;
