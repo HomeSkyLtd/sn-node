@@ -111,7 +111,7 @@ getNetworks((nets) => {
 				com.listen((obj, from) => {
 					console.log("[KEEP ALIVE] from " + obj.id);
 					timerId = startTimer(obj.id, timerId);
-				});
+				}, 'keepalive');
 			}, 'description');
 
 			//Listens for data
