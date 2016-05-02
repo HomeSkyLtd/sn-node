@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var Communicator = require("communicator");
 var Udp = require("udp");
 
@@ -10,7 +12,7 @@ function startTimer(node_id, id) {
 		clearTimeout(id);
 	setTimeout(() => {
 		console.log("Removing node with id " + node_id + " due to timeout.");
-		node[node_id] = null 
+		node[node_id] = null;
 	}, keepAliveTime);
 }
 
@@ -53,7 +55,7 @@ function insertNodeCommand(cb) {
 }
 
 var udpDriver = new Udp.Driver(() => {
-	
+
 	com = new Communicator.Communicator(udpDriver);
 	//Listen for new leafs
 	com.listen((obj, from) => {
@@ -62,8 +64,13 @@ var udpDriver = new Udp.Driver(() => {
 			packageType: 'iamcontroller | describeyourself | lifetime',
 			'yourid': nodes.length,
 			'lifetime': keepAliveTime,
+<<<<<<< HEAD
+		}, () => { nodes.push({}); });
+	}, Communicator.PACKAGE_TYPES.whoiscontroller);
+=======
 		}, () => { nodes.push({}) });
 	}, 'whoiscontroller');
+>>>>>>> refs/remotes/origin/master
 
 	//Register new nodes
 	com.listen((obj, from) => {
@@ -76,7 +83,7 @@ var udpDriver = new Udp.Driver(() => {
 			};
 		}
 		startTimer(obj.id);
-		
+
 
 	}, 'description');
 
@@ -99,6 +106,3 @@ var udpDriver = new Udp.Driver(() => {
 		startTimer(obj.id);
 	}, Communicator.PACKAGE_TYPES.keepalive);
 });
-
-
-
