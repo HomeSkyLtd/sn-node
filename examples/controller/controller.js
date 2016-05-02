@@ -58,8 +58,25 @@ function nodeExists(id, cb) {
     });
 }
 
-function getNode(cb) {
-
+function getNode(id, cb) {
+    MongoClient.connect(url, function(err, db) {
+        if(err){
+            console.error(err);
+            return;
+        }
+        var collection = db.collection('nodes');
+        collection.findOne({_id: mongo.ObjectID(id)}, (err, docs) => {
+            if(err){
+                console.log(err);
+                db.close();
+                return;
+            }
+            db.close();
+            if(docs === null) cb(new Error("Requested node id " + id + " not found"), null);
+            else cb(null, docs.description);
+        });
+        //err caso o node não exista ou sem description
+    });
 }
 
 function newNode(cb) {
@@ -119,7 +136,6 @@ function setNodeDescription(id, description, cb) {
     });
 }
 
-setNodeDescription("5727a6ce4896d0651d08e3ae", {address: 3, type: 5}, (docs)=>{console.log(docs);});
 
 const NETWORK_MAP = [Udp];
 getNetworks((nets) => {
