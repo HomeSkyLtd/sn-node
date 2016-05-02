@@ -54,7 +54,7 @@ describe('udp', function(){
                         (err) => {
                             if(err) done(err);
                             else{
-                                udpDriver.send({address: "localhost", port:4567}, new Buffer.from("Test"), (err)=>{
+                                udpDriver.send({address: "localhost", port:4567}, Buffer.from("Test"), (err)=>{
                                     if(err) done(err);
                                 });
                             }
@@ -79,7 +79,7 @@ describe('udp', function(){
                         (err) => {
                             if(err) done(err);
                             else{
-                                udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer.from("Test"), function (err) {
+                                udpDriver.send(udpDriver.getBroadcastAddress(), Buffer.from("Test"), function (err) {
                                     if (err) done(err);
                                 });
                             }
@@ -108,7 +108,7 @@ describe('udp', function(){
                                 var msgCallback2 = function(msg, from){
                                     from.port.should.be.exactly(4567);
                                     String(msg).should.be.exactly("Test");
-                                    udpDriver2.send(from, new Buffer.from("Reply"), (err)=>{
+                                    udpDriver2.send(from, Buffer.from("Reply"), (err)=>{
                                         if(err) done(err);
                                     });
                                 };
@@ -117,7 +117,7 @@ describe('udp', function(){
                                     (err) => {
                                         if(err) done(err);
                                         else{
-                                            udpDriver.send({address:"localhost", port:4568}, new Buffer.from("Test"), function (err) {
+                                            udpDriver.send({address:"localhost", port:4568}, Buffer.from("Test"), function (err) {
                                                 if (err) done(err);
                                             });
                                         }
@@ -149,7 +149,7 @@ describe('udp', function(){
                             if(err) done(err);
                             else{
                                 udpDriver.stop();
-                                udpDriver.send(udpDriver.getBroadcastAddress(), new Buffer.from("Test"), function (err) {
+                                udpDriver.send(udpDriver.getBroadcastAddress(), Buffer.from("Test"), function (err) {
                                     if (err) done(err);
                                 });
                                 //should not get any calls to msgCallback
