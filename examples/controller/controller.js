@@ -5,7 +5,8 @@ var Udp = require("udp");
 
 var nodes = [];
 var com;
-var keepAliveTime = 10*1000;//10s
+const KEEP_ALIVE_TIME = 10 * 1000;//10s
+
 function startTimer(node_id, id) {
 	if (id !== undefined)
 		clearTimeout(id);
@@ -15,6 +16,44 @@ function startTimer(node_id, id) {
 	}, keepAliveTime);
 }
 
+function getNetworks(cb) {
+
+}
+
+/* NODE FUNCTIONS */
+
+function nodeExists(cb) {
+
+}
+
+function getNode(cb) {
+
+}
+
+function newNode(cb) {
+
+}
+
+function deactivateNode(cb) {
+
+}
+
+function activateNode(cb) {
+
+}
+
+
+/*  DATA AND COMMAND FUNCTIONS */
+
+function insertNodeData(cb) {
+
+}
+
+/* Human commands */
+function insertNodeCommand(cb) {
+
+}
+
 var udpDriver = new Udp.Driver(() => {
 
 	com = new Communicator.Communicator(udpDriver);
@@ -22,12 +61,16 @@ var udpDriver = new Udp.Driver(() => {
 	com.listen((obj, from) => {
 		console.log("[NEW CONNECTION]");
 		com.send(from, {
-			packageType: Communicator.PACKAGE_TYPES.iamcontroller | Communicator.PACKAGE_TYPES.describeyourself
-			| Communicator.PACKAGE_TYPES.lifetime,
+			packageType: 'iamcontroller | describeyourself | lifetime',
 			'yourid': nodes.length,
 			'lifetime': keepAliveTime,
+<<<<<<< HEAD
 		}, () => { nodes.push({}); });
 	}, Communicator.PACKAGE_TYPES.whoiscontroller);
+=======
+		}, () => { nodes.push({}) });
+	}, 'whoiscontroller');
+>>>>>>> refs/remotes/origin/master
 
 	//Register new nodes
 	com.listen((obj, from) => {
@@ -42,7 +85,7 @@ var udpDriver = new Udp.Driver(() => {
 		startTimer(obj.id);
 
 
-	}, Communicator.PACKAGE_TYPES.description);
+	}, 'description');
 
 	//Listen for data
 	com.listen((obj, from) => {
