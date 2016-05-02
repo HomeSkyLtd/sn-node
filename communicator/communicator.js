@@ -10,75 +10,6 @@ var cbor = require("cbor");
         field2: value2,
         ...
     }
-
-    Each field has a set of possible values. When conveninent, these values are defined in
-    a specific enum.
-
-    Examples:
-
-    pkt = {
-        packageType: "description",
-        dataTypes: [
-            {
-                id: 0,
-                type: int | float | boolean,
-                range: [1,2],
-                measureStrategy: "event" | "periodic",
-                category: temperature | presence | open door | humidity | light
-            }
-        ],
-        commandTypes: [
-            {
-                id: 0
-                type: int | float | boolean,
-                range: { start: 0, end: 1 } | [1,2],
-                category: temperature | light on | light intensity | fan speed | ...
-            }
-        ]
-    }
-
-    Package examples:
-
-    Getting controller address
-    {
-        packageType: PACKAGE_TYPES.whoiscontroller
-    }
-    Controller declaring himself and sending sensor/actuator id
-    {
-        packageType: PACKAGE_TYPES.iamcontroller,
-        yourid: 19
-    }
-    Controller sending lifetime (always in milliseconds)
-    {
-        packageType: PACKAGE_TYPES.lifetime,
-        lifetime: 1000
-    }
-    Controller asking for description
-    {
-        packageType: PACKAGE_TYPES.describeyourself
-    }
-    Termometer sensor describing himself
-    {
-        packageType: PACKAGE_TYPES.description,
-        id: 19,
-        nodeClass: NODE_CLASSES.sensor,
-        dataType: [
-            {
-                id: 0,
-                type: "int",
-                range: [-100, 100],
-                measureStrategy: "event",
-                category: "temperature"
-                unit: "°C"
-            }
-        ]
-    }
-    Termometer sending data
-    {
-        packageType: PACKAGE_TYPES.data,
-        id: 0,
-        data: 20
-    }
 */
 
 /**
@@ -100,10 +31,16 @@ var cbor = require("cbor");
     Required fields: id, lifetime.
     @property { EnumItem } keepalive - contains heartbeat signal (value: 128)
     Required fields: id.
+    @property { EnumItem } iamback - Sent when the sensor or actuator has an id and wants to reconnect (value: 256)
+    Required fields: id.
+    @property { EnumItem } welcomeback - Sent when the controller accepts the new node back (value: 512)
+    @property { EnumItem } externalcommand - Sent when an external command changes the actuator states (value: 1024)
+    Required fields: id, command
 **/
 const PACKAGE_TYPES = new Enum({
     'whoiscontroller':1, 'iamcontroller':2, 'describeyourself':4, 'description':8,
-    'data':16, 'command':32, 'lifetime':64, 'keepalive':128
+    'data':16, 'command':32, 'lifetime':64, 'keepalive':128, 'iamback': 256,
+    'welcomeback': 512, 'externalcommand': 1024
 });
 
 /**
@@ -210,7 +147,10 @@ const PACKAGE_FIELDS = {
         data: ['id', 'data'],
         command: ['command'],
         lifetime: [ 'lifetime' ],
-        keepalive: [ 'id']
+        keepalive: [ 'id' ],
+        iamback: ['id'],
+        welcomeback: [],
+        externalcommand: ['id', 'command']
     },
     nodeClass: {
         sensor: ['dataType'],

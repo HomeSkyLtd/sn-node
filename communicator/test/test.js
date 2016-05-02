@@ -253,6 +253,66 @@ describe('Communicator', function() {
                 });
             });
 
+            it('should check required fields in iamback', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'iamback',
+                    id: 500 }, (err) => {
+                    should(err).not.be.Error();
+                    done();
+                });
+            });
+            it('should check missing fields in iamback', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'iamback'
+                }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check not required fields in iamback', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'iamback',
+                    id: 3,  command: [ { id: 1, value: 0.5 } ] }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+
+            it('should check required fields in welcomeback', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'welcomeback',
+                    }, (err) => {
+                    should(err).not.be.Error();
+                    done();
+                });
+            });
+            it('should check not required fields in welcomeback', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'welcomeback',
+                    id: 3 }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+
+            it('should check required fields in externalcommand', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'externalcommand',
+                    id: 500, command: [ { id: 1, value: 0.5 } ] }, (err) => {
+                    should(err).not.be.Error();
+                    done();
+                });
+            });
+            it('should check missing fields in externalcommand', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'externalcommand',
+                    id: 50}, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check not required fields in externalcommand', (done) => {
+                node1.send(getDriver2Address(), { packageType: 'externalcommand',
+                    id: 3,  command: [ { id: 1, value: 0.5 } ], lifetime: 100 }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            
+
         });
 
     });
