@@ -66,7 +66,7 @@ Driver.prototype.close = function () {
 Driver.prototype.send = function (to, message, callback) {
     if (to === -1) {
         //Broadcast
-        for (var i = 0; i < connections.length; i++) {
+        for (var i in connections) {
             if (i !== this._id && connections[i]._listen) {
                 connections[i]._listen(message, this._id);
             }
