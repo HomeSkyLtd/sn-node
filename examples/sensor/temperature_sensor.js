@@ -2,8 +2,8 @@ var Leaf = require("../../leaf/leaf.js");
 var Driver = require("./test_driver.js");
 var Comm = require("../../communicator/communicator.js");
 
-var driver = new Driver.Driver({id: 0}, function() {
-	var temp_sensor = new Leaf.Leaf(
+Driver.createDriver({id: 0}, function(err, driver) {
+	Leaf.createLeaf(
 		driver,
 		{
 			dataType: [
@@ -18,18 +18,21 @@ var driver = new Driver.Driver({id: 0}, function() {
 			],
 			commandType: []
 		},
-		() => {
-			setInterval(() => {
-				temp_sensor.sendData({id: 1 , value: 23.2}, function (err) {if (err) console.log(err)});
-			}, 5*1000);
+		(err, leaf) => {
+			if (err) console.log(err);
+			else {
+				setInterval(() => {
+					leaf.sendData({id: 1 , value: 23.2}, function (err) {if (err) console.log(err)});
+				}, 5*1000);
+			}
 		});
 });
 
-var driver_control = new Driver.Driver({id: 1}, () => {
-	var comm = new Comm.Communicator(driver_control);
+Driver.createDriver({id: 1}, (err, driver) => {
+	var comm = new Comm.Communicator(driver);
 
 	console.log("New communicator");
-	var to = driver_control.getBroadcastAddress();
+	var to = driver.getBroadcastAddress();
 	var msg = {
 		packageType: Comm.PACKAGE_TYPES.iamcontroller,
 		yourId: 1
