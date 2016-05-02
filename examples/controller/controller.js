@@ -1,11 +1,14 @@
 /*jshint esversion: 6 */
 
+var mongo = require('mongodb');
+var MongoClient = require('mongodb').MongoClient;
 var Communicator = require("communicator");
 var Udp = require("udp");
 
 var nodes = [];
 var com;
 const KEEP_ALIVE_TIME = 10 * 1000;//10s
+const url = 'mongodb://localhost:27017/controller';
 
 function startTimer(node_id, id) {
 	if (id !== undefined)
@@ -17,13 +20,43 @@ function startTimer(node_id, id) {
 }
 
 function getNetworks(cb) {
-
+    MongoClient.connect(url, function(err, db) {
+        if(err) {
+            console.error(err);
+            return;
+        }
+        var collection = db.collection('networks');
+        collection.find().toArray((err, docs)=>{
+            if(err){
+                console.error(err);
+                return;
+            }
+            for(var item of docs){
+                item.id = String(item._id);
+                delete item._id;
+            }
+            db.close();
+            cb(docs);
+        });
+    });
 }
 
 /* NODE FUNCTIONS */
 
-function nodeExists(cb) {
-
+function nodeExists(id, cb) {
+    MongoClient.connect(url, function(err, db) {
+        if(err){
+            console.error(err);
+            return;
+        }
+        var collection = db.collection('nodes');
+        collection.find({_id: mongo.ObjectID(id)}).toArray((err, docs) => {
+            if(docs.length === 1) cb(true);
+            else if (docs.length === 0) cb(false);
+            else throw new Error();
+            db.close();
+        });
+    });
 }
 
 function getNode(cb) {
@@ -31,7 +64,21 @@ function getNode(cb) {
 }
 
 function newNode(cb) {
-
+    MongoClient.connect(url, function(err, db) {
+        if(err){
+            console.error(err);
+            return;
+        }
+        var collection = db.collection('nodes');
+        collection.insertOne({}, function(err, r){
+            if(err){
+                console.error(err);
+                return;
+            }
+            db.close();
+            cb(String(r.insertedId));
+        });
+    });
 }
 
 function deactivateNode(cb) {
@@ -54,6 +101,27 @@ function insertNodeCommand(cb) {
 
 }
 
+function setNodeDescription(id, description, cb) {
+    MongoClient.connect(url, function(err, db) {
+        if(err){
+            console.err(err);
+            return;
+        }
+        var collection = db.collection('nodes');
+        collection.updateOne({_id: mongo.ObjectID(id)}, {description: description}, null, (err, result)=>{
+            if(err || result.result.ok !== 1){
+                console.error("Error updating node description for node id " + id);
+                if(err) console.error(err);
+                db.close();
+                return;
+            }
+            db.close();
+        });
+    });
+}
+
+setNodeDescription("5727a6ce4896d0651d08e3ae", {address: 3, type: 5}, (docs)=>{console.log(docs);});
+
 var udpDriver = new Udp.Driver(() => {
 
 	com = new Communicator.Communicator(udpDriver);
@@ -64,13 +132,8 @@ var udpDriver = new Udp.Driver(() => {
 			packageType: 'iamcontroller | describeyourself | lifetime',
 			'yourid': nodes.length,
 			'lifetime': keepAliveTime,
-<<<<<<< HEAD
 		}, () => { nodes.push({}); });
-	}, Communicator.PACKAGE_TYPES.whoiscontroller);
-=======
-		}, () => { nodes.push({}) });
 	}, 'whoiscontroller');
->>>>>>> refs/remotes/origin/master
 
 	//Register new nodes
 	com.listen((obj, from) => {
