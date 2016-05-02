@@ -29,7 +29,7 @@ function createDriver(params, callback) {
     @param {Driver~onMessage} msgCallback - Function to be called when a message arrives
     @param {Driver~onListening} [listenCallback] - Function to be called driver is listening, or if an error occurred
 */
-Driver.prototype.listen = function (msgCallback, listenCallback) { 
+Driver.prototype.listen = function (msgCallback, listenCallback) {
     if (this._listen) {
         if (listenCallback) listenCallback(Error("Already listening"));
         return;
@@ -57,7 +57,7 @@ Driver.prototype.close = function () {
 }
 
 /**
-    Sends a message to address 
+    Sends a message to address
     @param {Object} to - Object containing the address object of the recipient
     @param {Buffer} message - Buffer containing the message to be sent
     @param {Driver~onSent} [callback] - Function to be called when the message was sent
@@ -66,7 +66,7 @@ Driver.prototype.close = function () {
 Driver.prototype.send = function (to, message, callback) {
     if (to === -1) {
         //Broadcast
-        for (var i = 0; i < connections.length; i++) {
+        for (var i in connections) {
             if (i !== this._id && connections[i]._listen) {
                 connections[i]._listen(message, this._id);
             }
@@ -75,7 +75,7 @@ Driver.prototype.send = function (to, message, callback) {
     else if (connections[to]._listen) {
         //Send message: target is listening
         connections[to]._listen(message, this._id);
-        
+
     }
     else {
         //Target not listening: do nothing
@@ -104,7 +104,7 @@ exports.createDriver = createDriver;
 /**
  * Callback used by Driver.
  * @callback Driver~onInitialized
- * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
  * @param {Driver} driver - The new driver instance
  */
 
@@ -118,11 +118,11 @@ exports.createDriver = createDriver;
 /**
  * Callback used by listen.
  * @callback Driver~onListening
- * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null 
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by send.
  * @callback Driver~onSent
- * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null 
- */ 
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */

@@ -1,13 +1,11 @@
 var Leaf = require("../leaf.js");
-//var Xbee = require("../../drivers/serial-xbee/driver.js");
 var Driver = require("./test_driver.js");
 var Comm = require("../../communicator/communicator.js")
 
 //var driver_sensor = new Xbee.Driver({tty_port: "/dev/ttyUSB1"}, () => {
-var driver_sensor = new Driver.Driver({id: 1}, () => {
-	console.log(driver_sensor);
-	var sensor = new Leaf.Leaf(
-		driver_sensor,
+Driver.createDriver({id: 1}, (err, driver) => {
+	Leaf.createLeaf(
+		driver,
 		{
 			dataType: [{
 				id: 100,
@@ -21,12 +19,12 @@ var driver_sensor = new Driver.Driver({id: 1}, () => {
 			timeout: 5*1000,
 			limitOfPackets: 3
 		},
-		(err) => {
-			if (err) {
+		(err, leaf) => {
+			if (err || err !== null) {
 				console.log(err);
 			} else {
 				var object = [{id: 101, value: 26}, {id: 102, value: 100}];
-				sensor.sendData(object, function(err) {
+				leaf.sendData(object, function(err) {
 					if (err) {
 						console.log(err);
 					} else {
@@ -41,11 +39,10 @@ var driver_sensor = new Driver.Driver({id: 1}, () => {
 
 //var driver_control = new Xbee.Driver({tty_port: "/dev/ttyUSB0"}, () => {
 // Dummy controler
-var driver_control = new Driver.Driver({id: 0}, () => {
-	var comm = new Comm.Communicator(driver_control);
+Driver.createDriver({id: 0}, (err, driver) => {
+	var comm = new Comm.Communicator(driver);
 
-	console.log("New communicator");
-	var to = driver_control.getBroadcastAddress();
+	var to = driver.getBroadcastAddress();
 	var msg = {
 		packageType: Comm.PACKAGE_TYPES.iamcontroller,
 		yourId: 1

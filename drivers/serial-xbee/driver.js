@@ -5,8 +5,8 @@ var SerialPort = require('serialport').SerialPort;
 var C = xbee_api.constants;
 
 /**
- 	@class
- 	Creates a driver for xbee
+	@class
+	constructor of driver for xbee
 	@param {Object} params - an object with the following parameters:<br/>
 	<ul>
 		<li>baud rate: symbols transmitted per second, 9600 by default
@@ -45,6 +45,21 @@ function Driver(params, callback) {
 	this._serialport.on("open", () => {
 		this._getAddress(callback);
 	});
+}
+
+/**
+	Creates a driver for xbee
+	@param {Object} params - an object with the following parameters:<br/>
+	<ul>
+		<li>baud rate: symbols transmitted per second, 9600 by default
+		<li>data bits: 8 bits by default
+		<li>stop bits: 1 bit by default
+		<li>parity: "None" by default
+	</ul>
+	@param {Driver~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
+*/
+function createDriver(params, callback) {
+	new Driver(params, callback);
 }
 
 /**
@@ -185,4 +200,4 @@ Driver.prototype.close = function() {
 	}
 };
 
-exports.Driver = Driver;
+exports.createDriver = createDriver;
