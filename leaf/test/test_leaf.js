@@ -1,5 +1,5 @@
 var Leaf = require("../leaf.js");
-var Driver = require("./test_driver.js");
+var Driver = require("../../communicator/test/test_driver.js");
 var Comm = require("../../communicator/communicator.js")
 
 //var driver_sensor = new Xbee.Driver({tty_port: "/dev/ttyUSB1"}, () => {
