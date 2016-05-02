@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var Communicator = require("communicator");
 var Udp = require("udp");
 
@@ -9,12 +11,12 @@ function startTimer(node_id, id) {
 		clearTimeout(id);
 	setTimeout(() => {
 		console.log("Removing node with id " + node_id + " due to timeout.");
-		node[node_id] = null 
+		node[node_id] = null;
 	}, keepAliveTime);
 }
 
 var udpDriver = new Udp.Driver(() => {
-	
+
 	com = new Communicator.Communicator(udpDriver);
 	//Listen for new leafs
 	com.listen((obj, from) => {
@@ -24,7 +26,7 @@ var udpDriver = new Udp.Driver(() => {
 			| Communicator.PACKAGE_TYPES.lifetime,
 			'yourid': nodes.length,
 			'lifetime': keepAliveTime,
-		}, () => { nodes.push({}) });
+		}, () => { nodes.push({}); });
 	}, Communicator.PACKAGE_TYPES.whoiscontroller);
 
 	//Register new nodes
@@ -38,7 +40,7 @@ var udpDriver = new Udp.Driver(() => {
 			};
 		}
 		startTimer(obj.id);
-		
+
 
 	}, Communicator.PACKAGE_TYPES.description);
 
@@ -61,6 +63,3 @@ var udpDriver = new Udp.Driver(() => {
 		startTimer(obj.id);
 	}, Communicator.PACKAGE_TYPES.keepalive);
 });
-
-
-

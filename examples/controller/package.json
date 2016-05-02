@@ -8,12 +8,13 @@
   },
   "author": "",
   "license": "ISC",
-   "devDependencies": {
+  "devDependencies": {
     "mocha": "^2.4.5",
     "should": "^8.3.0"
   },
   "dependencies": {
     "communicator": "file:../../communicator",
+    "mongodb": "^2.1.18",
     "udp": "file:../../drivers/udp"
   }
 }
