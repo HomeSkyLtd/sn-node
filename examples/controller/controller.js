@@ -228,7 +228,11 @@ getNetworks((nets) => {
 			com.listen((obj, from) => {
 				var time = Date.now();
 				console.log("[NEW COMMAND] from " + obj.id  + " (network " + net.id + ") at " + time);
-				getNode(obj.id, (desc) => {
+				getNode(obj.id, (err, desc) => {
+                    if (err) {
+                        console.log("   Received data from unknown node");
+                        return;
+                    }
 					obj.command.forEach((key, command) => {
 						if (desc.commandType && desc.commandType[data.id] !== undefined) {
 							console.log("	External Command with id " + command.id + " received: " + command.value);
