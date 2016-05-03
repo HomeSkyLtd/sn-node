@@ -62,6 +62,13 @@ describe("controller-driver", function () {
 			comm.send(to, msg, function(err) {if (err) done(err);});
 			console.log("Message iamcontroller sent.");
 
+			var to = driver.getBroadcastAddress();
+			var msg = {
+				packageType: Comm.PACKAGE_TYPES.welcomeback,
+			};
+			comm.send(to, msg, function(err) {if (err) done(err);});
+			console.log("Message welcomeback sent.");
+
 			msg = {
 				packageType: Comm.PACKAGE_TYPES.lifetime,
 				lifetime: 5*1000

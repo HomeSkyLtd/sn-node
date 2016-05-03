@@ -1,4 +1,4 @@
-var Driver = require("../../communicator/test/test_driver.js");
+var Driver = require("../../drivers/serial-xbee/driver.js");
 var Leaf = require("../../leaf/leaf.js");
 var Comm = require("../../communicator/communicator.js");
 
@@ -23,7 +23,7 @@ Driver.createDriver({id: 0}, function (err, driver) {
 				else {
 					leaf.listenCommand(
 						function(obj){
-							//Commmand executed here. 
+							//Commmand executed here.
 							console.log("[leaf.listening] " + JSON.stringify(obj.command));
 						},
 						function() {
