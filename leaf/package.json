@@ -4,7 +4,7 @@
   "description": "Leaf class representing sensor or actuator",
   "main": "leaf.js",
   "scripts": {
-    "test": "node test/test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,8 @@
   "author": "HomeSkyLtd",
   "license": "ISC",
   "dependencies": {
-    "enum": "^2.3.0"
+    "enum": "^2.3.0",
+    "mocha": "^2.4.5",
+    "should": "^8.3.1"
   }
 }
