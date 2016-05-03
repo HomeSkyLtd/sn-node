@@ -13,6 +13,7 @@ function startTimer(node_id, id) {
 	if (id !== undefined)
 		clearTimeout(id);
 	return setTimeout(() => {
+        deactivateNode(node_id, () => { });
 		console.log("Deactivating node with id " + node_id + " due to timeout.");
 
 	}, 2 * KEEP_ALIVE_TIME);
@@ -174,6 +175,7 @@ getNetworks((nets) => {
 							'yourid': id,
 							'lifetime': KEEP_ALIVE_TIME,
 						});
+                        activateNode(node_id, () => {});
 					}
 					else
 						nodeInit();
@@ -202,11 +204,15 @@ getNetworks((nets) => {
 			com.listen((obj, from) => {
 				var time = Date.now();
 				console.log("[NEW DATA] from " + obj.id  + " (network " + net.id + ") at " + time);
-				getNode(obj.id, (err, desc) => {
+				getNode(obj.id, (err, desc, activated) => {
 					if (err) {
 						console.log("	Received data from unknown node");
 						return;
 					}
+                    if (!activated) {
+                        console.log("   Received data from deactivated node");
+                        return;
+                    }
 					obj.data.forEach((key, data) => {
 						if (desc.dataType && desc.dataType[data.id] !== undefined) {
 							console.log("	Data with id " + data.id + " received: " + data.value);
@@ -221,7 +227,7 @@ getNetworks((nets) => {
 			//Listens for external commands
 			com.listen((obj, from) => {
 				var time = Date.now();
-				console.log("[NEW DATA] from " + obj.id  + " (network " + net.id + ") at " + time);
+				console.log("[NEW COMMAND] from " + obj.id  + " (network " + net.id + ") at " + time);
 				getNode(obj.id, (desc) => {
 					obj.command.forEach((key, command) => {
 						if (desc.commandType && desc.commandType[data.id] !== undefined) {
