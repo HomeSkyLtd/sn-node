@@ -13,7 +13,8 @@ var getDBConnection = function(){
                 if(err) {
                     throw err;
                 }
-                cb(db);
+                connection = db;
+                cb(connection);
             });
         }
         else cb(connection);
@@ -25,14 +26,12 @@ function getNetworks(cb) {
         var collection = db.collection('networks');
         collection.find().toArray((err, docs)=>{
             if(err){
-                console.error(err);
-                return;
+                throw err;
             }
             for(var item of docs){
                 item.id = String(item._id);
                 delete item._id;
             }
-            db.close();
             cb(docs);
         });
     });
@@ -47,7 +46,6 @@ function nodeExists(id, cb) {
             if(docs.length === 1) cb(true);
             else if (docs.length === 0) cb(false);
             else throw new Error();
-            db.close();
         });
     });
 }
@@ -61,7 +59,6 @@ function getNode(id, cb) {
                 db.close();
                 return;
             }
-            db.close();
             if(docs === null) cb(new Error("Requested node id " + id + " not found"), null);
 			else if (docs.description === undefined) cb(new Error("Requested node id " + id +
 				" has no description"));
@@ -75,10 +72,8 @@ function newNode(cb) {
         var collection = db.collection('nodes');
         collection.insertOne({}, function(err, r){
             if(err){
-                console.error(err);
-                return;
+                throw err;
             }
-            db.close();
             cb(String(r.insertedId));
         });
     });
@@ -89,14 +84,11 @@ function deactivateNode(id, cb) {
 		var collection = db.collection('nodes');
 		collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{activated: false}},
 			null, (err, result)=>{
-			if(err || result.result.ok !== 1){
-				console.error("Error deactivating node id " + id);
-				if(err) console.error(err);
-				db.close();
-				return;
+            if(err) cb(err);
+            else if(result.result.ok !== 1){
+				cb(new Error("Error deactivating node " + id));
 			}
-			db.close();
-			cb();
+			else cb();
 		});
 	});
 }
@@ -106,14 +98,11 @@ function activateNode(id, cb) {
 		var collection = db.collection('nodes');
 		collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{activated: false}},
 			null, (err, result)=>{
-			if(err || result.result.ok !== 1){
-				console.error("Error deactivating node id " + id);
-				if(err) console.error(err);
-				db.close();
-				return;
-			}
-			db.close();
-			cb();
+            if(err) cb(err);
+            else if(result.result.ok !== 1){
+                cb(new Error("Error deactivating node " + id));
+            }
+            else cb();
 		});
 	});
 }
@@ -126,10 +115,11 @@ function insertNodeData(id, time, data, cb) {
 		var collection = db.collection('nodes');
 		collection.insertOne({id: id, time: time, data: data}, function(err, r){
 			if(err){
-                console.error(err);
-                return;
+                cb(err);
             }
-			db.close();
+            else{
+                cb();
+            }
 		});
 	});
 }
@@ -140,10 +130,9 @@ function insertNodeCommand(id, time, command, cb) {
 		var collection = db.collection('nodes');
 		collection.insertOne({id: id, time: time, command: command}, function(err, r){
 			if(err){
-				console.error(err);
-				return;
+				cb(err);
 			}
-			db.close();
+			else cb();
 		});
 	});
 }
@@ -153,15 +142,18 @@ function setNodeDescription(id, description, cb) {
         var collection = db.collection('nodes');
         collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{description: description, activated: true}},
 			null, (err, result)=>{
-            if(err || result.result.ok !== 1){
-                console.error("Error updating node description for node id " + id);
-                if(err) console.error(err);
-                db.close();
-                return;
+            if(err) cb(err);
+            else if(result.result.ok !== 1){
+                cb(new Error("Error updating node description for node id " + id));
             }
-            db.close();
-			cb();
+			else cb();
         });
+    });
+}
+
+function closeDB(){
+    getDBConnection((db)=>{
+        db.close();
     });
 }
 
@@ -170,6 +162,7 @@ newNode((id)=>{
 		deactivateNode(id, ()=>{
 			getNode(id, (err, r)=>{
 				console.log(r);
+                closeDB();
 			});
 		});
 	});
@@ -184,7 +177,8 @@ export_functions = {
     activateNode: activateNode,
     insertNodeData: insertNodeData,
     insertNodeCommand: insertNodeCommand,
-    setNodeDescription: setNodeDescription
+    setNodeDescription: setNodeDescription,
+    closeDB: closeDB
 };
 
 exports.db = export_functions;
