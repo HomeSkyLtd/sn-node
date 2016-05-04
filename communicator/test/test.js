@@ -493,7 +493,7 @@ describe('Communicator', function() {
                         done();
                     else
                         listened++;
-                    return false;
+                    node1.stopListen('data');
                 }, Communicator.PACKAGE_TYPES.data, null, (err) => {
                     should(err).not.be.Error();
                     node1.listen((msg, from) => {

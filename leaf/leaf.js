@@ -26,21 +26,21 @@ function Leaf (driver, args, callback) {
 	this._dataType = args.dataType;
 	this._commandType = args.commandType;
 
+	this._listOfCallbacks = [];
+
+	var timeout = 10*1000;
 	if (args.timeout) {
-		var timeout = args.timeout;
-	} else {
-		var timeout = 10*1000;
+		timeout = args.timeout;
 	}
 
+	var limitOfPackets = 3;
 	if (args.limitOfPackets) {
-		var limitOfPackets = args.limitOfPackets;
-	} else {
-		var limitOfPackets = 3;
+		limitOfPackets = args.limitOfPackets;
 	}
 
 	this._comm = new Communicator.Communicator(this._driver);
 
-	var id_dir = process.env['HOME'] + "/.node_id";
+	var id_dir = process.env.HOME + "/.node_id";
 	var obj = {};
 
 	fs.access(id_dir, fs.F_OK, (err) => {
@@ -57,8 +57,10 @@ function Leaf (driver, args, callback) {
 				console.log("[leaf.listening] Message welcomeback received from " + JSON.stringify(from));
 
 				callback(null, this);
+
 				return false;
-			}, Communicator.PACKAGE_TYPES.welcomeback, null, null);
+			}, Communicator.PACKAGE_TYPES.welcomeback, null,
+			function () {console.log("[leaf.listening] Starting listening for welcome back.");});
 
 		} else {
 			obj = {packageType: Communicator.PACKAGE_TYPES.whoiscontroller};
@@ -66,7 +68,7 @@ function Leaf (driver, args, callback) {
 			this._comm.listen((msg, from) => {
 						clearInterval(timerknock);
 
-						console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from));
+						console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from) + ": " + JSON.stringify(msg));
 					    this._controllerAddress = from;
 					    this._myId = msg.yourId;
 
@@ -76,6 +78,10 @@ function Leaf (driver, args, callback) {
 							console.log("[leaf.listening] file " + id_dir + " created.");
 						});
 
+						for (var func of this._listOfCallbacks) {
+							func(this);
+						}
+
 						callback(null, this);
 
 						return false;
@@ -84,26 +90,34 @@ function Leaf (driver, args, callback) {
 			this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
 
-				console.log("[leaf.listening] Message describeyourself received");
+				var describeYourselfCallback = function (that) {
+					console.log("[leaf.listening] Message describeyourself received");
 
-				var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
-				var object = {
-					packageType: Communicator.PACKAGE_TYPES.description,
-					id: this._myId,
-					nodeClass: this._nodeClass,
+					var enumClass = Communicator.NODE_CLASSES.get(that._nodeClass);
+					var object = {
+						packageType: Communicator.PACKAGE_TYPES.description,
+						id: that._myId,
+						nodeClass: that._nodeClass,
+					};
+
+					if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+						object.dataType = that._dataType;
+						object.commandType = that._commandType;
+					} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
+						object.commandType = that._commandType;
+					} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+						object.dataType = that._dataType;
+					}
+
+					that._comm.send(from, object, function (err) { if (err) throw err; });
+					console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 				};
 
-				if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
-					object.dataType = this._dataType;
-					object.commandType = this._commandType;
-				} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
-					object.commandType = this._commandType;
-				} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
-					object.dataType = this._dataType;
+				if (this._myId) {
+					describeYourselfCallback();
+				} else {
+					this._listOfCallbacks.push(describeYourselfCallback);
 				}
-
-				this._comm.send(from, object, function (err) { if (err) throw err; });
-				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 
 				return false;
 			}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
@@ -112,22 +126,31 @@ function Leaf (driver, args, callback) {
 		this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
 
-				console.log("[leaf.listening] Message lifetime received");
+				var lifetimeCallback = function (that) {
+					console.log("[leaf.listening] Message lifetime received");
 
-				this._controllerAddress = from;
-				this._lifetime = msg.lifetime;
+					that._controllerAddress = from;
+					that._lifetime = msg.lifetime;
 
-				if (this._lifetime !== 0) {
-					setInterval(() => {
-						var object = {
-							packageType: Communicator.PACKAGE_TYPES.keepalive,
-							id: this._myId
-						};
-						this._comm.send(from, object, function (err) { if (err) throw err; });
+					if (that._lifetime !== 0) {
+						setInterval(() => {
+							var object = {
+								packageType: Communicator.PACKAGE_TYPES.keepalive,
+								id: that._myId
+							};
+							that._comm.send(from, object, function (err) { if (err) throw err; });
 
-						console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
-					}, this._lifetime);
+							console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
+						}, that._lifetime);
+					}
+				};
+
+				if (this._myId) {
+					lifetimeCallback(this);
+				} else {
+					this._listOfCallbacks.push(lifetimeCallback);
 				}
+
 				return false;
 			}, Communicator.PACKAGE_TYPES.lifetime, null, null);
 

@@ -401,7 +401,7 @@ function checkPackage(pkt) {
     if (pkt.packageType === undefined)
         throw new Error("Missing field 'packageType' in package");
     //Required fields in package
-    var fields = {'packageType': 1 };
+    var fields = {'packageType': 1 }, key;
     //See which package fields are defined and make rules about required fields based on values
     for (var fieldKey in PACKAGE_FIELDS) {
         var values = PACKAGE_FIELDS[fieldKey];
@@ -409,7 +409,7 @@ function checkPackage(pkt) {
             //Value of field on package
             var value = VALUES[fieldKey].get(pkt[fieldKey]);
             //See how many values are defined (can be 1, 2, ...)
-            for (var key in VALUES[fieldKey].enums) {
+            for (key in VALUES[fieldKey].enums) {
                 var enumVal = VALUES[fieldKey].enums[key];
                 if (value.has(enumVal)) {
                     //If it is defined, add all required fields do fields
@@ -421,13 +421,13 @@ function checkPackage(pkt) {
         }
     }
     //Check if all defined fields are required
-    for (var key in pkt) {
+    for (key in pkt) {
         if (fields[key] !== 1) {
             throw new Error("Unexpected field '" + key + "' in package");
         }
     }
     //Check if all required fields are defined
-    for (var key in fields)
+    for (key in fields)
         if (!(key in pkt))
             throw new Error("Missing field '" + key + "' in package");
 }
@@ -462,6 +462,7 @@ function Communicator (driver) {
     this._driver = driver;
     this._listeningCallbacks = [];
     this._listening = false;
+    this._listeningId = 0;
 }
 
 
@@ -515,7 +516,6 @@ Communicator.prototype.sendBroadcast = function (object, callback) {
     @param {Object[]|Object} [addresses] - Addresses that will issue the callback. It is null if listening
     for or all package types
 
-    @param {Communicator~onListening} [listenCallback] - Function to be called when it starts listening
 */
 Communicator.prototype.listen = function (objectCallback, packageTypes, addresses, listenCallback) {
     if (!this._driver) {
@@ -525,7 +525,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     }
     // Adjust arguments (packageTypes and addresses)
     if (!packageTypes)
-        var packageTypes = null;
+        packageTypes = null;
     else if (!Array.isArray(packageTypes))
         packageTypes = [packageTypes];
     else if (packageTypes.length === 0)
@@ -545,7 +545,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     }
 
     if (!addresses)
-        var addresses = null;
+        addresses = null;
     else if (!Array.isArray(addresses))
         addresses = [addresses];
     else if (addresses.length === 0)
@@ -580,8 +580,6 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     return;
                 }
                 /* Function to scan all callbacks, searching for mathcing package */
-
-                var to_remove = [];
 
                 var scanPackages = (callback) => {
                     for (var i in cmpCallback.packageType) {
@@ -635,6 +633,20 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
     }
     else if (listenCallback)
         listenCallback(null);
+};
+
+Communicator.prototype.stopListen = function (packageType) {
+    if (packageType !== undefined) {
+        for (var i = this._listeningCallbacks.length - 1; i >= 0; i--) {
+            if (this._listeningCallbacks[i].packageType === PACKAGE_TYPES.get(packageType).value) {
+                this._listeningCallbacks.splice(i, 1);
+            }
+        }
+        if (this._listeningCallbacks.length === 0) {
+            this._driver.stop();
+            this._listening = false;
+        }
+    }
 };
 
 /**

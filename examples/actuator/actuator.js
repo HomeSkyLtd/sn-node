@@ -1,3 +1,5 @@
+/*jshint esversion: 6*/
+
 var Driver = require("../../drivers/udp/driver.js");
 var Leaf = require("../../leaf/leaf.js");
 var Comm = require("../../communicator/communicator.js");
@@ -29,7 +31,7 @@ Driver.createDriver({id: 0}, function (err, driver) {
 						function() {
 							if (err) console.log(err);
 							else {
-								console.log("[leaf.listening] Started listening for commands.")
+								console.log("[leaf.listening] Started listening for commands.");
 							}
 						});
 				}

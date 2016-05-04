@@ -1,8 +1,10 @@
+/*jshint esversion: 6*/
+
 var should = require("should");
 
 var Leaf = require("../leaf.js");
 var Driver = require("../../communicator/test/test_driver.js");
-var Comm = require("../../communicator/communicator.js")
+var Comm = require("../../communicator/communicator.js");
 
 describe('sensor-driver', function () {
 	Driver.createDriver({id: 1}, (err, driver) => {
@@ -61,8 +63,8 @@ describe("controller-driver", function () {
 			comm.send(to, msg, function(err) {if (err) done(err);});
 			console.log("Message iamcontroller sent.");
 
-			var to = driver.getBroadcastAddress();
-			var msg = {
+			to = driver.getBroadcastAddress();
+			msg = {
 				packageType: Comm.PACKAGE_TYPES.welcomeback,
 			};
 			comm.send(to, msg, function(err) {if (err) done(err);});
