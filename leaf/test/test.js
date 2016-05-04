@@ -33,7 +33,6 @@ describe('sensor-driver', function () {
 								if (err) {
 									err.should.not.be.Error();
 								} else {
-									console.log("[leaf.test_leaf] data sent from sensor to controller.");
 									object.should.be.exactly("[{id: 101, value: 26}, {id: 102, value: 100}]");
 								}
 							});
