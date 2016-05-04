@@ -43,7 +43,7 @@ function Driver(params, cb){
     });
 
     this._server.on('listening', () =>{
-        if (cb) cb(null);
+        if (cb) cb(null, this);
     });
 }
 
