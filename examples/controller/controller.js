@@ -19,7 +19,8 @@ function startTimer(node_id, id) {
 
 const NETWORK_MAP = [Udp];
 db.getNetworks((nets) => {
-	nets.forEach((key, net) => {
+    // console.log(nets);
+	nets.forEach((net, key) => {
 		if (!NETWORK_MAP[net.type]) {
             console.log("Unexisting network interface");
             return;
@@ -32,20 +33,23 @@ db.getNetworks((nets) => {
 			}
 			var com = new Communicator.Communicator(driver);
 
-			function nodeInit() {
+			function nodeInit(from) {
 				db.newNode((id) => {
 					com.send(from, {
 						packageType: 'iamcontroller | describeyourself | lifetime',
-						'yourid': id,
+						'yourId': id,
 						'lifetime': KEEP_ALIVE_TIME,
-					});
+					}, (err)=>{
+                        if(err) console.log(err);
+                        else console.log("Sent");});
 				});
 			}
-
+            console.log("Listening using params:");
+            console.log(net.params);
 			//Listens for new connections
 			com.listen((obj, from) => {
 				console.log("[NEW CONNECTION] (network " + net.id + ")");
-				nodeInit();
+				nodeInit(from);
 			}, 'whoiscontroller');
 
 			//Listens for reconnections
@@ -55,20 +59,21 @@ db.getNetworks((nets) => {
 					if (exists) {
 						com.send(from, {
 							packageType: 'welcomeback | lifetime',
-							'yourid': id,
+							'yourid': obj.id,
 							'lifetime': KEEP_ALIVE_TIME,
 						});
-                        db.activateNode(node_id, () => {});
+						console.log("Sending welcomeback and lifetime to " + JSON.stringify(from));
+                        db.activateNode(obj.id, () => {});
 					}
 					else
-						nodeInit();
+						nodeInit(from);
 				});
 			}, 'iamback');
 
 			//Listens for descriptions
 			com.listen((obj, from) => {
 				console.log("[NEW DESCRIPTION] from " + obj.id + " (network " + net.id + ")");
-				obj.dataType.forEach((key, val) => {
+				obj.dataType.forEach((val) => {
 					var desc = { nodeClass: val.nodeClass };
 					if (val.nodeClass & Communicator.NODE_CLASSES.actuator)
 						desc.commandType = val.commandType;
@@ -96,7 +101,7 @@ db.getNetworks((nets) => {
                         console.log("   Received data from deactivated node");
                         return;
                     }
-					obj.data.forEach((key, data) => {
+					obj.data.forEach((data) => {
 						if (desc.dataType && desc.dataType[data.id] !== undefined) {
 							console.log("	Data with id " + data.id + " received: " + data.value);
 							db.insertNodeData(obj.id, time, data, () => {});
@@ -116,7 +121,7 @@ db.getNetworks((nets) => {
                         console.log("   Received data from unknown node");
                         return;
                     }
-					obj.command.forEach((key, command) => {
+					obj.command.forEach((command) => {
 						if (desc.commandType && desc.commandType[data.id] !== undefined) {
 							console.log("	External Command with id " + command.id + " received: " + command.value);
 							db.insertNodeCommand(obj.id, time, command, () => {});

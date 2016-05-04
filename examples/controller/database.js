@@ -42,7 +42,7 @@ function getNetworks(cb) {
 function nodeExists(id, cb) {
     getDBConnection((db) => {
         var collection = db.collection('nodes');
-        collection.find({_id: mongo.ObjectID(id)}).toArray((err, docs) => {
+        collection.find({id: id}).toArray((err, docs) => {
             if(docs.length === 1) cb(true);
             else if (docs.length === 0) cb(false);
             else throw new Error();
@@ -53,7 +53,7 @@ function nodeExists(id, cb) {
 function getNode(id, cb) {
     getDBConnection((db) => {
         var collection = db.collection('nodes');
-        collection.findOne({_id: mongo.ObjectID(id)}, (err, docs) => {
+        collection.findOne({id: id}, (err, docs) => {
             if(err){
                 console.log(err);
                 db.close();
@@ -70,11 +70,13 @@ function getNode(id, cb) {
 function newNode(cb) {
     getDBConnection((db) => {
         var collection = db.collection('nodes');
-        collection.insertOne({}, function(err, r){
-            if(err){
-                throw err;
-            }
-            cb(String(r.insertedId));
+        getAndIncrementNodeCounter((id) => {
+            collection.insertOne({id: id}, function(err, r){
+                if(err){
+                    throw err;
+                }
+                cb(id);
+            });
         });
     });
 }
@@ -82,7 +84,7 @@ function newNode(cb) {
 function deactivateNode(id, cb) {
     getDBConnection((db) => {
 		var collection = db.collection('nodes');
-		collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{activated: false}},
+		collection.updateOne({id: id}, {$set:{activated: false}},
 			null, (err, result)=>{
             if(err) cb(err);
             else if(result.result.ok !== 1){
@@ -96,7 +98,7 @@ function deactivateNode(id, cb) {
 function activateNode(id, cb) {
     getDBConnection((db) => {
 		var collection = db.collection('nodes');
-		collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{activated: false}},
+		collection.updateOne({id: id}, {$set:{activated: false}},
 			null, (err, result)=>{
             if(err) cb(err);
             else if(result.result.ok !== 1){
@@ -140,7 +142,7 @@ function insertNodeCommand(id, time, command, cb) {
 function setNodeDescription(id, description, cb) {
     getDBConnection((db) => {
         var collection = db.collection('nodes');
-        collection.updateOne({_id: mongo.ObjectID(id)}, {$set:{description: description, activated: true}},
+        collection.updateOne({id: id}, {$set:{description: description, activated: true}},
 			null, (err, result)=>{
             if(err) cb(err);
             else if(result.result.ok !== 1){
@@ -151,22 +153,50 @@ function setNodeDescription(id, description, cb) {
     });
 }
 
+function getAndIncrementNodeCounter(cb){
+    getDBConnection((db) => {
+        var collection = db.collection('nodeCount');
+        collection.findOne({}, (err, doc)=>{
+            if(err) throw err;
+            else if(doc === null){
+                collection.insertOne({count: 1}, (err, r)=>{
+                    if(err) throw err;
+                    else if (r.result.ok != 1)
+                        throw new Error("Error creating node count");
+                    else cb(0);
+                });
+            }
+            else{
+                collection.updateOne({count: doc.count}, {$set:{count: doc.count+1}});
+                cb(doc.count);
+            }
+        });
+    });
+}
+
 function closeDB(){
     getDBConnection((db)=>{
         db.close();
     });
 }
 
-newNode((id)=>{
-	setNodeDescription(id, {info: "someinfo"}, ()=>{
-		deactivateNode(id, ()=>{
-			getNode(id, (err, r)=>{
-				console.log(r);
-                closeDB();
-			});
-		});
-	});
-});
+
+
+// getAndIncrementNodeCounter((count)=>{
+//     console.log(count);
+//     closeDB();
+// });
+
+// newNode((id)=>{
+// 	setNodeDescription(id, {info: "someinfo"}, ()=>{
+// 		deactivateNode(id, ()=>{
+// 			getNode(id, (err, r)=>{
+// 				console.log(r);
+//                 closeDB();
+// 			});
+// 		});
+// 	});
+// });
 
 export_functions = {
     getNetworks: getNetworks,
