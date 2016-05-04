@@ -2,6 +2,7 @@
 
 var Enum = require('enum');
 var Communicator = require("../communicator");
+var fs = require("fs");
 
 /**
  * Construct instance of Leaf and get controller address.
@@ -38,85 +39,116 @@ function Leaf (driver, args, callback) {
 	}
 
 	this._comm = new Communicator.Communicator(this._driver);
-	this._comm.listen((msg, from) => {
+
+	var id_dir = process.env['HOME'] + "/.node_id";
+	var obj = {};
+
+	fs.access(id_dir, fs.F_OK, (err) => {
+		if (err) {
+			obj = {packageType: Communicator.PACKAGE_TYPES.iamback};
+
+			this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
 
-				console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from));
-			    this._controllerAddress = from;
-			    this._myId = msg.yourId;
+				console.log("[leaf.listening] Message welcomeback received from " + JSON.stringify(from));
+
 				callback(null, this);
+				return false;
+			}, Communicator.PACKAGE_TYPES.welcomeback, null, null);
+
+		} else {
+			obj = {packageType: Communicator.PACKAGE_TYPES.whoiscontroller};
+
+			this._comm.listen((msg, from) => {
+						clearInterval(timerknock);
+
+						console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from));
+					    this._controllerAddress = from;
+					    this._myId = msg.yourId;
+
+						fs.writeFile(id_dir, this._myId, function (err) {
+							if (err) {
+								console.log("[leaf.listening] err in iamcontroller: " + err);
+							} else {
+								console.log("[leaf.listening] file " + id_dir + " created.");
+							}
+						});
+
+						callback(null, this);
+
+						return false;
+				    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
+
+			this._comm.listen((msg, from) => {
+				clearInterval(timerknock);
+
+				console.log("[leaf.listening] Message describeyourself received");
+
+				var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
+				var object = {
+					packageType: Communicator.PACKAGE_TYPES.description,
+					id: this._myId,
+					nodeClass: this._nodeClass,
+				};
+
+				if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+					object.dataType = this._dataType;
+					object.commandType = this._commandType;
+				} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
+					object.commandType = this._commandType;
+				} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+					object.dataType = this._dataType;
+				}
+
+				this._comm.send(from, object, function (err) { if (err) console.log(err); });
+				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 
 				return false;
-		    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
-
-	this._comm.listen((msg, from) => {
-			clearInterval(timerknock);
-
-			console.log("[leaf.listening] Message lifetime received");
-
-			this._controllerAddress = from;
-			this._lifetime = msg.lifetime;
-
-			if (this._lifetime !== 0) {
-				setInterval(() => {
-					var object = {
-						packageType: Communicator.PACKAGE_TYPES.keepalive,
-						id: this._myId
-					};
-					this._comm.send(from, object, function (err) { if (err) console.log(err); });
-
-					console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
-				}, this._lifetime);
-			}
-			return false;
-		}, Communicator.PACKAGE_TYPES.lifetime, null, null);
-
-	this._comm.listen((msg, from) => {
-		clearInterval(timerknock);
-
-		console.log("[leaf.listening] Message describeyourself received");
-
-		var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
-		var object = {
-			packageType: Communicator.PACKAGE_TYPES.description,
-			id: this._myId,
-			nodeClass: this._nodeClass,
-		};
-
-		if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
-			object.dataType = this._dataType;
-			object.commandType = this._commandType;
-		} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
-			object.commandType = this._commandType;
-		} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
-			object.dataType = this._dataType;
+			}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
 		}
 
-		this._comm.send(from, object, function (err) { if (err) console.log(err); });
-		console.log("[leaf.listening] message description sent " + JSON.stringify(object));
+		this._comm.listen((msg, from) => {
+				clearInterval(timerknock);
 
-		return false;
-	}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
+				console.log("[leaf.listening] Message lifetime received");
 
-	var obj = {packageType: Communicator.PACKAGE_TYPES.whoiscontroller};
-	this._comm.sendBroadcast(obj, function (err) {
-		if (err) console.log(err);
-	});
-	++nPackagesSent;
-	console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
+				this._controllerAddress = from;
+				this._lifetime = msg.lifetime;
 
-	timerknock = setInterval(() => {
+				if (this._lifetime !== 0) {
+					setInterval(() => {
+						var object = {
+							packageType: Communicator.PACKAGE_TYPES.keepalive,
+							id: this._myId
+						};
+						this._comm.send(from, object, function (err) { if (err) console.log(err); });
+
+						console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
+					}, this._lifetime);
+				}
+				return false;
+			}, Communicator.PACKAGE_TYPES.lifetime, null, null);
+
+		this._comm.sendBroadcast(obj, function (err) {
+			if (err) console.log(err);
+		});
 		++nPackagesSent;
-		if (nPackagesSent > limitOfPackets) {
-			callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"), this);
-			clearInterval(timerknock);
-		} else {
-			this._comm.sendBroadcast({packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, function (err) {
-				if (err) console.log(err);
-			});
-			console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
-		}
-	}, timeout);
+		console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
+
+		timerknock = setInterval(() => {
+			++nPackagesSent;
+			if (nPackagesSent > limitOfPackets) {
+				callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"), this);
+				clearInterval(timerknock);
+			} else {
+				this._comm.sendBroadcast(obj, function (err) {
+					if (err) console.log(err);
+				});
+				console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
+			}
+		}, timeout);
+
+	});
 }
 
 /**
