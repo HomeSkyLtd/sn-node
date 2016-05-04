@@ -1,3 +1,5 @@
+/*jshint esversion: 6*/
+
 var Leaf = require("../../leaf/leaf.js");
 var Driver = require("../../drivers/udp/driver.js");
 var Comm = require("../../communicator/communicator.js");
@@ -25,7 +27,7 @@ Driver.createDriver({rport: 4567}, function(err, driver) {
 				if (err) console.log(err);
 				else {
 					setInterval(() => {
-						leaf.sendData({id: 1 , value: 23.2}, function (err) {if (err) console.log(err)});
+						leaf.sendData({id: 1 , value: 23.2}, function (err) {if (err) console.log(err);});
 					}, 5*1000);
 				}
 			});
