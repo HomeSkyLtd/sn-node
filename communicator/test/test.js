@@ -472,30 +472,44 @@ describe('Communicator', function() {
             });
         });
 
-        it('should call two callbacks from package of two types', (done) => {
-            var listened = false;
+        it('should call three callbacks from package of two types', (done) => {
+            var listened = 0;
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
-                if (listened)
+                if (listened == 2)
                     done();
                 else
-                    listened = true;
+                    listened++;
+                return false;
             }, Communicator.PACKAGE_TYPES.description, null, (err) => {
                 should(err).not.be.Error();
                 node1.listen((msg, from) => {
-                    should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                    //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value | Communicator.PAC);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data[0].value).be.equal("Test");
-                    if (listened)
+                    if (listened == 2)
                         done();
                     else
-                        listened = true;
+                        listened++;
+                    return false;
                 }, Communicator.PACKAGE_TYPES.data, null, (err) => {
                     should(err).not.be.Error();
-                    node2.send(getDriver1Address(), { 'packageType': 'data | description', id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                    node1.listen((msg, from) => {
+                        //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                        should(from).be.equal(getDriver2Address());
+                        should(msg.data[0].value).be.equal("Test");
+                        if (listened == 2)
+                            done();
+                        else
+                            listened++;
+                        return false;
+                    }, Communicator.PACKAGE_TYPES.whoiscontroller, null, (err) => {
                         should(err).not.be.Error();
+                        node2.send(getDriver1Address(), { 'packageType': 'data | description | whoiscontroller', id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                            should(err).not.be.Error();
+                        });
                     });
                 });
             });
