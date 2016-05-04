@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "cbor": "^1.0.1",
-    "enum": "^2.3.0"
+    "enum": "^2.3.0",
+    "minimist": "*"
   },
   "devDependencies": {
     "mocha": "^2.4.5",

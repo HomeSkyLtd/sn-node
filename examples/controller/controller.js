@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
-
-var Communicator = require("communicator");
-var Udp = require("udp");
+var db = require("./database").db;
+var Communicator = require("../../communicator/communicator");
+var Udp = require("../../drivers/udp/driver.js");
 
 var nodes = [];
 const KEEP_ALIVE_TIME = 10 * 1000;//10s
@@ -10,7 +10,7 @@ function startTimer(node_id, id) {
 	if (id !== undefined)
 		clearTimeout(id);
 	return setTimeout(() => {
-        deactivateNode(node_id, () => { });
+        db.deactivateNode(node_id, () => { });
 		console.log("Deactivating node with id " + node_id + " due to timeout.");
 
 	}, 2 * KEEP_ALIVE_TIME);
@@ -18,9 +18,13 @@ function startTimer(node_id, id) {
 
 
 const NETWORK_MAP = [Udp];
-getNetworks((nets) => {
+db.getNetworks((nets) => {
 	nets.forEach((key, net) => {
-		NETWORK_MAP[net.type].createDriver(net.params, (err, driver) => {
+		if (!NETWORK_MAP[net.type]) {
+            console.log("Unexisting network interface");
+            return;
+        }
+        NETWORK_MAP[net.type].createDriver(net.params, (err, driver) => {
 			if (err) {
 				console.log("Failed to start network interface:");
 				console.log(err);
@@ -29,7 +33,7 @@ getNetworks((nets) => {
 			var com = new Communicator.Communicator(driver);
 
 			function nodeInit() {
-				newNode((id) => {
+				db.newNode((id) => {
 					com.send(from, {
 						packageType: 'iamcontroller | describeyourself | lifetime',
 						'yourid': id,
@@ -47,14 +51,14 @@ getNetworks((nets) => {
 			//Listens for reconnections
 			com.listen((obj, from) => {
 				console.log("[RECONNECTION] from " + obj.id + " (network " + net.id + ")");
-				nodeExists(obj.id, (exists) => {
+				db.nodeExists(obj.id, (exists) => {
 					if (exists) {
 						com.send(from, {
 							packageType: 'welcomeback | lifetime',
 							'yourid': id,
 							'lifetime': KEEP_ALIVE_TIME,
 						});
-                        activateNode(node_id, () => {});
+                        db.activateNode(node_id, () => {});
 					}
 					else
 						nodeInit();
@@ -70,7 +74,7 @@ getNetworks((nets) => {
 						desc.commandType = val.commandType;
 					if (val.nodeClass & Communicator.NODE_CLASSES.sensor)
 						desc.dataType = val.dataType;
-					setNodeDescription(obj.id, desc, () => {});
+					db.setNodeDescription(obj.id, desc, () => {});
 				});
 				var timerId = startTimer(obj.id);
 				com.listen((obj, from) => {
@@ -83,7 +87,7 @@ getNetworks((nets) => {
 			com.listen((obj, from) => {
 				var time = Date.now();
 				console.log("[NEW DATA] from " + obj.id  + " (network " + net.id + ") at " + time);
-				getNode(obj.id, (err, desc, activated) => {
+				db.getNode(obj.id, (err, desc, activated) => {
 					if (err) {
 						console.log("	Received data from unknown node");
 						return;
@@ -95,7 +99,7 @@ getNetworks((nets) => {
 					obj.data.forEach((key, data) => {
 						if (desc.dataType && desc.dataType[data.id] !== undefined) {
 							console.log("	Data with id " + data.id + " received: " + data.value);
-							insertNodeData(obj.id, time, data, () => {});
+							db.insertNodeData(obj.id, time, data, () => {});
 						}
 						else
 							console.log("	Data with id " + data.id + " not declared");
@@ -107,7 +111,7 @@ getNetworks((nets) => {
 			com.listen((obj, from) => {
 				var time = Date.now();
 				console.log("[NEW COMMAND] from " + obj.id  + " (network " + net.id + ") at " + time);
-				getNode(obj.id, (err, desc) => {
+				db.getNode(obj.id, (err, desc) => {
                     if (err) {
                         console.log("   Received data from unknown node");
                         return;
@@ -115,7 +119,7 @@ getNetworks((nets) => {
 					obj.command.forEach((key, command) => {
 						if (desc.commandType && desc.commandType[data.id] !== undefined) {
 							console.log("	External Command with id " + command.id + " received: " + command.value);
-							insertNodeCommand(obj.id, time, command, () => {});
+							db.insertNodeCommand(obj.id, time, command, () => {});
 						}
 						else
 							console.log("	External Command with id " + command.id + " not declared");
