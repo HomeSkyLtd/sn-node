@@ -344,7 +344,7 @@ function checkTypes(object) {
                         var tempValue = def.enum.get(value);
                         if (tempValue === undefined)
                             throw new Error("Invalid value '" + value + "' in field '" + key + "'");
-                        value = tempValue.value;
+                        obj[key] = value = tempValue.value;
                     }
                     if (!def.enum.get(value) || def.enum.get(value).value !== value)
                         throw new Error("Invalid value '" + value + "' in field '" + key + "'");

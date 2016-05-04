@@ -494,7 +494,7 @@ describe('Communicator', function() {
                         listened = true;
                 }, Communicator.PACKAGE_TYPES.data, null, (err) => {
                     should(err).not.be.Error();
-                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                    node2.send(getDriver1Address(), { 'packageType': 'data | description', id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
                         should(err).not.be.Error();
                     });
                 });
