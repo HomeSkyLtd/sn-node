@@ -47,6 +47,10 @@ function Driver(params, cb){
     });
 }
 
+function createDriver(params, callback) {
+    new Driver(params, callback);
+}
+
 /**
     Opens a UDP socket listening the port and address specified in the rport parameter
     @param {Driver~onMessage} msgCallback - Function to be called when a message arrives
@@ -130,7 +134,7 @@ Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port};
 };
 
-exports.Driver = Driver;
+exports.createDriver = createDriver;
 
 /**
  * Callback used by Driver.
