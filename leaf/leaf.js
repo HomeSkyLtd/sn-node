@@ -44,8 +44,12 @@ function Leaf (driver, args, callback) {
 	var obj = {};
 
 	fs.access(id_dir, fs.F_OK, (err) => {
-		if (err) {
-			obj = {packageType: Communicator.PACKAGE_TYPES.iamback};
+		if (!err) {
+			this._myId = fs.readFileSync(id_dir, 'utf8', 'r');
+			obj = {
+				packageType: Communicator.PACKAGE_TYPES.iamback,
+				id: this._myId
+			};
 
 			this._comm.listen((msg, from) => {
 				clearInterval(timerknock);
@@ -67,11 +71,9 @@ function Leaf (driver, args, callback) {
 					    this._myId = msg.yourId;
 
 						fs.writeFile(id_dir, this._myId, function (err) {
-							if (err) {
-								console.log("[leaf.listening] err in iamcontroller: " + err);
-							} else {
-								console.log("[leaf.listening] file " + id_dir + " created.");
-							}
+							if (err) throw err;
+
+							console.log("[leaf.listening] file " + id_dir + " created.");
 						});
 
 						callback(null, this);
@@ -100,7 +102,7 @@ function Leaf (driver, args, callback) {
 					object.dataType = this._dataType;
 				}
 
-				this._comm.send(from, object, function (err) { if (err) console.log(err); });
+				this._comm.send(from, object, function (err) { if (err) throw err; });
 				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 
 				return false;
@@ -121,7 +123,7 @@ function Leaf (driver, args, callback) {
 							packageType: Communicator.PACKAGE_TYPES.keepalive,
 							id: this._myId
 						};
-						this._comm.send(from, object, function (err) { if (err) console.log(err); });
+						this._comm.send(from, object, function (err) { if (err) throw err; });
 
 						console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
 					}, this._lifetime);
@@ -130,7 +132,7 @@ function Leaf (driver, args, callback) {
 			}, Communicator.PACKAGE_TYPES.lifetime, null, null);
 
 		this._comm.sendBroadcast(obj, function (err) {
-			if (err) console.log(err);
+			if (err) throw err;
 		});
 		++nPackagesSent;
 		console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
@@ -142,7 +144,7 @@ function Leaf (driver, args, callback) {
 				clearInterval(timerknock);
 			} else {
 				this._comm.sendBroadcast(obj, function (err) {
-					if (err) console.log(err);
+					if (err) throw err;
 				});
 				console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 			}
