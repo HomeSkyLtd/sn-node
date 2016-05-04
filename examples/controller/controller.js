@@ -59,9 +59,10 @@ db.getNetworks((nets) => {
 					if (exists) {
 						com.send(from, {
 							packageType: 'welcomeback | lifetime',
-							'yourid': obj.id,
 							'lifetime': KEEP_ALIVE_TIME,
-						});
+						}, (err) => {
+                            if(err) console.log(err);
+                        });
 						console.log("Sending welcomeback and lifetime to " + JSON.stringify(from));
                         db.activateNode(obj.id, () => {});
 					}
