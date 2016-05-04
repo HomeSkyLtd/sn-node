@@ -14,7 +14,8 @@ describe('udp', function(){
 
     describe('#listen()', function(){
         it('should execute without errors', function(done){
-            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, udpDriver){
+            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+                udpDriver = driverInstance;
                 if (err) err.should.not.be.Error();
                 udpDriver.listen(
                     ()=>{},
@@ -46,7 +47,8 @@ describe('udp', function(){
                 });
             }
 
-            udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, (err)=>{
+            driver.createDriver({rport:4567, broadcast_port: 4567}, (err, driverInstance)=>{
+                udpDriver = driverInstance;
                 if (err) err.should.not.be.Error();
                 udpDriver.listen(
                     msgCallback,
@@ -72,7 +74,8 @@ describe('udp', function(){
                 done();
             }
 
-            udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+                udpDriver = driverInstance;
                 udpDriver.listen(
                     msgCallback,
                     (err) => {
@@ -97,32 +100,35 @@ describe('udp', function(){
                 done();
             }
 
-            udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+                udpDriver = driverInstance;
                 udpDriver.listen(
                     msgCallback,
                     (err) => {
                         if(err) done(err);
                         else{
-                            var udpDriver2 = new driver.Driver({rport:4568, broadcast_port: 4567});
-                            var msgCallback2 = function(msg, from){
-                                console.log(from);
-                                from.port.should.be.exactly(4567);
-                                String(msg).should.be.exactly("Test");
-                                udpDriver2.send(from, Buffer.from("Reply"), (err)=>{
-                                    if(err) done(err);
-                                });
-                            };
-                            udpDriver2.listen(
-                                msgCallback2,
-                                (err) => {
-                                    if(err) done(err);
-                                    else{
-                                        udpDriver.send({address:"localhost", port:4568}, Buffer.from("Test"), function (err) {
-                                            if (err) done(err);
-                                        });
+                            driver.createDriver({rport:4568, broadcast_port: 4567}, (err, driverInstance2)=>{
+                                if(err) done(err);
+                                udpDriver2 = driverInstance2;
+                                var msgCallback2 = function(msg, from){
+                                    from.port.should.be.exactly(4567);
+                                    String(msg).should.be.exactly("Test");
+                                    udpDriver2.send(from, Buffer.from("Reply"), (err)=>{
+                                        if(err) done(err);
+                                    });
+                                };
+                                udpDriver2.listen(
+                                    msgCallback2,
+                                    (err) => {
+                                        if(err) done(err);
+                                        else{
+                                            udpDriver.send({address:"localhost", port:4568}, Buffer.from("Test"), function (err) {
+                                                if (err) done(err);
+                                            });
+                                        }
                                     }
-                                }
-                            );
+                                );
+                            });
 
                         }
                     }
@@ -142,7 +148,8 @@ describe('udp', function(){
                 done();
             }
 
-            udpDriver = new driver.Driver({rport:4567, broadcast_port: 4567}, function(err){
+             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+                udpDriver = driverInstance;
                 udpDriver.listen(
                     msgCallback,
                     (err) => {
@@ -167,10 +174,13 @@ describe('udp', function(){
             a1 = {address: "192.168.1.1", port: 1234};
             a2 = {address: "192.168.1.1", port: 1235};
             a3 = {address: "192.168.1.2", port: 1234};
-            driver.Driver.compareAddresses(a1,a2).should.be.true();
-            driver.Driver.compareAddresses(a1,a3).should.be.false();
-            driver.Driver.compareAddresses(a2,a3).should.be.false();
-            done();
+            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+                udpDriver = driverInstance;
+                udpDriver.compareAddresses(a1,a2).should.be.true();
+                udpDriver.compareAddresses(a1,a3).should.be.false();
+                udpDriver.compareAddresses(a2,a3).should.be.false();
+                done();
+            });
         });
     });
 });
