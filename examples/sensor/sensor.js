@@ -1,5 +1,5 @@
 var Leaf = require("../../leaf/leaf.js");
-var Driver = require("../../communicator/test/test_driver.js");
+var Driver = require("../../drivers/udp/driver.js");
 var Comm = require("../../communicator/communicator.js");
 
 // This driver represents a sensor that listens controller messages.
