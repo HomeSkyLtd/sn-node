@@ -29,7 +29,7 @@ function Leaf (driver, args, callback) {
 	if (args.timeout) {
 		var timeout = args.timeout;
 	} else {
-		var timeout = 30*1000;
+		var timeout = 10*1000;
 	}
 
 	if (args.limitOfPackets) {
