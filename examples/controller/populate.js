@@ -18,7 +18,7 @@ MongoClient.connect(url, function(err, db) {
                 else{
                     console.log("Inserting network entries...");
                     collection.insertMany([
-                        {params: {rport:4567, broadcast_port: 4567}, type: 0}, //udp params
+                        {params: {rport:2356, broadcast_port: 2356}, type: 0}, //udp params
                         {params: {tty_port: "/dev/ttyUSB0"}, type: 1} //xbee 802.15.4 params
                     ], (err, r)=>{
                         console.log("Done! Inserted entries: ");
