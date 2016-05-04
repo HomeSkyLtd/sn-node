@@ -157,16 +157,16 @@ function closeDB(){
     });
 }
 
-newNode((id)=>{
-	setNodeDescription(id, {info: "someinfo"}, ()=>{
-		deactivateNode(id, ()=>{
-			getNode(id, (err, r)=>{
-				console.log(r);
-                closeDB();
-			});
-		});
-	});
-});
+// newNode((id)=>{
+// 	setNodeDescription(id, {info: "someinfo"}, ()=>{
+// 		deactivateNode(id, ()=>{
+// 			getNode(id, (err, r)=>{
+// 				console.log(r);
+//                 closeDB();
+// 			});
+// 		});
+// 	});
+// });
 
 export_functions = {
     getNetworks: getNetworks,
