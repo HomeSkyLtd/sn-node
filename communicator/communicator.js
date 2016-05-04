@@ -574,12 +574,15 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     checkTypes(pkt);
                     checkPackage(pkt);
                 }
-                catch (err) {
+                catch (error) {
                     console.log("[Communicator.listen] Package with error received. Silent ignoring...");
-                    console.log(err);
+                    console.log(error);
                     return;
                 }
                 /* Function to scan all callbacks, searching for mathcing package */
+
+                var to_remove = [];
+
                 var scanPackages = (callback) => {
                     for (var i in cmpCallback.packageType) {
                         if (PACKAGE_TYPES.get(pkt.packageType).has(cmpCallback.packageType[i]) ||
@@ -609,7 +612,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     }
                 };
 
-                for (var i in that._listeningCallbacks) {
+                for (var i = that._listeningCallbacks.length - 1; i >= 0; i--) {
                     var cmpCallback = that._listeningCallbacks[i];
                     // Filter package and calls callbacks
                     if (cmpCallback.packageType === null && cmpCallback.addresses === null)
