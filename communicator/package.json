@@ -10,11 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "cbor": "^1.0.1",
-    "enum": "^2.3.0",
-    "commander": "*"
+    "commander": "^2.9.0",
+    "enum": "^2.3.0"
   },
   "devDependencies": {
     "mocha": "^2.4.5",
-    "should": "^8.3.0"  
+    "should": "^8.3.0"
   }
 }
