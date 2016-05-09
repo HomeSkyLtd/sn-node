@@ -13,7 +13,7 @@ Driver.createDriver({rport: 4567}, function(err, driver) {
 			{
 				dataType: [
 					{
-						id: 0,
+						id: 1,
 						type: "real",
 						range: [-10, 50],
 						measureStrategy: "periodic",
