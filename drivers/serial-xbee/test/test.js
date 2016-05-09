@@ -46,7 +46,7 @@ describe('serial-xbee', function(){
                         (err) => {
                             if(err) done(err);
                             else{
-                                driver.Driver({tty_port: "/dev/ttyUSB1"}, (err, driverInstance2)=>{
+                                driver.createDriver({tty_port: "/dev/ttyUSB1"}, (err, driverInstance2)=>{
                                     xbeeSender = driverInstance2;
                                     if(err) done(err);
                                     xbeeSender.send({address: "0013A20040B0783F"}, new Buffer.from("Test"), (err)=>{
@@ -72,13 +72,15 @@ describe('serial-xbee', function(){
                     done();
                 }
 
-                xbeeDriver = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function(err){
+                driver.createDriver({tty_port: "/dev/ttyUSB0"}, function(err, driverInstance){
+                    xbeeDriver = driverInstance;
                     xbeeDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
-                                xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
+                                driver.createDriver({tty_port: "/dev/ttyUSB1"}, (err, driverInstance2)=>{
+                                    xbeeSender = driverInstance2;
                                     if(err) done(err);
                                     xbeeSender.send(xbeeDriver.getBroadcastAddress(), new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
@@ -102,14 +104,16 @@ describe('serial-xbee', function(){
                     done();
                 }
 
-                xbeeDriver = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function(err){
+                xbeeDriver = driver.createDriver({tty_port: "/dev/ttyUSB0"}, function(err, driverInstance){
                     if(err) done(err);
+                    xbeeDriver = driverInstance;
                     xbeeDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
-                                var xbeeDriver2 = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
+                                driver.createDriver({tty_port: "/dev/ttyUSB1"}, (err, driverInstance2)=>{
+                                    xbeeDriver2 = driverInstance2;
                                     if(err) done(err);
                                     var msgCallback2 = function(msg, from){
                                         from.address.toUpperCase().should.be.exactly("0013A20040B0783F");
@@ -152,14 +156,16 @@ describe('serial-xbee', function(){
                     done();
                 }
 
-                xbeeDriver = new driver.Driver({tty_port: "/dev/ttyUSB0"}, function(err){
+                driver.createDriver({tty_port: "/dev/ttyUSB0"}, function(err, driverInstance){
+                    xbeeDriver = driverInstance;
                     xbeeDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
                                 xbeeDriver.stop();
-                                xbeeSender = new driver.Driver({tty_port: "/dev/ttyUSB1"}, (err)=>{
+                                driver.createDriver({tty_port: "/dev/ttyUSB1"}, (err, driverInstance2)=>{
+                                    xbeeSender = driverInstance2;
                                     if(err) done(err);
                                     xbeeSender.send({address: "0013A20040B0783F"}, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
@@ -174,17 +180,19 @@ describe('serial-xbee', function(){
                         }
                     );
                 });
+            });
+        });
 
-                describe('#compareAddresses()', function(){
-                    it('should compare addresses correctly', function(done){
-                        a1 = {address: "0013A20040B0783F"};
-                        a2 = {address: "13A20040B0783F"};
-                        a3 = {address: "1013A20040B0783F"};
-                        driver.Driver.compareAddresses(a1,a2).should.be.true();
-                        driver.Driver.compareAddresses(a1,a3).should.be.false();
-                        driver.Driver.compareAddresses(a2,a3).should.be.false();
-                        done();
-                    });
+        describe('#compareAddresses()', function(){
+            it('should compare addresses correctly', function(done){
+                a1 = {address: "0013A20040B0783F"};
+                a2 = {address: "13A20040B0783F"};
+                a3 = {address: "1013A20040B0783F"};
+                driver.createDriver({tty_port: "/dev/ttyUSB0"}, (err, xbeeDriver) =>{
+                    xbeeDriver.constructor.compareAddresses(a1,a2).should.be.true();
+                    xbeeDriver.constructor.compareAddresses(a1,a3).should.be.false();
+                    xbeeDriver.constructor.compareAddresses(a2,a3).should.be.false();
+                    done();
                 });
             });
         });

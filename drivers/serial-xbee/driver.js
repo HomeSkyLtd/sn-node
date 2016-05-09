@@ -104,7 +104,7 @@ Driver.prototype._getAddress = function(callback) {
 			} else if (frame.command === "SL") {
 				this.address += frame.commandData.toString('hex');
 				this._xbeeAPI.removeAllListeners("frame_object");
-				if (callback) callback(); // After address is ready, execute callback.
+				if (callback) callback(null, this); // After address is ready, execute callback.
 			}
 		});
 
