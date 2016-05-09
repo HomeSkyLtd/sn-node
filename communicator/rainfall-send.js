@@ -13,10 +13,6 @@ program
 	.arguments('<address> <port> <packageType> [package]')
 	.action(function (address, port, packageType, package) {
 		var pkt;
-		if (!packageTypesRegex.test(packageType)) {
-			console.log("	error: invalid value in argument 'packageType'");
-			return;
-		}
 		if (package) {
 			pkt = JSON.parse(package);
 		}
