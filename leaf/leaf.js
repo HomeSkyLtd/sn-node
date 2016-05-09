@@ -97,7 +97,7 @@ function Leaf (driver, args, callback) {
 					var object = {
 						packageType: Communicator.PACKAGE_TYPES.description,
 						id: that._myId,
-						nodeClass: that._nodeClass,
+						nodeClass: that._nodeClass
 					};
 
 					if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {

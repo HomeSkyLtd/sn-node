@@ -30,9 +30,9 @@ function Driver(params, cb){
     //instantiate socket and associate it to a port
     this._server = dgram.createSocket('udp4');
     if(this._rport === undefined)
-        this._server.bind();
-    else
-        this._server.bind(this._rport);
+		this._server.bind();
+	else
+		this._server.bind(this._rport);
 
     //ignore any messages received for now
     this._msgCallback = function(){};
@@ -43,6 +43,8 @@ function Driver(params, cb){
     });
 
     this._server.on('listening', () =>{
+		if (!this._rport)
+			this._rport = this._server.address().port;
         if (cb) cb(null, this);
     });
 }
