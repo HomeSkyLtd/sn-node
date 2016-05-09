@@ -610,6 +610,10 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     }
                 };
 
+                var scanALl = (callback) => {
+                    scanPackages(() => scanAddresses(callback));
+                };
+
                 for (var i = that._listeningCallbacks.length - 1; i >= 0; i--) {
                     var cmpCallback = that._listeningCallbacks[i];
                     // Filter package and calls callbacks
@@ -620,7 +624,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     else if (cmpCallback.addresses === null)
                         scanPackages(completeCallback);
                     else
-                        scanPackages(() => scanAddresses(completeCallback));
+                        scanALl(completeCallback);
                 }
             });
         }, (err) => {
