@@ -9,10 +9,7 @@ var packageReceived = function (driver) {
 	comm.listen(function (msg, from) {
 		var types = Rainfall.PACKAGE_TYPES.get(msg.packageType).key;
 		console.log("Message of type " + types + " from " + from.address + ":" + from.port);
-<<<<<<< HEAD
 		console.log("Message: " + JSON.stringify(msg) + "\n");
-=======
->>>>>>> 1f9be22bfd53d763c0e02ca75e31b99d1d6e0ec0
 	}, null, null, null);
 };
 
