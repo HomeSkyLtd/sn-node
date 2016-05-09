@@ -62,7 +62,7 @@ function getNode(id, cb) {
             if(docs === null) cb(new Error("Requested node id " + id + " not found"), null);
 			else if (docs.description === undefined) cb(new Error("Requested node id " + id +
 				" has no description"));
-            else cb(null, docs.description);
+            else cb(null, docs.description, docs.activated);
         });
     });
 }
@@ -98,7 +98,7 @@ function deactivateNode(id, cb) {
 function activateNode(id, cb) {
     getDBConnection((db) => {
 		var collection = db.collection('nodes');
-		collection.updateOne({id: id}, {$set:{activated: false}},
+		collection.updateOne({id: id}, {$set:{activated: true}},
 			null, (err, result)=>{
             if(err) cb(err);
             else if(result.result.ok !== 1){
@@ -114,7 +114,7 @@ function activateNode(id, cb) {
 
 function insertNodeData(id, time, data, cb) {
     getDBConnection((db) => {
-		var collection = db.collection('nodes');
+		var collection = db.collection('nodeData');
 		collection.insertOne({id: id, time: time, data: data}, function(err, r){
 			if(err){
                 cb(err);
@@ -129,7 +129,7 @@ function insertNodeData(id, time, data, cb) {
 /* Human commands */
 function insertNodeCommand(id, time, command, cb) {
     getDBConnection((db) => {
-		var collection = db.collection('nodes');
+		var collection = db.collection('nodeCommands');
 		collection.insertOne({id: id, time: time, command: command}, function(err, r){
 			if(err){
 				cb(err);

@@ -74,19 +74,28 @@ db.getNetworks((nets) => {
 			//Listens for descriptions
 			com.listen((obj, from) => {
 				console.log("[NEW DESCRIPTION] from " + obj.id + " (network " + net.id + ")");
-				obj.dataType.forEach((val) => {
-					var desc = { nodeClass: val.nodeClass };
-					if (val.nodeClass & Communicator.NODE_CLASSES.actuator)
-						desc.commandType = val.commandType;
-					if (val.nodeClass & Communicator.NODE_CLASSES.sensor)
-						desc.dataType = val.dataType;
-					db.setNodeDescription(obj.id, desc, () => {});
-				});
+                var desc = {nodeClass: obj.nodeClass};
+
+                var info = function(obj) {
+                    return obj.reduce((prev, cur)=>{
+                        if (prev[cur.id] !== undefined) console.error("dataType with repeated ids detected");
+                        prev[cur.id] = cur;
+                        return prev;
+                    }, {});
+                };
+
+                if (obj.nodeClass & Communicator.NODE_CLASSES.actuator)
+                    desc.commandType = info(obj.commandType);
+                if (obj.nodeClass & Communicator.NODE_CLASSES.sensor)
+                    desc.dataType = info(obj.dataType);
+
+                db.setNodeDescription(obj.id, desc, () => {});
 				var timerId = startTimer(obj.id);
 				com.listen((obj, from) => {
 					console.log("[KEEP ALIVE] from " + obj.id);
 					timerId = startTimer(obj.id, timerId);
 				}, 'keepalive');
+				db.activateNode(obj.id, () => {});
 			}, 'description');
 
 			//Listens for data
@@ -94,6 +103,7 @@ db.getNetworks((nets) => {
 				var time = Date.now();
 				console.log("[NEW DATA] from " + obj.id  + " (network " + net.id + ") at " + time);
 				db.getNode(obj.id, (err, desc, activated) => {
+                    console.log(activated);
 					if (err) {
 						console.log("	Received data from unknown node");
 						return;
