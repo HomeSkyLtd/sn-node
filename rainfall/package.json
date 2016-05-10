@@ -1,8 +1,8 @@
 {
-  "name": "communicator",
+  "name": "rainfall",
   "version": "1.0.0",
   "description": "API",
-  "main": "communicator.js",
+  "main": "rainfall.js",
   "scripts": {
     "test": "mocha"
   },
@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "cbor": "^1.0.1",
-    "commander": "^2.9.0",
     "enum": "^2.3.0"
   },
   "devDependencies": {

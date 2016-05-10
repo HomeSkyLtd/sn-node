@@ -2,10 +2,10 @@
 
 var should = require('should');
 
-var Communicator = require("../communicator");
+var Rainfall = require("../rainfall");
 var Driver = require("./test_driver");
 
-describe('Communicator', function() {
+describe('Rainfall', function() {
     var driver1, driver2;
 
     before('Instanciation of drivers', (done) => {
@@ -23,9 +23,9 @@ describe('Communicator', function() {
 
     function clearNodes() {
         if (node1) node1.close();
-        node1 = new Communicator.Communicator(driver1);
+        node1 = new Rainfall.Rainfall(driver1);
         if (node2) node2.close();
-        node2 = new Communicator.Communicator(driver2);
+        node2 = new Rainfall.Rainfall(driver2);
     }
 
     function getDriver1Address() {
@@ -37,7 +37,7 @@ describe('Communicator', function() {
     }
 
 
-    beforeEach('Closing and cleaning Communicator', () => {
+    beforeEach('Closing and cleaning Rainfall', () => {
         clearNodes();
     });
 
@@ -45,7 +45,7 @@ describe('Communicator', function() {
     describe('#send()', () => {
 
         it('should execute without error', (done) => {
-            node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, (err) => {
+            node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.whoiscontroller}, (err) => {
                 should(err).not.be.Error();
                 done();
             });
@@ -57,61 +57,61 @@ describe('Communicator', function() {
             });
         });
         it('should allow packages with multiple package types', (done) => {
-            node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data |
-            Communicator.PACKAGE_TYPES.command, id: 0, command: [], data: []  }, (err) => {
+            node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.data |
+            Rainfall.PACKAGE_TYPES.command, id: 0, command: [], data: []  }, (err) => {
                 should(err).not.be.Error();
                 done();
             });
         });
         describe("#Check fields", () => {
             it('should check required fields in whoiscontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.whoiscontroller}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.whoiscontroller}, (err) => {
                     should(err).not.be.Error();
                     done();
                 });
             });
              it('should check not required fields in whoiscontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.whoiscontroller, id: 10}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.whoiscontroller, id: 10}, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
 
             it('should check required fields in iamcontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourId: 10 }, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.iamcontroller, yourId: 10 }, (err) => {
                     should(err).not.be.Error();
                     done();
                 });
             });
             it('should check missing fields in iamcontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller }, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.iamcontroller }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in iamcontroller', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.iamcontroller, yourId: 20, data: []}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.iamcontroller, yourId: 20, data: []}, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
 
             it('should check required fields in describeyourself', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.describeyourself}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.describeyourself}, (err) => {
                     should(err).not.be.Error();
                     done();
                 });
             });
             it('should check not required fields in describeyourself', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.describeyourself, yourId: 20, data: []}, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.describeyourself, yourId: 20, data: []}, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
 
             it('should check required fields in description for sensor', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                    id: 0, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: Rainfall.NODE_CLASSES.sensor, dataType: [{
                         id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
                     }] }, (err) => {
                     should(err).not.be.Error();
@@ -119,15 +119,15 @@ describe('Communicator', function() {
                 });
             });
             it('should check missing fields in description for sensor', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                id: 3, nodeClass: Communicator.NODE_CLASSES.sensor }, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                id: 3, nodeClass: Rainfall.NODE_CLASSES.sensor }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in description for sensor', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                    id: 3, nodeClass: Communicator.NODE_CLASSES.sensor, dataType: [{
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 3, nodeClass: Rainfall.NODE_CLASSES.sensor, dataType: [{
                         id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: "m", dataCategory: 1
                     }], commandType: []}, (err) => {
                     should(err).be.Error();
@@ -136,7 +136,7 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in description for actuator', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
                     id: 0, nodeClass: "actuator", commandType: [{
                         id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }] }, (err) => {
@@ -145,15 +145,15 @@ describe('Communicator', function() {
                 });
             });
             it('should check missing fields in description for actuator', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                id: 3, nodeClass: Communicator.NODE_CLASSES.actuator }, (err) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                id: 3, nodeClass: Rainfall.NODE_CLASSES.actuator }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in description for actuator', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.description,
-                    id: 3, nodeClass: Communicator.NODE_CLASSES.actuator, commandType: [{
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 3, nodeClass: Rainfall.NODE_CLASSES.actuator, commandType: [{
                         id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }], dataType: []}, (err) => {
                     should(err).be.Error();
@@ -162,7 +162,7 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in data', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.data,
                     id: 0, data: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
                     ]}, (err) => {
@@ -171,7 +171,7 @@ describe('Communicator', function() {
                 });
             });
             it('should check missing fields in data', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.data,
                 data: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
                     ]}, (err) => {
@@ -180,8 +180,8 @@ describe('Communicator', function() {
                 });
             });
             it('should check not required fields in data', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.data,
-                    id: 3, nodeClass: Communicator.NODE_CLASSES.actuator, data: [
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.data,
+                    id: 3, nodeClass: Rainfall.NODE_CLASSES.actuator, data: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
                     ]}, (err) => {
                     should(err).be.Error();
@@ -190,7 +190,7 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in command', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command,
                     command: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
                     ]}, (err) => {
@@ -199,14 +199,14 @@ describe('Communicator', function() {
                 });
             });
             it('should check missing fields in command', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command
                 }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in command', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.command,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command,
                     id: 3, command: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
                     ]}, (err) => {
@@ -216,21 +216,21 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in lifetime', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.lifetime,
                     lifetime: 500}, (err) => {
                     should(err).not.be.Error();
                     done();
                 });
             });
             it('should check missing fields in lifetime', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.lifetime
                 }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in lifetime', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.lifetime,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.lifetime,
                     id: 3, lifetime: 100 }, (err) => {
                     should(err).be.Error();
                     done();
@@ -238,21 +238,21 @@ describe('Communicator', function() {
             });
 
             it('should check required fields in keepalive', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.keepalive,
                     id: 500}, (err) => {
                     should(err).not.be.Error();
                     done();
                 });
             });
             it('should check missing fields in keepalive', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.keepalive
                 }, (err) => {
                     should(err).be.Error();
                     done();
                 });
             });
             it('should check not required fields in keepalive', (done) => {
-                node1.send(getDriver2Address(), { packageType: Communicator.PACKAGE_TYPES.keepalive,
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.keepalive,
                     id: 3, lifetime: 100 }, (err) => {
                     should(err).be.Error();
                     done();
@@ -326,7 +326,7 @@ describe('Communicator', function() {
      describe('#sendBroadcast()', () => {
 
         it('should execute without error', (done) => {
-            node1.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller}, (err) => {
+            node1.sendBroadcast({ 'packageType': Rainfall.PACKAGE_TYPES.whoiscontroller}, (err) => {
                 should(err).not.be.Error();
                 done();
             });
@@ -353,7 +353,7 @@ describe('Communicator', function() {
             });
         });
         it('should allow multiple packageTypes', (done) => {
-            node1.listen(() => {}, [Communicator.PACKAGE_TYPES.data, Communicator.PACKAGE_TYPES.description], null, (err) => {
+            node1.listen(() => {}, [Rainfall.PACKAGE_TYPES.data, Rainfall.PACKAGE_TYPES.description], null, (err) => {
                 should(err).not.be.Error();
                 done();
             });
@@ -376,13 +376,13 @@ describe('Communicator', function() {
 
         it('should send a message correctly', (done) => {
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test Data");
                 done();
             }, null, null, (err) => {
                 should(err).not.be.Error();
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();
                 });
             });
@@ -390,13 +390,13 @@ describe('Communicator', function() {
 
         it('should receive message from specific package type', (done) => {
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test Data");
                 done();
             }, 'data', null, (err) => {
                 should(err).not.be.Error();
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 0, data: [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();
                 });
             });
@@ -404,17 +404,17 @@ describe('Communicator', function() {
 
         it('should receive only one message (filtering by package type)', (done) => {
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test Data2");
                 done();
-            }, [Communicator.PACKAGE_TYPES.data], null, (err) => {
+            }, [Rainfall.PACKAGE_TYPES.data], null, (err) => {
                 should(err).not.be.Error();
-                node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourId: 2}, (err) => {
+                node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.iamcontroller, yourId: 2}, (err) => {
                     should(err).not.be.Error();
-                    node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
+                    node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.whoiscontroller }, (err) => {
                         should(err).not.be.Error();
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 0, 'data': [ { 'id': 0, 'value': 'Test Data2'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 0, 'data': [ { 'id': 0, 'value': 'Test Data2'}] }, (err) => {
                             should(err).not.be.Error();
                         });
                     });
@@ -425,19 +425,19 @@ describe('Communicator', function() {
         it('should receive only one message (filtering by address)', (done) => {
 
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 done();
             }, null, getDriver2Address(), (err) => {
                 Driver.createDriver({id: 2}, (err, tempDriver) => {
-                    var tempNode =  new Communicator.Communicator(tempDriver);
+                    var tempNode =  new Rainfall.Rainfall(tempDriver);
                     should(err).not.be.Error();
-                    tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.iamcontroller, yourId: 3 }, (err) => {
+                    tempNode.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.iamcontroller, yourId: 3 }, (err) => {
                         should(err).not.be.Error();
-                        node1.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.whoiscontroller }, (err) => {
+                        node1.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.whoiscontroller }, (err) => {
                             should(err).not.be.Error();
-                            node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 3, data: [ { id: 0, value: 'Test'}] }, (err) => {
+                            node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 3, data: [ { id: 0, value: 'Test'}] }, (err) => {
                                 should(err).not.be.Error();
                                 tempNode.close();
                             });
@@ -450,19 +450,19 @@ describe('Communicator', function() {
         it('should receive only one message (filtering by package type and address)', (done) => {
 
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 done();
-            }, Communicator.PACKAGE_TYPES.data, getDriver2Address(), (err) => {
+            }, Rainfall.PACKAGE_TYPES.data, getDriver2Address(), (err) => {
                 Driver.createDriver({id: 2}, (err, tempDriver) => {
-                    var tempNode =  new Communicator.Communicator(tempDriver);
+                    var tempNode =  new Rainfall.Rainfall(tempDriver);
                     should(err).not.be.Error();
-                    tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, nodeClass: 1, id: 0, 'dataType': [ ]}, (err) => {
+                    tempNode.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.description, nodeClass: 1, id: 0, 'dataType': [ ]}, (err) => {
                         should(err).not.be.Error();
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.command, 'command': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.command, 'command': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                             should(err).not.be.Error();
-                            node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                            node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
                                 should(err).not.be.Error();
                                 tempNode.close();
                             });
@@ -475,7 +475,7 @@ describe('Communicator', function() {
         it('should call three callbacks from package of two types', (done) => {
             var listened = 0;
             node1.listen((msg, from) => {
-                //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                //should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.description.value | Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test");
                 if (listened == 2)
@@ -483,10 +483,10 @@ describe('Communicator', function() {
                 else
                     listened++;
                 return false;
-            }, Communicator.PACKAGE_TYPES.description, null, (err) => {
+            }, Rainfall.PACKAGE_TYPES.description, null, (err) => {
                 should(err).not.be.Error();
                 node1.listen((msg, from) => {
-                    //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value | Communicator.PAC);
+                    //should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.description.value | Rainfall.PACKAGE_TYPES.data.value | Rainfall.PAC);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data[0].value).be.equal("Test");
                     if (listened == 2)
@@ -494,10 +494,10 @@ describe('Communicator', function() {
                     else
                         listened++;
                     node1.stopListen('data');
-                }, Communicator.PACKAGE_TYPES.data, null, (err) => {
+                }, Rainfall.PACKAGE_TYPES.data, null, (err) => {
                     should(err).not.be.Error();
                     node1.listen((msg, from) => {
-                        //should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.description.value | Communicator.PACKAGE_TYPES.data.value);
+                        //should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.description.value | Rainfall.PACKAGE_TYPES.data.value);
                         should(from).be.equal(getDriver2Address());
                         should(msg.data[0].value).be.equal("Test");
                         if (listened == 2)
@@ -505,7 +505,7 @@ describe('Communicator', function() {
                         else
                             listened++;
                         return false;
-                    }, Communicator.PACKAGE_TYPES.whoiscontroller, null, (err) => {
+                    }, Rainfall.PACKAGE_TYPES.whoiscontroller, null, (err) => {
                         should(err).not.be.Error();
                         node2.send(getDriver1Address(), { 'packageType': 'data | description | whoiscontroller', id: 0, nodeClass: 1, dataType: [], 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
                             should(err).not.be.Error();
@@ -523,13 +523,13 @@ describe('Communicator', function() {
                     done();
                 else
                     listened = true;
-            }, Communicator.PACKAGE_TYPES.data | Communicator.PACKAGE_TYPES.description, null, (err) => {
+            }, Rainfall.PACKAGE_TYPES.data | Rainfall.PACKAGE_TYPES.description, null, (err) => {
                 Driver.createDriver({id: 2}, (err, tempDriver) => {
-                    var tempNode =  new Communicator.Communicator(tempDriver);
+                    var tempNode =  new Rainfall.Rainfall(tempDriver);
                     should(err).not.be.Error();
-                    tempNode.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.description, nodeClass: 1, id: 1, 'dataType': [ ]}, (err) => {
+                    tempNode.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.description, nodeClass: 1, id: 1, 'dataType': [ ]}, (err) => {
                         should(err).not.be.Error();
-                        node2.send(getDriver1Address(), { 'packageType': Communicator.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                        node2.send(getDriver1Address(), { 'packageType': Rainfall.PACKAGE_TYPES.data, id: 1, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                             should(err).not.be.Error();
                         });
                     });
@@ -542,13 +542,13 @@ describe('Communicator', function() {
 
         it('should broadcast a message correctly', (done) => {
             node1.listen((msg, from) => {
-                should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                 should(from).be.equal(getDriver2Address());
                 should(msg.data[0].value).be.equal("Test Data");
                 done();
             }, null, null, (err) => {
                 should(err).not.be.Error();
-                node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
+                node2.sendBroadcast({ 'packageType': Rainfall.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test Data'}] }, (err) => {
                     should(err).not.be.Error();
                 });
             });
@@ -556,10 +556,10 @@ describe('Communicator', function() {
 
         it('should broadcast a message to multiple nodes correctly', (done) => {
             Driver.createDriver({id: 2}, (err, tempDriver) => {
-                var tempNode =  new Communicator.Communicator(tempDriver);
+                var tempNode =  new Rainfall.Rainfall(tempDriver);
                 var called = false;
                 node1.listen((msg, from) => {
-                    should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                    should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                     should(from).be.equal(getDriver2Address());
                     should(msg.data[0].value).be.equal("Test");
                     if (!called)
@@ -569,7 +569,7 @@ describe('Communicator', function() {
                 }, null, null, (err) => {
                     should(err).not.be.Error();
                     tempNode.listen((msg, from) => {
-                        should(msg.packageType).be.equal(Communicator.PACKAGE_TYPES.data.value);
+                        should(msg.packageType).be.equal(Rainfall.PACKAGE_TYPES.data.value);
                         should(from).be.equal(getDriver2Address());
                         should(msg.data[0].value).be.equal("Test");
                         if (!called)
@@ -577,7 +577,7 @@ describe('Communicator', function() {
                         else
                             done();
                     }, null, null, (err) => {
-                            node2.sendBroadcast({ 'packageType': Communicator.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
+                            node2.sendBroadcast({ 'packageType': Rainfall.PACKAGE_TYPES.data, id: 5, 'data': [ { 'id': 0, 'value': 'Test'}] }, (err) => {
                                 should(err).not.be.Error();
                         });
                     });

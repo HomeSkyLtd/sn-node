@@ -1,7 +1,7 @@
 //jshint esversion: 6
 
 var Driver = require('../drivers/udp/driver.js');
-var Rainfall = require("./communicator");
+var Rainfall = require("../rainfall/rainfall");
 var program = require('commander');
 
 
@@ -21,7 +21,7 @@ program
 		}
 		pkt.packageType = packageType;
 		Driver.createDriver({}, (err, instance) => {
-			var com = new Rainfall.Communicator(instance);
+			var com = new Rainfall.Rainfall(instance);
 			com.send({address: address, port: port}, pkt, (error) => {
 				if (error) {
 					console.log("Package not sent! Reason: ");
