@@ -86,41 +86,6 @@ function Leaf (driver, args, callback) {
 
 						return false;
 				    }, Rainfall.PACKAGE_TYPES.iamcontroller, null, null);
-
-			this._rain.listen((msg, from) => {
-				clearInterval(timerknock);
-
-				var describeYourselfCallback = function (that) {
-					console.log("[leaf.listening] Message describeyourself received");
-
-					var enumClass = Rainfall.NODE_CLASSES.get(that._nodeClass);
-					var object = {
-						packageType: Rainfall.PACKAGE_TYPES.description,
-						id: that._myId,
-						nodeClass: that._nodeClass
-					};
-
-					if (enumClass.has(Rainfall.NODE_CLASSES.actuator) && enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
-						object.dataType = that._dataType;
-						object.commandType = that._rainandType;
-					} else if (enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
-						object.commandType = that._rainandType;
-					} else if (enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
-						object.dataType = that._dataType;
-					}
-
-					that._rain.send(from, object, function (err) { if (err) throw err; });
-					console.log("[leaf.listening] message description sent " + JSON.stringify(object));
-				};
-
-				if (this._myId) {
-					describeYourselfCallback();
-				} else {
-					this._listOfCallbacks.push(describeYourselfCallback);
-				}
-
-				return false;
-			}, Rainfall.PACKAGE_TYPES.describeyourself, null, null);
 		}
 
 		this._rain.listen((msg, from) => {
@@ -153,6 +118,41 @@ function Leaf (driver, args, callback) {
 
 				return false;
 			}, Rainfall.PACKAGE_TYPES.lifetime, null, null);
+
+		this._rain.listen((msg, from) => {
+			clearInterval(timerknock);
+
+			var describeYourselfCallback = function (that) {
+				console.log("[leaf.listening] Message describeyourself received");
+
+				var enumClass = Rainfall.NODE_CLASSES.get(that._nodeClass);
+				var object = {
+					packageType: Rainfall.PACKAGE_TYPES.description,
+					id: that._myId,
+					nodeClass: that._nodeClass
+				};
+
+				if (enumClass.has(Rainfall.NODE_CLASSES.actuator) && enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
+					object.dataType = that._dataType;
+					object.commandType = that._rainandType;
+				} else if (enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
+					object.commandType = that._rainandType;
+				} else if (enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
+					object.dataType = that._dataType;
+				}
+
+				that._rain.send(from, object, function (err) { if (err) throw err; });
+				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
+			};
+
+			if (this._myId) {
+				describeYourselfCallback(this);
+			} else {
+				this._listOfCallbacks.push(describeYourselfCallback);
+			}
+
+			return false;
+		}, Rainfall.PACKAGE_TYPES.describeyourself, null, null);
 
 		this._rain.sendBroadcast(obj, function (err) {
 			if (err) throw err;
