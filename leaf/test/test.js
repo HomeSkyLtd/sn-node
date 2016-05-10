@@ -3,7 +3,7 @@
 var should = require("should");
 
 var Leaf = require("../leaf.js");
-var Driver = require("../../communicator/test/test_driver.js");
+var Driver = require("../../rainfall/test/test_driver.js");
 var Rainfall = require("../../rainfall/rainfall.js");
 
 describe('sensor-driver', function () {
