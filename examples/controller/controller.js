@@ -65,6 +65,11 @@ db.getNetworks((nets) => {
                         });
 						console.log("Sending welcomeback and lifetime to " + JSON.stringify(from));
                         db.activateNode(obj.id, () => {});
+						var timerId = startTimer(obj.id);
+						com.listen((obj, from) => {
+							console.log("[KEEP ALIVE] from " + obj.id);
+							timerId = startTimer(obj.id, timerId);
+						}, 'keepalive');
 					}
 					else
 						nodeInit(from);
