@@ -5,6 +5,7 @@ var Udp = require("../../drivers/udp/driver.js");
 
 var nodes = [];
 const KEEP_ALIVE_TIME = 10 * 1000;//10s
+var timers = {};
 
 function startTimer(node_id, id) {
 	if (id !== undefined)
@@ -55,7 +56,7 @@ db.getNetworks((nets) => {
 			//Listens for reconnections
 			com.listen((obj, from) => {
 				console.log("[RECONNECTION] from " + obj.id + " (network " + net.id + ")");
-				db.getNode(obj.id, (exists) => {
+				db.nodeExists(obj.id, (exists) => {
 					if (exists) {
 						com.send(from, {
 							packageType: 'welcomeback | lifetime',
@@ -65,11 +66,7 @@ db.getNetworks((nets) => {
                         });
 						console.log("Sending welcomeback and lifetime to " + JSON.stringify(from));
                         db.activateNode(obj.id, () => {});
-						var timerId = startTimer(obj.id);
-						com.listen((obj, from) => {
-							console.log("[KEEP ALIVE] from " + obj.id);
-							timerId = startTimer(obj.id, timerId);
-						}, 'keepalive');
+						timers[obj.id] = startTimer(obj.id, timers[obj.id]);
 					}
 					else
 						nodeInit(from);
@@ -95,13 +92,15 @@ db.getNetworks((nets) => {
                     desc.dataType = info(obj.dataType);
 
                 db.setNodeDescription(obj.id, desc, () => {});
-				var timerId = startTimer(obj.id);
-				com.listen((obj, from) => {
-					console.log("[KEEP ALIVE] from " + obj.id);
-					timerId = startTimer(obj.id, timerId);
-				}, 'keepalive');
+				timers[obj.id] = startTimer(obj.id);
+
 				db.activateNode(obj.id, () => {});
 			}, 'description');
+
+			com.listen((obj, from) => {
+				console.log("[KEEP ALIVE] from " + obj.id);
+				timers[obj.id] = startTimer(obj.id, timers[obj.id]);
+			}, 'keepalive');
 
 			//Listens for data
 			com.listen((obj, from) => {
