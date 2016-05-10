@@ -456,7 +456,7 @@ function decode (rawPackage, callback) {
     @class
     @param {Object} Driver object
 */
-function Communicator (driver) {
+function Rainfall (driver) {
     if (!driver)
         throw new Error("Invalid driver");
     this._driver = driver;
@@ -470,9 +470,9 @@ function Communicator (driver) {
     Sends a json object to address
     @param {Object} to - Object containing the address object of the recipient, depends on the driver
     @param {Message} object - Json object containing the message to be sent
-    @param {Communicator~onSent} [callback] - Function to be called when the object was sent
+    @param {Rainfall~onSent} [callback] - Function to be called when the object was sent
 */
-Communicator.prototype.send = function (to, object, callback) {
+Rainfall.prototype.send = function (to, object, callback) {
     if (!this._driver) {
         if (callback)
             callback(new Error("Can't send message using closed instance"));
@@ -498,9 +498,9 @@ Communicator.prototype.send = function (to, object, callback) {
 /**
     Sends a json object to broadcast address
     @param {Message} object - Json object containing the message to be sent
-    @param {Communicator~onSent} [callback] - Function to be called when the object was sent
+    @param {Rainfall~onSent} [callback] - Function to be called when the object was sent
 */
-Communicator.prototype.sendBroadcast = function (object, callback) {
+Rainfall.prototype.sendBroadcast = function (object, callback) {
     this.send(this._driver.getBroadcastAddress(), object, callback);
 };
 
@@ -508,7 +508,7 @@ Communicator.prototype.sendBroadcast = function (object, callback) {
     Starts listening for objects. You can call this method multiple times to set multiple callbacks
     for each package type (or addresses). All callbacks that match the object address and type will be called
 
-    @param {Communicator~onMessage} objectCallback - Function to be called when a object arrives
+    @param {Rainfall~onMessage} objectCallback - Function to be called when a object arrives
 
     @param {PACKAGE_TYPES[]|PACKAGE_TYPES|String[]|String} [packageTypes] - Package types that will issue the callback. It is null if listening
     for all package types
@@ -517,7 +517,7 @@ Communicator.prototype.sendBroadcast = function (object, callback) {
     for or all package types
 
 */
-Communicator.prototype.listen = function (objectCallback, packageTypes, addresses, listenCallback) {
+Rainfall.prototype.listen = function (objectCallback, packageTypes, addresses, listenCallback) {
     if (!this._driver) {
         if (listenCallback)
             listenCallback(new Error("Can't listen using closed instance"));
@@ -566,7 +566,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
             decode(rawPackage, (err, pkt) => {
                 if (err) {
                     // TODO: Check if we should be doing this
-                    console.log("[Communicator.listen] Package with error received. Silent ignoring...");
+                    console.log("[Rainfall.listen] Package with error received. Silent ignoring...");
                     console.log(err);
                     return;
                 }
@@ -575,7 +575,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
                     checkPackage(pkt);
                 }
                 catch (error) {
-                    console.log("[Communicator.listen] Package with error received. Silent ignoring...");
+                    console.log("[Rainfall.listen] Package with error received. Silent ignoring...");
                     console.log(error);
                     return;
                 }
@@ -639,7 +639,7 @@ Communicator.prototype.listen = function (objectCallback, packageTypes, addresse
         listenCallback(null);
 };
 
-Communicator.prototype.stopListen = function (packageType) {
+Rainfall.prototype.stopListen = function (packageType) {
     if (packageType !== undefined) {
         for (var i = this._listeningCallbacks.length - 1; i >= 0; i--) {
             if (this._listeningCallbacks[i].packageType === PACKAGE_TYPES.get(packageType).value) {
@@ -654,16 +654,16 @@ Communicator.prototype.stopListen = function (packageType) {
 };
 
 /**
-    Closes the Communicator. After this call, can't listen or send messages.
+    Closes the Rainfall. After this call, can't listen or send messages.
 */
-Communicator.prototype.close = function () {
+Rainfall.prototype.close = function () {
     this._driver.close();
     this._driver = null;
     this._listeningCallbacks = [];
     this._listening = false;
 };
 
-exports.Communicator = Communicator;
+exports.Rainfall = Rainfall;
 
 /**
     The message object. It is a regular javascript object with certain fields.
@@ -671,7 +671,7 @@ exports.Communicator = Communicator;
     To define enums you can use the enum item or a string with the key. Flaggable enums
     accept multiple values (like packageType and nodeClass)
 
-    @typedef {Object} Communicator~Message
+    @typedef {Object} Rainfall~Message
 
     @property {PACKAGE_TYPES|String} packageType - Defines which package it is. Required field
     and the presence or absence of other fields depends on this value.
@@ -679,25 +679,25 @@ exports.Communicator = Communicator;
     @property {Number} [yourId] - Used by the controller to inform the node its id.
     @property {Number} [id] - Field defining the node id. It is useful to the controller to
     know which node is sending the message. Defined by the controller in the yourId field.
-    @property {Communicator~data[]} [data] - List of data. Sent by the sensor to the controller.
-    @property {Communicator~data[]} [command] - List of commands. Sent by the controller to the actuator.
+    @property {Rainfall~data[]} [data] - List of data. Sent by the sensor to the controller.
+    @property {Rainfall~data[]} [command] - List of commands. Sent by the controller to the actuator.
     @property {Number} [lifetime] - The period of time between keepalive messages sent by the node
-    @property {Communicator~dataType[]} [dataType] - Field used by the sensor to inform the controller the data it
+    @property {Rainfall~dataType[]} [dataType] - Field used by the sensor to inform the controller the data it
     will send
-    @property {Communicator~commandType[]} [commandType] - Field used by the actautor to inform the controller
+    @property {Rainfall~commandType[]} [commandType] - Field used by the actautor to inform the controller
     the commands it accepts
 */
 
 /**
     Data object. Used by sensor to send collected data.
-    @typedef {Object} Communicator~data
+    @typedef {Object} Rainfall~data
     @property {Number} id - Id of the data. Defined by the sensor.
     @property {String|Number} value: Value of the measure.
 */
 
 /**
     Data type object. Used by sensor to inform the controller the collected data.
-    @typedef {Object} Communicator~dataType
+    @typedef {Object} Rainfall~dataType
     @property {Number} id - Id of the data. Defined by the sensor.
     @property {DATA_TYPES|String} type - The format of the data sent.
     @property {Number[]} [range] - Range of the data, it is a list with two values (start and end).
@@ -711,7 +711,7 @@ exports.Communicator = Communicator;
 
 /**
     Command type object. Used by actuator to inform the controller the accepted commands.
-    @typedef {Object} Communicator~commandType
+    @typedef {Object} Rainfall~commandType
     @property {Number} id - Id of the command. Defined by the actuator.
     @property {DATA_TYPES|String} type - The format of the command.
     @property {Number[]} [range] - Range of the command, it is a list with two values (start and end).
@@ -724,7 +724,7 @@ exports.Communicator = Communicator;
 
 /**
  * Callback used by listen.
- * @callback Communicator~onMessage
+ * @callback Rainfall~onMessage
  * @returns {boolean|undefined} False if server should stop listening. Otherwise it will keep listening.
  * @param {Object} message - Json object containing the received object
  * @param {Object} from - Object containing the address object of the transmitter
@@ -732,12 +732,12 @@ exports.Communicator = Communicator;
 
 /**
  * Callback used by listen.
- * @callback Communicator~onListening
+ * @callback Rainfall~onListening
  * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by send.
- * @callback Communicator~onSent
+ * @callback Rainfall~onSent
  * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
  */
