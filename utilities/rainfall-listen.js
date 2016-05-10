@@ -1,11 +1,11 @@
 var Driver = require('../drivers/udp/driver.js');
-var Rainfall = require("./communicator");
+var Rainfall = require("../rainfall/rainfall");
 var program = require('commander');
 
 var packageReceived = function (driver) {
 	console.log('[LISTENING] port : ' + driver._rport);
 
-	var comm = new Rainfall.Communicator(driver);
+	var comm = new Rainfall.Rainfall(driver);
 	comm.listen(function (msg, from) {
 		var types = Rainfall.PACKAGE_TYPES.get(msg.packageType).key;
 		console.log("Message of type " + types + " from " + from.address + ":" + from.port);
