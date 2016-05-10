@@ -14,7 +14,7 @@ var packageReceived = function (driver) {
 };
 
 program
-	.usage('<port>')
+	.usage('<port>'	)
 	.version('0.0.1')
 	.arguments('[port]')
 	.action(function (port) {
