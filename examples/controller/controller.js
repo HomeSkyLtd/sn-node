@@ -42,7 +42,7 @@ db.getNetworks((nets) => {
 						'lifetime': KEEP_ALIVE_TIME,
 					}, (err)=>{
                         if(err) console.log(err);
-                        else console.log("Sent");});
+                        else console.log("iamcontroller, describeyourself, lifetime Sent");});
 				});
 			}
             console.log("Listening using params:");
@@ -76,7 +76,7 @@ db.getNetworks((nets) => {
 			//Listens for descriptions
 			com.listen((obj, from) => {
 				console.log("[NEW DESCRIPTION] from " + obj.id + " (network " + net.id + ")");
-                var desc = {nodeClass: obj.nodeClass};
+				var desc = {nodeClass: obj.nodeClass};
 
                 var info = function(obj) {
                     return obj.reduce((prev, cur)=>{
@@ -86,9 +86,9 @@ db.getNetworks((nets) => {
                     }, {});
                 };
 
-                if (obj.nodeClass & Communicator.NODE_CLASSES.actuator)
+                if (obj.nodeClass & Rainfall.NODE_CLASSES.actuator)
                     desc.commandType = info(obj.commandType);
-                if (obj.nodeClass & Communicator.NODE_CLASSES.sensor)
+                if (obj.nodeClass & Rainfall.NODE_CLASSES.sensor)
                     desc.dataType = info(obj.dataType);
 
                 db.setNodeDescription(obj.id, desc, () => {});
@@ -107,7 +107,6 @@ db.getNetworks((nets) => {
 				var time = Date.now();
 				console.log("[NEW DATA] from " + obj.id  + " (network " + net.id + ") at " + time);
 				db.getNode(obj.id, (err, desc, activated) => {
-                    console.log(activated);
 					if (err) {
 						console.log("	Received data from unknown node");
 						return;
