@@ -1,6 +1,6 @@
 {
   "name": "rainfall",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "API implementation of the Rainfall protocol, used in home automation",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "rainfall.js",
@@ -12,7 +12,7 @@
   { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
   { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" } 
   ],
-  "keyword": [ "rainfall", "protocol", "API", "home automation", "automation" ],
+  "keywords": [ "rainfall", "protocol", "API", "home automation", "automation" ],
   "license": "ISC",
   "dependencies": {
     "cbor": "^1.0.1",
