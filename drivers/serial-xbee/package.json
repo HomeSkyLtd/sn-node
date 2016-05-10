@@ -1,17 +1,26 @@
 {
-  "name": "serial-xbee",
-  "version": "1.0.0",
-  "description": "",
+  "name": "rainfall-xbee-s1",
+  "version": "0.0.1",
+  "description": "XBee S1 driver for the rainfall protocol",
   "main": "driver.js",
+  "repository": "https://github.com/HomeSkyLtd/sn-node",
   "scripts": {
     "test": "mocha test/test.js"
   },
+  "contributors": [
+  { "name": "Ricardo Boccoli Gallego", "email": "ricardo.gallego93@gmail.com" },
+  { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
+  { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" }
+  ],
+  "keywords": [ "rainfall", "driver", "home automation", "xbee" ],
   "dependencies": {
     "jsdoc": "^3.4.0",
     "serialport": "^3.1.2-beta1",
     "should": "^8.3.0",
     "xbee-api": "^0.4.2"
   },
-  "author": "",
+  "directories": {
+    "doc": "./out"
+  },
   "license": "ISC"
 }

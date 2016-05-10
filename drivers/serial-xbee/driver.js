@@ -74,7 +74,7 @@ Driver.compareAddresses = function(address1, address2) {
 	return addr1Pad === addr2Pad;
 };
 
-/**
+/*
 	Private method that saves MAC address as this objects' attribute.
 	@param {Driver~onAddressReady} [callback] - Callback function to be executes after address is read from device and saved.
 	@returns {Object} an object with the following parameters:<br/>
@@ -115,7 +115,7 @@ Driver.prototype._getAddress = function(callback) {
 	return {address: this.address};
 };
 
-/**
+/*
 	Public method that calls _getAddress but doesn't pass a callback as parameter.
 	@returns {Object} An object with the following parameters:<br/>
 	<ul>
