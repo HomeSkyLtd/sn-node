@@ -2,7 +2,7 @@
 
 var Leaf = require("../../leaf/leaf.js");
 var Driver = require("../../drivers/udp/driver.js");
-var Comm = require("../../communicator/communicator.js");
+var Rainfall = require("../../rainfall/rainfall.js");
 
 // This driver represents a sensor that listens controller messages.
 Driver.createDriver({rport: 4567}, function(err, driver) {
@@ -39,7 +39,7 @@ setTimeout(() => {
 	Driver.createDriver({rport: 4568}, (err, driver) => {
 		if (err) console.log(err);
 		else {
-			var comm = new Comm.Communicator(driver);
+			var comm = new Rainfall.Rainfall(driver);
 
 			console.log("New communicator");
 			var to = {
@@ -48,27 +48,27 @@ setTimeout(() => {
 			};
 
 			var msg = {
-				packageType: Comm.PACKAGE_TYPES.iamcontroller,
+				packageType: Rainfall.PACKAGE_TYPES.iamcontroller,
 				yourId: 1
 			};
 			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
 			console.log("[dummy-controller.send] Message iamcontroller sent.");
 
 			msg = {
-				packageType: Comm.PACKAGE_TYPES.welcomeback,
+				packageType: Rainfall.PACKAGE_TYPES.welcomeback,
 			};
 			comm.send(to, msg, function(err) {if (err) done(err);});
 			console.log("[dummy-controller.send] Message welcome back sent.");
 
 			msg = {
-				packageType: Comm.PACKAGE_TYPES.lifetime,
+				packageType: Rainfall.PACKAGE_TYPES.lifetime,
 				lifetime: 5*1000
 			};
 			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
 			console.log("[dummy-controller.send] Message lifetime sent.");
 
 			msg = {
-				packageType: Comm.PACKAGE_TYPES.describeyourself
+				packageType: Rainfall.PACKAGE_TYPES.describeyourself
 			};
 			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
 			console.log("[dummy-controller.send] Message describeyourself sent.");

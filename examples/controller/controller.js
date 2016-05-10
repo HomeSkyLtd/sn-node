@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 var db = require("./database").db;
-var Communicator = require("../../communicator/communicator");
+var Rainfall = require("../../rainfall/rainfall");
 var Udp = require("../../drivers/udp/driver.js");
 
 var nodes = [];
@@ -31,7 +31,7 @@ db.getNetworks((nets) => {
 				console.log(err);
 				return;
 			}
-			var com = new Communicator.Communicator(driver);
+			var com = new Rainfall.Rainfall(driver);
 
 			function nodeInit(from) {
 				db.newNode((id) => {
@@ -55,7 +55,7 @@ db.getNetworks((nets) => {
 			//Listens for reconnections
 			com.listen((obj, from) => {
 				console.log("[RECONNECTION] from " + obj.id + " (network " + net.id + ")");
-				db.nodeExists(obj.id, (exists) => {
+				db.getNode(obj.id, (exists) => {
 					if (exists) {
 						com.send(from, {
 							packageType: 'welcomeback | lifetime',
@@ -65,6 +65,11 @@ db.getNetworks((nets) => {
                         });
 						console.log("Sending welcomeback and lifetime to " + JSON.stringify(from));
                         db.activateNode(obj.id, () => {});
+						var timerId = startTimer(obj.id);
+						com.listen((obj, from) => {
+							console.log("[KEEP ALIVE] from " + obj.id);
+							timerId = startTimer(obj.id, timerId);
+						}, 'keepalive');
 					}
 					else
 						nodeInit(from);
