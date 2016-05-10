@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 
 var Enum = require('enum');
-var Communicator = require("../communicator");
+var Rainfall = require("../rainfall");
 var fs = require("fs");
 
 /**
@@ -24,7 +24,7 @@ function Leaf (driver, args, callback) {
 	this._nodeClass = parseClass(args.dataType, args.commandType);
 
 	this._dataType = args.dataType;
-	this._commandType = args.commandType;
+	this._rainandType = args.commandType;
 
 	this._listOfCallbacks = [];
 
@@ -38,7 +38,7 @@ function Leaf (driver, args, callback) {
 		limitOfPackets = args.limitOfPackets;
 	}
 
-	this._comm = new Communicator.Communicator(this._driver);
+	this._rain = new Rainfall.Rainfall(this._driver);
 
 	var id_dir = process.env.HOME + "/.node_id";
 	var obj = {};
@@ -47,11 +47,11 @@ function Leaf (driver, args, callback) {
 		if (!err) {
 			this._myId = fs.readFileSync(id_dir, 'utf8', 'r');
 			obj = {
-				packageType: Communicator.PACKAGE_TYPES.iamback,
+				packageType: Rainfall.PACKAGE_TYPES.iamback,
 				id: this._myId
 			};
 
-			this._comm.listen((msg, from) => {
+			this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
 
 				console.log("[leaf.listening] Message welcomeback received from " + JSON.stringify(from));
@@ -59,13 +59,13 @@ function Leaf (driver, args, callback) {
 				callback(null, this);
 
 				return false;
-			}, Communicator.PACKAGE_TYPES.welcomeback, null,
+			}, Rainfall.PACKAGE_TYPES.welcomeback, null,
 			function () {console.log("[leaf.listening] Starting listening for welcome back.");});
 
 		} else {
-			obj = {packageType: Communicator.PACKAGE_TYPES.whoiscontroller};
+			obj = {packageType: Rainfall.PACKAGE_TYPES.whoiscontroller};
 
-			this._comm.listen((msg, from) => {
+			this._rain.listen((msg, from) => {
 						clearInterval(timerknock);
 
 						console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from) + ": " + JSON.stringify(msg));
@@ -85,31 +85,31 @@ function Leaf (driver, args, callback) {
 						callback(null, this);
 
 						return false;
-				    }, Communicator.PACKAGE_TYPES.iamcontroller, null, null);
+				    }, Rainfall.PACKAGE_TYPES.iamcontroller, null, null);
 
-			this._comm.listen((msg, from) => {
+			this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
 
 				var describeYourselfCallback = function (that) {
 					console.log("[leaf.listening] Message describeyourself received");
 
-					var enumClass = Communicator.NODE_CLASSES.get(that._nodeClass);
+					var enumClass = Rainfall.NODE_CLASSES.get(that._nodeClass);
 					var object = {
-						packageType: Communicator.PACKAGE_TYPES.description,
+						packageType: Rainfall.PACKAGE_TYPES.description,
 						id: that._myId,
 						nodeClass: that._nodeClass
 					};
 
-					if (enumClass.has(Communicator.NODE_CLASSES.actuator) && enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+					if (enumClass.has(Rainfall.NODE_CLASSES.actuator) && enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
 						object.dataType = that._dataType;
-						object.commandType = that._commandType;
-					} else if (enumClass.has(Communicator.NODE_CLASSES.actuator)) {
-						object.commandType = that._commandType;
-					} else if (enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+						object.commandType = that._rainandType;
+					} else if (enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
+						object.commandType = that._rainandType;
+					} else if (enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
 						object.dataType = that._dataType;
 					}
 
-					that._comm.send(from, object, function (err) { if (err) throw err; });
+					that._rain.send(from, object, function (err) { if (err) throw err; });
 					console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 				};
 
@@ -120,10 +120,10 @@ function Leaf (driver, args, callback) {
 				}
 
 				return false;
-			}, Communicator.PACKAGE_TYPES.describeyourself, null, null);
+			}, Rainfall.PACKAGE_TYPES.describeyourself, null, null);
 		}
 
-		this._comm.listen((msg, from) => {
+		this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
 
 				var lifetimeCallback = function (that) {
@@ -135,10 +135,10 @@ function Leaf (driver, args, callback) {
 					if (that._lifetime !== 0) {
 						setInterval(() => {
 							var object = {
-								packageType: Communicator.PACKAGE_TYPES.keepalive,
+								packageType: Rainfall.PACKAGE_TYPES.keepalive,
 								id: that._myId
 							};
-							that._comm.send(from, object, function (err) { if (err) throw err; });
+							that._rain.send(from, object, function (err) { if (err) throw err; });
 
 							console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
 						}, that._lifetime);
@@ -152,9 +152,9 @@ function Leaf (driver, args, callback) {
 				}
 
 				return false;
-			}, Communicator.PACKAGE_TYPES.lifetime, null, null);
+			}, Rainfall.PACKAGE_TYPES.lifetime, null, null);
 
-		this._comm.sendBroadcast(obj, function (err) {
+		this._rain.sendBroadcast(obj, function (err) {
 			if (err) throw err;
 		});
 		++nPackagesSent;
@@ -166,7 +166,7 @@ function Leaf (driver, args, callback) {
 				callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"), this);
 				clearInterval(timerknock);
 			} else {
-				this._comm.sendBroadcast(obj, function (err) {
+				this._rain.sendBroadcast(obj, function (err) {
 					if (err) throw err;
 				});
 				console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
@@ -204,15 +204,15 @@ function createLeaf(driver, args, callback) {
  */
 Leaf.prototype.sendData = function (data, callback) {
 	if (!data) throw Error("[leaf.sendData] Can't send undefined object.");
-	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
+	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
 
-	if (enumClass && !enumClass.has(Communicator.NODE_CLASSES.sensor)) {
+	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
 		var msg = "[leaf.sendData] This leaf is not a sensor. Data cannot be sent.";
 		throw new Error(msg);
 	}
 
 	var object = {
-		packageType: Communicator.PACKAGE_TYPES.data,
+		packageType: Rainfall.PACKAGE_TYPES.data,
 		id: this._myId
 	};
 
@@ -223,7 +223,7 @@ Leaf.prototype.sendData = function (data, callback) {
 	object.data = data;
 	console.log("[leaf.sendData] data sent " + JSON.stringify(object));
 
-	this._comm.send(this._controllerAddress, object, callback);
+	this._rain.send(this._controllerAddress, object, callback);
 };
 
 /**
@@ -232,14 +232,14 @@ Leaf.prototype.sendData = function (data, callback) {
  * @param {Leaf~onListening} [callback] function to be called when it starts listening
  */
 Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
-	var enumClass = Communicator.NODE_CLASSES.get(this._nodeClass);
+	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
 
-	if (enumClass && !enumClass.has(Communicator.NODE_CLASSES.actuator)) {
+	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
 		var msg = "[leaf.listenCommand] This leaf is not a actuator. Command cannot be received.";
 		throw new Error(msg);
 	}
 
-	this._comm.listen(objectCallback, Communicator.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
+	this._rain.listen(objectCallback, Rainfall.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
 	console.log("[leaf.listenCommand] Listening command from controller.");
 };
 
@@ -253,10 +253,10 @@ var parseClass = function(dataType, commandType) {
 	var result = 0;
 
 	if (dataType && dataType.length !== 0)
-		result |= Communicator.NODE_CLASSES.sensor;
+		result |= Rainfall.NODE_CLASSES.sensor;
 
 	if (commandType && commandType.length !== 0)
-		result |= Communicator.NODE_CLASSES.actuator;
+		result |= Rainfall.NODE_CLASSES.actuator;
 
 	return result;
 };
