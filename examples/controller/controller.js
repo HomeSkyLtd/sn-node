@@ -72,7 +72,6 @@ db.getNetworks((nets) => {
 						nodeInit(from);
 				});
 			}, 'iamback');
-
 			//Listens for descriptions
 			com.listen((obj, from) => {
 				console.log("[NEW DESCRIPTION] from " + obj.id + " (network " + net.id + ")");
