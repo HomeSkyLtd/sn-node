@@ -11,9 +11,18 @@
     "url": "https://github.com/HomeSkyLtd/sn-node/leaf"
   },
   "contributors": [
-  { "name": "Ricardo Boccoli Gallego", "email": "ricardo.gallego93@gmail.com" },
-  { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
-  { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" }
+    {
+      "name": "Ricardo Boccoli Gallego",
+      "email": "ricardo.gallego93@gmail.com"
+    },
+    {
+      "name": "Henrique Rodrigues",
+      "email": "henriqrodrigues@gmail.com"
+    },
+    {
+      "name": "Fabio Tsuyoshi Muramatsu",
+      "email": "ftmtsuyoshi@gmail.com"
+    }
   ],
   "keywords": [
     "leaf",
@@ -24,6 +33,7 @@
   "dependencies": {
     "enum": "^2.3.0",
     "mocha": "^2.4.5",
+    "rainfall": "0.0.5",
     "should": "^8.3.1"
   }
 }
