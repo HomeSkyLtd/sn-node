@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 
 var Enum = require('enum');
-var Rainfall = require("../rainfall");
+var Rainfall = require("rainfall");
 var fs = require("fs");
 
 /**
@@ -178,7 +178,6 @@ function Leaf (driver, args, callback) {
 
 /**
  * Factories instance of Leaf and get controller address.
- * @class
  * @param {Object} driver Driver object
  * @param {Object} args Arguments object: </br>
  * <ul>
