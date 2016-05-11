@@ -13,4 +13,4 @@ This node controls all the sensors and actuators in the network, they only commu
 Actually, the protocol is flexible enough to let you define a node as both a sensor and an actuator.
 
 ##Documentation
-For documentation on how to use the API, refer to [this](https://github.com/HomeSkyLtd/sn-node/blob/master/documentation.MD)
+For documentation on how to use the API, refer to [this](https://github.com/HomeSkyLtd/sn-node/blob/master/rainfall/documentation.MD)
