@@ -1,43 +1,93 @@
+/*jshint esversion: 6 */
+
 var net = require('net');
+var udp = require('../udp/');
 
 const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356;
 
 function Driver (params, callback) {
-    if (!params.)
-    this._socket = new net.Socket(params);
+    this._msgCallback = function () {};
+    this._port = params.rport;
+    this._listenBroadcast = params.listenbroadcast;
+    //TCP socket for general communication
+    this._tcpClient = new net.Socket();
+    
+    net.createServer((socket) => { 
+        console.log("foi");
+        this._tcpServer = socket;
+        udp.createDriver(params, (err, udpInstance) => {
+            this._udp = udpInstance;
+            if (callback) callback(null, this);
+        });
+        this._lastCallback = null; 
+
+
+        this._tcpClient.on('error', (err) => {
+            if (this._lastCallback)
+                this._lastCallback(err);
+            this._lastCallback = null;
+        });
+        this.tcpServer.on('error', (err) => {
+            if (this._lastCallback)
+                this._lastCallback(err);
+            this._lastCallback = null;
+        });
+    });
 }
+
 /**
     The client should call this function to instantiate the driver. The new driver is passed in the callback function.
     The implementation is very example, just copy and paste the code bellow.
-    @param {Object} [params] - An object containing parameters for the specific driver
+    @param {Object} [params] - An object containing rport and broadcast_port
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 **/
 function createDriver(params, callback) {
     new Driver(params, callback);
 }
-
 /**
     Starts listening for messages
     @param {Driver~onMessage} msgCallback - Function to be called when a message arrives
     @param {Driver~onListening} [listenCallback] - Function to be called driver is listening, or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
-    throw Error("Not implemented");
+    this._lastCallback = listenCallback;
+    this._tcpServer.on('data', (buf) => {
+            console.log("DATA");
+    });
+    listenCallback();
+    /*this._tcp.listen({ port: this._port }, () => {
+        this._lastCallback = null;
+        //Is listening, start events
+        var incomingMessages = {};
+        this._tcp.on('data', (buf) => {
+            console.log("DATA");
+        });
+
+        if (this._listenBroadcast) {
+            this._udp.listen(msgCallback, (udpError) => {
+                if (listenCallback) listenCallback(udpError);
+            });
+        }
+        else if (listenCallback)
+            listenCallback();
+    });*/
+
 };
 
 /**
     Stops listening for messages. But, if you start listening again, this instance must work
 */
 Driver.prototype.stop = function () {
-    throw Error("Not implemented");
+    this._udp.stop();
 };
 
 /**
     Closes driver. After that call, the driver don't need to work anymore and should stop any assync task
 */
 Driver.prototype.close = function () {
-    throw Error("Not implemented");
+    this._tcpServer.unref();
+    this._udp.close();
 };
 
 /**
@@ -48,20 +98,21 @@ Driver.prototype.close = function () {
 
 */
 Driver.prototype.send = function (to, message, callback) {
-    var socket = net.createConnection(to.port, to.address, function () {
-        socket.end(message);
-    });
-};
-
-/**
-    Gets the driver network address. Only need to work when "listening" was called
-    @returns {Driver~Address} Network address
-*/
-Driver.prototype.getAddress = function () {
-    return  {
-        address: this._socket.localAddress,
-        port: this._socket.localPort
-    };
+    if (to.address === this._udp.getBroadcastAddress().address) {
+        //Send broadcast using udp
+        this._udp.send(to, message, callback);
+    }
+    else {
+        this._lastCallback = callback;
+        this._tcpClient.connect({
+            port: to.port,
+            host: to.address,
+            localPort: this._port,
+        }, (socket) => {
+            console.log("connected");
+            socket.end(message);
+        });
+    }
 };
 
 /**
@@ -70,10 +121,11 @@ Driver.prototype.getAddress = function () {
     @returns {Driver~Address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
-    return {
-        address: BROADCAST_ADDR,
-        port: this._broadcast_port
-    };
+    return this._udp.getBroadcastAddress();
+};
+
+Driver.prototype.getAddress = function () {
+    return this._udp.getAddress();
 };
 
 /**
@@ -85,6 +137,19 @@ Driver.prototype.getBroadcastAddress = function () {
 Driver.compareAddresses = function (address1, address2) {
     return address1.address === address2.address;
 };
+
+createDriver({rport: 2929}, (err, test) => {
+    console.log("eita");
+    test.listen(() => { }, (err) => {
+        console.log("listening " + err);
+        test.send(test.getAddress(), Buffer.from("oifads"), (err) => {
+            if (err) console.log("err");
+            console.log("sent");
+            test.close();
+        });
+    });
+});
+
 
 exports.createDriver = createDriver;
 
