@@ -3,13 +3,14 @@
 <dl>
 <dt><a href="#Leaf">Leaf</a></dt>
 <dd></dd>
-<dt><a href="#createLeaf">createLeaf</a></dt>
-<dd></dd>
 </dl>
 
 ## Functions
 
 <dl>
+<dt><a href="#createLeaf">createLeaf(driver, args, [callback])</a></dt>
+<dd><p>Factories instance of Leaf and get controller address.</p>
+</dd>
 <dt><a href="#parseClass">parseClass(dataType, commandList)</a> ⇒ <code>Enum</code></dt>
 <dd><p>Decide if class is Sensor, Actuator or both.</p>
 </dd>
@@ -63,13 +64,10 @@ Listen a message with command from actuator to controller.
 
 <a name="createLeaf"></a>
 
-## createLeaf
-**Kind**: global class  
-<a name="new_createLeaf_new"></a>
-
-### new createLeaf(driver, args, [callback])
+## createLeaf(driver, args, [callback])
 Factories instance of Leaf and get controller address.
 
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
