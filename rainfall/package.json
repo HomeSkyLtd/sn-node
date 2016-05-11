@@ -1,6 +1,6 @@
 {
   "name": "rainfall",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "API implementation of the Rainfall protocol, used in home automation",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "rainfall.js",
