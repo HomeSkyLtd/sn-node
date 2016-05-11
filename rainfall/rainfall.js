@@ -469,7 +469,7 @@ function Rainfall (driver) {
 /**
     Sends a json object to address
     @param {Object} to - Object containing the address object of the recipient, depends on the driver
-    @param {Message} object - Json object containing the message to be sent
+    @param {Rainfall~Message} object - Json object containing the message to be sent
     @param {Rainfall~onSent} [callback] - Function to be called when the object was sent
 */
 Rainfall.prototype.send = function (to, object, callback) {
@@ -497,7 +497,7 @@ Rainfall.prototype.send = function (to, object, callback) {
 
 /**
     Sends a json object to broadcast address
-    @param {Message} object - Json object containing the message to be sent
+    @param {Rainfall~Message} object - Json object containing the message to be sent
     @param {Rainfall~onSent} [callback] - Function to be called when the object was sent
 */
 Rainfall.prototype.sendBroadcast = function (object, callback) {

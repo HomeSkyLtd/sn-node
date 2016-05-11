@@ -6,7 +6,7 @@ var C = xbee_api.constants;
 
 /**
 	@class
-	constructor of driver for xbee
+	Constructor for xbee driver
 	@param {Object} params - an object with the following parameters:<br/>
 	<ul>
 		<li>baud rate: symbols transmitted per second, 9600 by default
@@ -201,3 +201,28 @@ Driver.prototype.close = function() {
 };
 
 exports.createDriver = createDriver;
+
+/**
+ * Callback used by Driver.
+ * @callback Driver~onInitialized
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
+ */
+
+/**
+ * Callback used by listen.
+ * @callback Driver~onMessage
+ * @param {Buffer} message - Buffer containing the buffer received from the network
+ * @param {Object} from - Object containing the address object of the transmitter
+ */
+
+/**
+ * Callback used by listen.
+ * @callback Driver~onListening
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
+ */
+
+/**
+ * Callback used by send.
+ * @callback Driver~onSent
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */
