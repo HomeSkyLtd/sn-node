@@ -26,53 +26,12 @@ Driver.createDriver({rport: 4567}, function(err, driver) {
 			(err, leaf) => {
 				if (err) console.log(err);
 				else {
+					var i = 0;
 					setInterval(() => {
-						leaf.sendData({id: 1 , value: 23.2}, function (err) {if (err) console.log(err);});
+						leaf.sendData({id: 1 , value: 20+i%10}, function (err) {if (err) console.log(err);});
+						i += 0.1;
 					}, 5*1000);
 				}
 			});
 	}
 });
-
-/*
-setTimeout(() => {
-	Driver.createDriver({rport: 4568}, (err, driver) => {
-		if (err) console.log(err);
-		else {
-			var comm = new Rainfall.Rainfall(driver);
-
-			console.log("New communicator");
-			var to = {
-				port: 4567,
-				address: "192.168.1.111"
-			};
-
-			var msg = {
-				packageType: Rainfall.PACKAGE_TYPES.iamcontroller,
-				yourId: 1
-			};
-			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
-			console.log("[dummy-controller.send] Message iamcontroller sent.");
-
-			msg = {
-				packageType: Rainfall.PACKAGE_TYPES.welcomeback,
-			};
-			comm.send(to, msg, function(err) {if (err) done(err);});
-			console.log("[dummy-controller.send] Message welcome back sent.");
-
-			msg = {
-				packageType: Rainfall.PACKAGE_TYPES.lifetime,
-				lifetime: 5*1000
-			};
-			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
-			console.log("[dummy-controller.send] Message lifetime sent.");
-
-			msg = {
-				packageType: Rainfall.PACKAGE_TYPES.describeyourself
-			};
-			comm.send(to, msg, function(err) {if (err) console.log("Send error: " + err);});
-			console.log("[dummy-controller.send] Message describeyourself sent.");
-		}
-	});
-}, 5000);
-*/
