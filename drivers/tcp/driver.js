@@ -6,34 +6,49 @@ var udp = require('../udp/');
 const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356;
 
+/**
+    Creates the TCP driver. It also contains a UDP driver for broadcast communication
+*/
 function Driver (params, callback) {
     this._msgCallback = function () {};
     this._port = params.rport;
-    this._listenBroadcast = params.listenbroadcast;
-    //TCP socket for general communication
-    this._tcpClient = new net.Socket();
-    
-    net.createServer((socket) => { 
-        console.log("foi");
-        this._tcpServer = socket;
-        udp.createDriver(params, (err, udpInstance) => {
-            this._udp = udpInstance;
-            if (callback) callback(null, this);
-        });
-        this._lastCallback = null; 
-
-
-        this._tcpClient.on('error', (err) => {
-            if (this._lastCallback)
-                this._lastCallback(err);
+    this._msgCallback = null;
+    //TCP server to listen
+    this._tcpServer = net.createServer();
+    this._tcpServer.on('error', (err) => {
+        if (this._lastCallback) {
+            this._lastCallback(err);
             this._lastCallback = null;
-        });
-        this.tcpServer.on('error', (err) => {
-            if (this._lastCallback)
-                this._lastCallback(err);
-            this._lastCallback = null;
-        });
+        }
     });
+    this._tcpServer.on('connection', (socket) => {
+        var buf = null;
+        socket.on('data', (data) => {
+            if (buf === null)
+                buf = data;
+            else
+                buf = Buffer.concat([buf, data], buf.length + data.length);
+        });
+        socket.on('end', () => {
+            if (this._msgCallback)
+                this._msgCallback(buf);
+        });
+        socket.on('error', (err) => {
+            buf = err;
+        });
+        console.log("NEW CONNECTION");
+
+    });
+
+    this._tcpClient = new net.Socket();
+    this._tcpClient.on('error', (err) => {
+        if (this._lastCallback) {
+            this._lastCallback(err);
+            this._lastCallback = null;
+        }
+    });
+    if (callback)
+        callback(null, this);
 }
 
 /**
@@ -52,10 +67,13 @@ function createDriver(params, callback) {
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
     this._lastCallback = listenCallback;
-    this._tcpServer.on('data', (buf) => {
-            console.log("DATA");
+    this._tcpServer.listen({
+        port: this._port
+    }, (buf) => {
+        console.log("Listening");
+        listenCallback();
     });
-    listenCallback();
+    this._msgCallback = msgCallback;
     /*this._tcp.listen({ port: this._port }, () => {
         this._lastCallback = null;
         //Is listening, start events
@@ -86,8 +104,8 @@ Driver.prototype.stop = function () {
     Closes driver. After that call, the driver don't need to work anymore and should stop any assync task
 */
 Driver.prototype.close = function () {
-    this._tcpServer.unref();
-    this._udp.close();
+    this._tcpServer.close();
+    //this._udp.close();
 };
 
 /**
@@ -98,21 +116,15 @@ Driver.prototype.close = function () {
 
 */
 Driver.prototype.send = function (to, message, callback) {
-    if (to.address === this._udp.getBroadcastAddress().address) {
-        //Send broadcast using udp
-        this._udp.send(to, message, callback);
-    }
-    else {
-        this._lastCallback = callback;
-        this._tcpClient.connect({
-            port: to.port,
-            host: to.address,
-            localPort: this._port,
-        }, (socket) => {
-            console.log("connected");
-            socket.end(message);
-        });
-    }
+    this._lastCallback = callback;
+    this._tcpClient.connect({
+        port: to.port,
+        host: to.address,
+        localPort: this._port,
+    }, () => {
+        console.log("connected");
+        this._tcpClient.end(message);
+    });
 };
 
 /**
@@ -121,11 +133,11 @@ Driver.prototype.send = function (to, message, callback) {
     @returns {Driver~Address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
-    return this._udp.getBroadcastAddress();
+    //return this._udp.getBroadcastAddress();
 };
 
 Driver.prototype.getAddress = function () {
-    return this._udp.getAddress();
+    return this._tcpServer.address();
 };
 
 /**
@@ -138,14 +150,14 @@ Driver.compareAddresses = function (address1, address2) {
     return address1.address === address2.address;
 };
 
+console.log("Starting tests...");
 createDriver({rport: 2929}, (err, test) => {
-    console.log("eita");
-    test.listen(() => { }, (err) => {
-        console.log("listening " + err);
-        test.send(test.getAddress(), Buffer.from("oifads"), (err) => {
-            if (err) console.log("err");
-            console.log("sent");
-            test.close();
+    console.log("Created listener driver");
+    test.listen((msg) => { console.log("got message"); console.log(String(msg)); }, (err) => {
+        console.log("start listening ");
+        createDriver({rport: 3131 }, (err, test2) => {
+            console.log("Created sender driver");
+            test2.send( { port: 2929 }, Buffer.from("olar"));
         });
     });
 });
