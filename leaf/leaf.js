@@ -243,6 +243,39 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 };
 
 /**
+ * Send a message with command from actuator/sensor to controller.
+ * @param {Object|Array} command Array of objects or one object with this fields
+ * <ul>
+ * 		<li>id: which of its parameters he is sending.
+ * 		<li>command: executed by actuator
+ * </ul>
+ * @param {Leaf~onDataSent} [callback] function executed after data is sent
+ */
+Leaf.prototype.sendExternalCommand = function (command, callback) {
+	if (!command) throw Error("[leaf.sendExternalCommand] Can't send undefined object.");
+	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
+
+	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
+		var msg = "[leaf.listenCommand] This leaf is not a actuator. Command cannot be received.";
+		throw new Error(msg);
+	}
+
+	var object = {
+		packageType: Rainfall.PACKAGE_TYPES.externalcommand,
+		id: this._myId
+	};
+
+	if (!Array.isArray(command)) {
+		command = [command];
+	}
+
+	object.command = command;
+	console.log("[leaf.sendExternalCommand] command sent " + JSON.stringify(object));
+
+	this._rain.send(this._controllerAddress, object, callback);
+};
+
+/**
  * Decide if class is Sensor, Actuator or both.
  * @param {Array} dataType list of dataTypes to specify data.
  * @param {Array} commandList list of commandTypes to specify commands.

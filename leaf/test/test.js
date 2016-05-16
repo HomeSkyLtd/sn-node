@@ -15,14 +15,28 @@ describe('sensor-driver', function () {
 					driver,
 					{
 						dataType: [{
-							id: 100,
+							id: 101,
 							type: "real",
 							range: [0, 40],
 							measureStrategy: "periodic",
 							dataCategory: "temperature",
 							unit: "ºC"
+						},
+						{
+							id: 102,
+							type: "int",
+							range: [0, 255],
+							measureStrategy: "periodic",
+							dataCategory: "luminance",
+							unit: "lm"
 						}],
-						commandType: [],
+						commandType: [{
+							id: 103,
+							type: "real",
+							range: [0, 1],
+							commandCategory: "lightintensity",
+							unit: "cd"
+						}],
 						timeout: 5*1000,
 						limitOfPackets: 3
 					},
@@ -36,6 +50,15 @@ describe('sensor-driver', function () {
 									err.should.not.be.Error();
 								} else {
 									object.should.be.exactly("[{id: 101, value: 26}, {id: 102, value: 100}]");
+								}
+							});
+
+							object = {id: 103, value: 0.5};
+							leaf.sendExternalCommand(object, function(err) {
+								if (err) {
+									err.should.not.be.Error();
+								} else {
+									object.should.be.exactly("{id: 103, value: 0.5}");
 								}
 							});
 						}
