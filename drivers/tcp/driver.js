@@ -16,12 +16,17 @@ function Driver (params, callback) {
     //TCP server to listen
     this._tcpServer = net.createServer();
     this._tcpServer.on('error', (err) => {
+        console.log("Error on server tcp");
         if (this._lastCallback) {
             this._lastCallback(err);
             this._lastCallback = null;
         }
     });
+    this._tcpServer.on('close', (err) => {
+        console.log("CLosed server tcp");
+    });
     this._tcpServer.on('connection', (socket) => {
+        console.log("server got NEW CONNECTION");
         var buf = null;
         socket.on('data', (data) => {
             if (buf === null)
@@ -30,23 +35,17 @@ function Driver (params, callback) {
                 buf = Buffer.concat([buf, data], buf.length + data.length);
         });
         socket.on('end', () => {
+            console.log('server got end from client');
             if (this._msgCallback)
                 this._msgCallback(buf);
+            socket.destroy();
         });
         socket.on('error', (err) => {
+            console.log('server got error ' + err);
             buf = err;
         });
-        console.log("NEW CONNECTION");
-
     });
 
-    this._tcpClient = new net.Socket();
-    this._tcpClient.on('error', (err) => {
-        if (this._lastCallback) {
-            this._lastCallback(err);
-            this._lastCallback = null;
-        }
-    });
     if (callback)
         callback(null, this);
 }
@@ -69,8 +68,8 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
     this._lastCallback = listenCallback;
     this._tcpServer.listen({
         port: this._port
-    }, (buf) => {
-        console.log("Listening");
+    }, () => {
+        console.log("server Listening");
         listenCallback();
     });
     this._msgCallback = msgCallback;
@@ -105,7 +104,6 @@ Driver.prototype.stop = function () {
 */
 Driver.prototype.close = function () {
     this._tcpServer.close();
-    //this._udp.close();
 };
 
 /**
@@ -117,13 +115,26 @@ Driver.prototype.close = function () {
 */
 Driver.prototype.send = function (to, message, callback) {
     this._lastCallback = callback;
-    this._tcpClient.connect({
+    console.log({
+        port: to.port,
+        host: to.address,
+        localPort: this._port,
+    });
+    const client = net.createConnection({
         port: to.port,
         host: to.address,
         localPort: this._port,
     }, () => {
-        console.log("connected");
-        this._tcpClient.end(message);
+        console.log("client connected");
+        client.end(message);
+        callback();
+    });
+    client.on('end', () => {
+        console.log('client disconnected from server');
+    });
+    client.on('error', (err) => {
+        console.log("client got error: " + err);
+        client.destroy();
     });
 };
 
@@ -133,11 +144,7 @@ Driver.prototype.send = function (to, message, callback) {
     @returns {Driver~Address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
-    //return this._udp.getBroadcastAddress();
-};
-
-Driver.prototype.getAddress = function () {
-    return this._tcpServer.address();
+    return this._udp.getBroadcastAddress();
 };
 
 /**
@@ -152,13 +159,11 @@ Driver.compareAddresses = function (address1, address2) {
 
 console.log("Starting tests...");
 createDriver({rport: 2929}, (err, test) => {
-    console.log("Created listener driver");
-    test.listen((msg) => { console.log("got message"); console.log(String(msg)); }, (err) => {
-        console.log("start listening ");
-        createDriver({rport: 3131 }, (err, test2) => {
-            console.log("Created sender driver");
-            test2.send( { port: 2929 }, Buffer.from("olar"));
-        });
+    test.listen((msg) => { console.log("got message"); console.log(String(msg)); test.close(); }, (err) => {
+        createDriver({}, (err, test2) => {
+            test2.send( { port: 2929 }, Buffer.from("olar"), () => {  test2.close(); });
+
+        });    
     });
 });
 
