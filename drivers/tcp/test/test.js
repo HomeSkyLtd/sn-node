@@ -4,20 +4,24 @@ var driver = require("../driver.js");
 var should = require("should");
 
 describe('tcp', function(){
-    var tcpDriver;
+    var tcpDriver1, tcpDriver2;
 
     //clean tcpDriver before each test
     beforeEach('Closing and cleaning tcp driver', function(){
-        if (tcpDriver) tcpDriver.close();
-        tcpDriver = null;
+        if (tcpDriver1) 
+            tcpDriver1.close();
+        if (tcpDriver2)
+            tcpDriver2.close();
+        tcpDriver1 = null;
+        tcpDriver2 = null;
     });
 
     describe('#listen()', function(){
         it('should execute without errors', function(done){
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
-                tcpDriver = driverInstance;
+                tcpDriver1 = driverInstance;
                 if (err) err.should.not.be.Error();
-                tcpDriver.listen(
+                tcpDriver1.listen(
                     ()=>{},
                     (err) => {
                         if(err) done(err);
@@ -28,36 +32,36 @@ describe('tcp', function(){
         });
     });
 
+    
     describe('#send()', function(){
         it('should send message correctly to server', function(done){
             function msgCallback(msg, from){
-                from.port.should.be.exactly(4567);
+                from.port.should.be.exactly(4568);
                 String(msg).should.be.exactly("Test");
                 done();
             }
 
             //use this function if you want to test sending with a different socket
             function sendMessage(to, msg){
-                sender = new driver.Driver({rport: 4568, broadcast_port:4568}, (err)=>{
-                    if(err) done(err);
-                    sender.send(to, msg, (err)=>{
+                driver.createDriver({rport: 4568, broadcast_port:4568}, (err, driverInstance)=>{
+                    tcpDriver2 = driverInstance;
+                    tcpDriver2.listen(()=>{}, () => {
                         if(err) done(err);
-                        sender.close();
+                        tcpDriver2.send(to, msg, (err)=>{
+                            if(err) done(err);
+                        });
                     });
                 });
             }
-
             driver.createDriver({rport:4567, broadcast_port: 4567}, (err, driverInstance)=>{
-                tcpDriver = driverInstance;
+                tcpDriver1 = driverInstance;
                 if (err) err.should.not.be.Error();
-                tcpDriver.listen(
+                tcpDriver1.listen(
                     msgCallback,
                     (err) => {
                         if(err) done(err);
                         else{
-                            tcpDriver.send({address: "localhost", port:4567}, Buffer.from("Test"), (err)=>{
-                                if(err) done(err);
-                            });
+                            sendMessage({address: "localhost", port: 4567}, Buffer.from("Test"));
                         }
                     }
                 );
@@ -66,6 +70,7 @@ describe('tcp', function(){
         });
     });
 
+    
     describe('#send() and #getBroadcastAddress()', function(){
         it('should broadcast message correctly', function(done){
             function msgCallback(msg, from){
@@ -74,14 +79,14 @@ describe('tcp', function(){
                 done();
             }
 
-            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
-                tcpDriver = driverInstance;
-                tcpDriver.listen(
+            driver.createDriver({rport:4567, broadcast_port: 4567, udplisten: true}, function(err, driverInstance){
+                tcpDriver1 = driverInstance;
+                tcpDriver1.listen(
                     msgCallback,
                     (err) => {
                         if(err) done(err);
                         else{
-                            tcpDriver.send(tcpDriver.getBroadcastAddress(), Buffer.from("Test"), function (err) {
+                            tcpDriver1.send(tcpDriver1.getBroadcastAddress(), Buffer.from("Test"), function (err) {
                                 if (err) done(err);
                             });
                         }
@@ -92,6 +97,7 @@ describe('tcp', function(){
         });
     });
 
+    
     describe('#send() as a reply to a received message', function(){
         it('should reply to messages correctly', function(done){
             function msgCallback(msg, from){
@@ -101,8 +107,8 @@ describe('tcp', function(){
             }
 
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
-                tcpDriver = driverInstance;
-                tcpDriver.listen(
+                tcpDriver1 = driverInstance;
+                tcpDriver1.listen(
                     msgCallback,
                     (err) => {
                         if(err) done(err);
@@ -122,7 +128,7 @@ describe('tcp', function(){
                                     (err) => {
                                         if(err) done(err);
                                         else{
-                                            tcpDriver.send({address:"localhost", port:4568}, Buffer.from("Test"), function (err) {
+                                            tcpDriver1.send({address:"localhost", port:4568}, Buffer.from("Test"), function (err) {
                                                 if (err) done(err);
                                             });
                                         }
@@ -138,6 +144,7 @@ describe('tcp', function(){
         });
     });
 
+    
     describe('#stop()', function(){
         it('server should stop listening', function(done){
             function msgCallback(msg, from){
@@ -149,14 +156,14 @@ describe('tcp', function(){
             }
 
              driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
-                tcpDriver = driverInstance;
-                tcpDriver.listen(
+                tcpDriver1 = driverInstance;
+                tcpDriver1.listen(
                     msgCallback,
                     (err) => {
                         if(err) done(err);
                         else{
-                            tcpDriver.stop();
-                            tcpDriver.send(tcpDriver.getBroadcastAddress(), Buffer.from("Test"), function (err) {
+                            tcpDriver1.stop();
+                            tcpDriver1.send(tcpDriver1.getBroadcastAddress(), Buffer.from("Test"), function (err) {
                                 if (err) done(err);
                             });
                             //should not get any calls to msgCallback
@@ -175,10 +182,10 @@ describe('tcp', function(){
             a2 = {address: "192.168.1.1", port: 1235};
             a3 = {address: "192.168.1.2", port: 1234};
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
-                tcpDriver = driverInstance;
-                tcpDriver.constructor.compareAddresses(a1,a2).should.be.true();
-                tcpDriver.constructor.compareAddresses(a1,a3).should.be.false();
-                tcpDriver.constructor.compareAddresses(a2,a3).should.be.false();
+                tcpDriver1 = driverInstance;
+                tcpDriver1.constructor.compareAddresses(a1,a2).should.be.true();
+                tcpDriver1.constructor.compareAddresses(a1,a3).should.be.false();
+                tcpDriver1.constructor.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });
