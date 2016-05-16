@@ -43,6 +43,8 @@ function Leaf (driver, args, callback) {
 	var id_dir = process.env.HOME + "/.node_id";
 	var obj = {};
 
+    var idIsOld = false;
+
 	fs.access(id_dir, fs.F_OK, (err) => {
 		if (!err) {
 			this._myId = fs.readFileSync(id_dir, 'utf8', 'r');
@@ -50,11 +52,17 @@ function Leaf (driver, args, callback) {
 				packageType: Rainfall.PACKAGE_TYPES.iamback,
 				id: this._myId
 			};
-
+            idIsOld = true;
 			this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
 
 				console.log("[leaf.listening] Message welcomeback received from " + JSON.stringify(from));
+                idIsOld = false;
+                this._controllerAddress = from;
+
+				for (var func of this._listOfCallbacks) {
+	                func(this);
+	            }
 
 				callback(null, this);
 
@@ -62,31 +70,33 @@ function Leaf (driver, args, callback) {
 			}, Rainfall.PACKAGE_TYPES.welcomeback, null,
 			function () {console.log("[leaf.listening] Starting listening for welcome back.");});
 
+
+
 		} else {
 			obj = {packageType: Rainfall.PACKAGE_TYPES.whoiscontroller};
-
-			this._rain.listen((msg, from) => {
-						clearInterval(timerknock);
-
-						console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from) + ": " + JSON.stringify(msg));
-					    this._controllerAddress = from;
-					    this._myId = msg.yourId;
-
-						fs.writeFile(id_dir, this._myId, function (err) {
-							if (err) throw err;
-
-							console.log("[leaf.listening] file " + id_dir + " created.");
-						});
-
-						for (var func of this._listOfCallbacks) {
-							func(this);
-						}
-
-						callback(null, this);
-
-						return false;
-				    }, Rainfall.PACKAGE_TYPES.iamcontroller, null, null);
 		}
+
+        this._rain.listen((msg, from) => {
+            clearInterval(timerknock);
+
+            console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from) + ": " + JSON.stringify(msg));
+            this._controllerAddress = from;
+            this._myId = msg.yourId;
+            idIsOld = false;
+            fs.writeFile(id_dir, this._myId, function (err) {
+                if (err) throw err;
+
+                console.log("[leaf.listening] file " + id_dir + " created.");
+            });
+
+            for (var func of this._listOfCallbacks) {
+                func(this);
+            }
+
+            callback(null, this);
+
+            return false;
+        }, Rainfall.PACKAGE_TYPES.iamcontroller, null, null);
 
 		this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
@@ -94,7 +104,7 @@ function Leaf (driver, args, callback) {
 				var lifetimeCallback = function (that) {
 					console.log("[leaf.listening] Message lifetime received");
 
-					that._controllerAddress = from;
+					// that._controllerAddress = from;
 					that._lifetime = msg.lifetime;
 
 					if (that._lifetime !== 0) {
@@ -109,8 +119,7 @@ function Leaf (driver, args, callback) {
 						}, that._lifetime);
 					}
 				};
-
-				if (this._myId) {
+				if (this._myId && !idIsOld) {
 					lifetimeCallback(this);
 				} else {
 					this._listOfCallbacks.push(lifetimeCallback);
@@ -144,8 +153,7 @@ function Leaf (driver, args, callback) {
 				that._rain.send(from, object, function (err) { if (err) throw err; });
 				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
 			};
-
-			if (this._myId) {
+			if (this._myId && !idIsOld) {
 				describeYourselfCallback(this);
 			} else {
 				this._listOfCallbacks.push(describeYourselfCallback);

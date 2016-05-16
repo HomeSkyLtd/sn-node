@@ -516,6 +516,8 @@ Rainfall.prototype.sendBroadcast = function (object, callback) {
     @param {Object[]|Object} [addresses] - Addresses that will issue the callback. It is null if listening
     for or all package types
 
+    @param {Rainfall~onListening} [listenCallback] - Function to be called when it starts listening for packages (or there is an error)
+
 */
 Rainfall.prototype.listen = function (objectCallback, packageTypes, addresses, listenCallback) {
     if (!this._driver) {
@@ -603,7 +605,7 @@ Rainfall.prototype.listen = function (objectCallback, packageTypes, addresses, l
                 var completeCallback = () => {
                     if (cmpCallback.callback(pkt, from) === false) {
                         that._listeningCallbacks.splice(i, 1);
-                        if (that._listeningCallbacks.length === 0) {
+                        if (that._listeningCallbacks.length === 0 && that._listening) {
                             that._driver.stop();
                             this._listening = false;
                         }
@@ -639,17 +641,30 @@ Rainfall.prototype.listen = function (objectCallback, packageTypes, addresses, l
         listenCallback(null);
 };
 
+/**
+    Stops all callbacks associated with the specified packageType from being called when the package arrives.
+    If a callback listens for more than one package type, it will still be called. Throws error if rainfall is closed.
+
+    @param {PACKAGE_TYPES[]|PACKAGE_TYPES|String[]|String} [packageTypes] - Package types that will stop being listened. If
+    it is falsy, stops all callbacks.
+*/
 Rainfall.prototype.stopListen = function (packageType) {
-    if (packageType !== undefined) {
+    if (!this._driver)
+        throw new Error("Can't listen using closed instance");
+    
+    if (packageType) {
         for (var i = this._listeningCallbacks.length - 1; i >= 0; i--) {
             if (this._listeningCallbacks[i].packageType === PACKAGE_TYPES.get(packageType).value) {
                 this._listeningCallbacks.splice(i, 1);
             }
         }
-        if (this._listeningCallbacks.length === 0) {
-            this._driver.stop();
-            this._listening = false;
-        }
+    }
+    else
+        this._listeningCallbacks = [];
+
+    if (this._listeningCallbacks.length === 0 && this._listening) {
+        this._driver.stop();
+        this._listening = false;
     }
 };
 
