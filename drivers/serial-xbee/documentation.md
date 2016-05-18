@@ -159,10 +159,10 @@ Parameters object used with the factory method
 | Name | Type | Description |
 | --- | --- | --- |
 | tty_port | <code>String</code> | The serial port where the xbee module is connected |
-| baud_rate | <code>Number</code> | Symbols transmitted per second, 9600 by default |
-| data_bits | <code>Number</code> | Number of bits to be transmitted in the serial channel, 8 by default |
-| stop_bits | <code>Number</code> | Number of stop bits used in the serial channel, 8 by default |
-| parity | <code>String</code> | Specify the behavior of the parity bit in the serial channel. Must be         one of "none", "even", "mark", "odd", "space". Defaults to "none". |
+| baud_rate | <code>Number</code> | (optional) Symbols transmitted per second, 9600 by default |
+| data_bits | <code>Number</code> | (optional) Number of bits to be transmitted in the serial channel, 8 by default |
+| stop_bits | <code>Number</code> | (optional) Number of stop bits used in the serial channel, 8 by default |
+| parity | <code>String</code> | (optional) Specify the behavior of the parity bit in the serial channel. Must be         one of "none", "even", "mark", "odd", "space". Defaults to "none". |
 
 <a name="module_xbee_s1..address"></a>
 
@@ -174,5 +174,5 @@ Address object
 
 | Name | Type | Description |
 | --- | --- | --- |
-| 64-bit | <code>String</code> | MAC address of the device |
+| address | <code>String</code> | 64-bit MAC address of the device |
 

@@ -210,15 +210,15 @@ exports.compareAddresses = compareAddresses;
      Parameters object used with the factory method
      @typedef {Object} initParams
      @property {String} tty_port - The serial port where the xbee module is connected
-     @property {Number} [baud_rate] - Symbols transmitted per second, 9600 by default
-     @property {Number} [data_bits] - Number of bits to be transmitted in the serial channel, 8 by default
-     @property {Number} [stop_bits] - Number of stop bits used in the serial channel, 8 by default
-     @property {String} [parity] - Specify the behavior of the parity bit in the serial channel. Must be
+     @property {Number} baud_rate - (optional) Symbols transmitted per second, 9600 by default
+     @property {Number} data_bits - (optional) Number of bits to be transmitted in the serial channel, 8 by default
+     @property {Number} stop_bits - (optional) Number of stop bits used in the serial channel, 8 by default
+     @property {String} parity - (optional) Specify the behavior of the parity bit in the serial channel. Must be
         one of "none", "even", "mark", "odd", "space". Defaults to "none".
  */
 
  /**
     Address object
     @typedef {Object} address
-    @property {String} 64-bit MAC address of the device
+    @property {String} address - 64-bit MAC address of the device
  */
