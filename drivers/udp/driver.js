@@ -5,39 +5,7 @@ const dgram = require("dgram");
 const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356;
 
-/**
- * Callback used by Driver.
- * @callback Driver~onInitialized
- * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
- * @param {Driver} driver - The driver object
- */
-
-/**
- * Callback used by listen.
- * @callback Driver~onMessage
- * @param {Buffer} message - Buffer containing the buffer received from the network
- * @param {Driver~Address} from - Address of the transmitter
- */
-
-/**
- * Callback used by listen.
- * @callback Driver~onListening
- * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
- */
-
-/**
- * Callback used by send.
- * @callback Driver~onSent
- * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
- */
-
-/**
-    @typedef {Object} Driver~Address
-    @property {String} address - The IP (v4 or v6) address
-    @property {Number} port - The UDP port
-    @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
- */
-
+/** @module udp */
 /**
     @class UDP driver
 **/
@@ -78,8 +46,8 @@ function createDriver(params, callback) {
 
 /**
     Opens an UDP socket listening the port and address specified in the rport parameter
-    @param {Driver~onMessage} msgCallback - Function to be called when a message arrives
-    @param {Driver~onListening} [listenCallback] - Function to be called when the driver is listening,
+    @param {onMessage} msgCallback - Function to be called when a message arrives
+    @param {onListening} [listenCallback] - Function to be called when the driver is listening,
         or if an error occurred
 */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
@@ -93,9 +61,9 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 
 /**
     Sends an UDP packet.
-    @param {Driver~Address} to - Object containing the address object of the recipient
+    @param {Address} to - Object containing the address object of the recipient
     @param {Buffer} message - Buffer containing the message to be sent
-    @param {Driver~onSent} [callback] - Function to be called when the message was sent
+    @param {onSent} [callback] - Function to be called when the message was sent
 
 */
 Driver.prototype.send = function(to, msg, callback) {
@@ -127,7 +95,7 @@ Driver.prototype.stop = function() {
 
 /**
     Gets the driver network address. Only works when "listening" was called beforehands
-    @returns {Driver~Address} Network address
+    @returns {Address} Network address
 */
 Driver.prototype.getAddress = function(){
     var address;
@@ -146,15 +114,14 @@ var compareAddresses = function(a1, a2){
 
 /**
     Gets the broadcast network address.
-    @returns {Driver~Address}  Broadcast network address
+    @returns {Address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port, family: 'IPv4'};
 };
 
-/**
-@module rainfallUdp
-*/
+
+
 /**
     Creates a driver for UDP socket
     @param {Object} params - an object with the following parameters:<br />
@@ -164,14 +131,49 @@ Driver.prototype.getBroadcastAddress = function(){
         <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,
             a default value (2356) will be used
     </ul>
-    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
+    @param {onInitialized} [callback] - Function to be called when the driver is initialized
 
 */
 exports.createDriver = createDriver;
+
 /**
     Compares two addresses
-    @param {Driver~Address} a1 - First address to compare
-    @param {Driver~Address} a2 - Second address to compare
+    @param {Address} a1 - First address to compare
+    @param {Address} a2 - Second address to compare
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
 exports.compareAddresses = compareAddresses;
+
+
+/**
+ * Callback used by Driver.
+ * @callback onInitialized
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
+ * @param {Driver} driver - The driver object
+ */
+
+/**
+ * Callback used by listen.
+ * @callback onMessage
+ * @param {Buffer} message - Buffer containing the buffer received from the network
+ * @param {Address} from - Address of the transmitter
+ */
+
+/**
+ * Callback used by listen.
+ * @callback onListening
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
+ */
+
+/**
+ * Callback used by send.
+ * @callback onSent
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */
+
+/**
+    @typedef {Object} Address
+    @property {String} address - The IP (v4 or v6) address
+    @property {Number} port - The UDP port
+    @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
+ */

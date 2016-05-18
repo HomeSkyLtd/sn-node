@@ -1,174 +1,166 @@
-## Modules
+<a name="module_udp"></a>
 
-<dl>
-<dt><a href="#module_rainfallUdp">rainfallUdp</a></dt>
-<dd></dd>
-</dl>
+## udp
 
-## Classes
+* [udp](#module_udp)
+    * _static_
+        * [.createDriver](#module_udp.createDriver)
+        * [.compareAddresses](#module_udp.compareAddresses) ⇒ <code>boolean</code>
+    * _inner_
+        * [~Driver](#module_udp..Driver)
+            * [.listen(msgCallback, [listenCallback])](#module_udp..Driver+listen)
+            * [.send(to, message, [callback])](#module_udp..Driver+send)
+            * [.close()](#module_udp..Driver+close)
+            * [.stop()](#module_udp..Driver+stop)
+            * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>Address</code>
+            * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>Address</code>
+        * [~onInitialized](#module_udp..onInitialized) : <code>function</code>
+        * [~onMessage](#module_udp..onMessage) : <code>function</code>
+        * [~onListening](#module_udp..onListening) : <code>function</code>
+        * [~onSent](#module_udp..onSent) : <code>function</code>
+        * [~Address](#module_udp..Address) : <code>Object</code>
 
-<dl>
-<dt><a href="#Driver">Driver</a></dt>
-<dd><p>UDP driver</p>
-</dd>
-</dl>
+<a name="module_udp.createDriver"></a>
 
-<a name="module_rainfallUdp"></a>
-
-## rainfallUdp
-
-* [rainfallUdp](#module_rainfallUdp)
-    * [.createDriver](#module_rainfallUdp.createDriver)
-    * [.compareAddresses](#module_rainfallUdp.compareAddresses) ⇒ <code>boolean</code>
-
-<a name="module_rainfallUdp.createDriver"></a>
-
-### rainfallUdp.createDriver
+### udp.createDriver
 Creates a driver for UDP socket
 
-**Kind**: static property of <code>[rainfallUdp](#module_rainfallUdp)</code>  
+**Kind**: static property of <code>[udp](#module_udp)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | params | <code>Object</code> | an object with the following parameters:<br />     <ul>         <li>[rport]: The port listened by the server. If undefined, server will listen on             arbitrary port         <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,             a default value (2356) will be used     </ul> |
-| [callback] | <code>[onInitialized](#Driver..onInitialized)</code> | Function to be called when the driver is initialized |
+| [callback] | <code>onInitialized</code> | Function to be called when the driver is initialized |
 
-<a name="module_rainfallUdp.compareAddresses"></a>
+<a name="module_udp.compareAddresses"></a>
 
-### rainfallUdp.compareAddresses ⇒ <code>boolean</code>
+### udp.compareAddresses ⇒ <code>boolean</code>
 Compares two addresses
 
-**Kind**: static property of <code>[rainfallUdp](#module_rainfallUdp)</code>  
+**Kind**: static property of <code>[udp](#module_udp)</code>  
 **Returns**: <code>boolean</code> - true if address1 and adress2 are the same and false otherwise  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| a1 | <code>[Address](#Driver..Address)</code> | First address to compare |
-| a2 | <code>[Address](#Driver..Address)</code> | Second address to compare |
+| a1 | <code>Address</code> | First address to compare |
+| a2 | <code>Address</code> | Second address to compare |
 
-<a name="Driver"></a>
+<a name="module_udp..Driver"></a>
 
-## Driver
+### udp~Driver
 UDP driver
 
-**Kind**: global class  
+**Kind**: inner class of <code>[udp](#module_udp)</code>  
 
-* [Driver](#Driver)
-    * _instance_
-        * [.listen(msgCallback, [listenCallback])](#Driver+listen)
-        * [.send(to, message, [callback])](#Driver+send)
-        * [.close()](#Driver+close)
-        * [.stop()](#Driver+stop)
-        * [.getAddress()](#Driver+getAddress) ⇒ <code>[Address](#Driver..Address)</code>
-        * [.getBroadcastAddress()](#Driver+getBroadcastAddress) ⇒ <code>[Address](#Driver..Address)</code>
-    * _inner_
-        * [~onInitialized](#Driver..onInitialized) : <code>function</code>
-        * [~onMessage](#Driver..onMessage) : <code>function</code>
-        * [~onListening](#Driver..onListening) : <code>function</code>
-        * [~onSent](#Driver..onSent) : <code>function</code>
-        * [~Address](#Driver..Address) : <code>Object</code>
+* [~Driver](#module_udp..Driver)
+    * [.listen(msgCallback, [listenCallback])](#module_udp..Driver+listen)
+    * [.send(to, message, [callback])](#module_udp..Driver+send)
+    * [.close()](#module_udp..Driver+close)
+    * [.stop()](#module_udp..Driver+stop)
+    * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>Address</code>
+    * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>Address</code>
 
-<a name="Driver+listen"></a>
+<a name="module_udp..Driver+listen"></a>
 
-### driver.listen(msgCallback, [listenCallback])
+#### driver.listen(msgCallback, [listenCallback])
 Opens an UDP socket listening the port and address specified in the rport parameter
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| msgCallback | <code>[onMessage](#Driver..onMessage)</code> | Function to be called when a message arrives |
-| [listenCallback] | <code>[onListening](#Driver..onListening)</code> | Function to be called when the driver is listening,         or if an error occurred |
+| msgCallback | <code>onMessage</code> | Function to be called when a message arrives |
+| [listenCallback] | <code>onListening</code> | Function to be called when the driver is listening,         or if an error occurred |
 
-<a name="Driver+send"></a>
+<a name="module_udp..Driver+send"></a>
 
-### driver.send(to, message, [callback])
+#### driver.send(to, message, [callback])
 Sends an UDP packet.
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| to | <code>[Address](#Driver..Address)</code> | Object containing the address object of the recipient |
+| to | <code>Address</code> | Object containing the address object of the recipient |
 | message | <code>Buffer</code> | Buffer containing the message to be sent |
-| [callback] | <code>[onSent](#Driver..onSent)</code> | Function to be called when the message was sent |
+| [callback] | <code>onSent</code> | Function to be called when the message was sent |
 
-<a name="Driver+close"></a>
+<a name="module_udp..Driver+close"></a>
 
-### driver.close()
+#### driver.close()
 Closes the UDP socket. This driver should not be used anmore.
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
-<a name="Driver+stop"></a>
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
+<a name="module_udp..Driver+stop"></a>
 
-### driver.stop()
+#### driver.stop()
 Stops the UDP server, if listen() was called. You can still use the driver to listen and send
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
-<a name="Driver+getAddress"></a>
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
+<a name="module_udp..Driver+getAddress"></a>
 
-### driver.getAddress() ⇒ <code>[Address](#Driver..Address)</code>
+#### driver.getAddress() ⇒ <code>Address</code>
 Gets the driver network address. Only works when "listening" was called beforehands
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
-**Returns**: <code>[Address](#Driver..Address)</code> - Network address  
-<a name="Driver+getBroadcastAddress"></a>
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
+**Returns**: <code>Address</code> - Network address  
+<a name="module_udp..Driver+getBroadcastAddress"></a>
 
-### driver.getBroadcastAddress() ⇒ <code>[Address](#Driver..Address)</code>
+#### driver.getBroadcastAddress() ⇒ <code>Address</code>
 Gets the broadcast network address.
 
-**Kind**: instance method of <code>[Driver](#Driver)</code>  
-**Returns**: <code>[Address](#Driver..Address)</code> - Broadcast network address  
-<a name="Driver..onInitialized"></a>
+**Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
+**Returns**: <code>Address</code> - Broadcast network address  
+<a name="module_udp..onInitialized"></a>
 
-### Driver~onInitialized : <code>function</code>
+### udp~onInitialized : <code>function</code>
 Callback used by Driver.
 
-**Kind**: inner typedef of <code>[Driver](#Driver)</code>  
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem initializing this will be an Error object, otherwise will be null |
-| driver | <code>[Driver](#Driver)</code> | The driver object |
+| driver | <code>Driver</code> | The driver object |
 
-<a name="Driver..onMessage"></a>
+<a name="module_udp..onMessage"></a>
 
-### Driver~onMessage : <code>function</code>
+### udp~onMessage : <code>function</code>
 Callback used by listen.
 
-**Kind**: inner typedef of <code>[Driver](#Driver)</code>  
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | message | <code>Buffer</code> | Buffer containing the buffer received from the network |
-| from | <code>[Address](#Driver..Address)</code> | Address of the transmitter |
+| from | <code>Address</code> | Address of the transmitter |
 
-<a name="Driver..onListening"></a>
+<a name="module_udp..onListening"></a>
 
-### Driver~onListening : <code>function</code>
+### udp~onListening : <code>function</code>
 Callback used by listen.
 
-**Kind**: inner typedef of <code>[Driver](#Driver)</code>  
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem listening this will be an Error object, otherwise will be null |
 
-<a name="Driver..onSent"></a>
+<a name="module_udp..onSent"></a>
 
-### Driver~onSent : <code>function</code>
+### udp~onSent : <code>function</code>
 Callback used by send.
 
-**Kind**: inner typedef of <code>[Driver](#Driver)</code>  
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem sending this will be an Error object, otherwise will be null |
 
-<a name="Driver..Address"></a>
+<a name="module_udp..Address"></a>
 
-### Driver~Address : <code>Object</code>
-**Kind**: inner typedef of <code>[Driver](#Driver)</code>  
+### udp~Address : <code>Object</code>
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 **Properties**
 
 | Name | Type | Description |
