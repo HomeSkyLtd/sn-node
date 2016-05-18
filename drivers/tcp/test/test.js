@@ -8,7 +8,7 @@ describe('tcp', function(){
 
     //clean tcpDriver before each test
     beforeEach('Closing and cleaning tcp driver', function(){
-        if (tcpDriver1) 
+        if (tcpDriver1)
             tcpDriver1.close();
         if (tcpDriver2)
             tcpDriver2.close();
@@ -32,7 +32,7 @@ describe('tcp', function(){
         });
     });
 
-    
+
     describe('#send()', function(){
         it('should send message correctly to server', function(done){
             function msgCallback(msg, from){
@@ -70,7 +70,7 @@ describe('tcp', function(){
         });
     });
 
-    
+
     describe('#send() and #getBroadcastAddress()', function(){
         it('should broadcast message correctly', function(done){
             function msgCallback(msg, from){
@@ -97,7 +97,7 @@ describe('tcp', function(){
         });
     });
 
-    
+
     describe('#send() as a reply to a received message', function(){
         it('should reply to messages correctly', function(done){
             function msgCallback(msg, from){
@@ -144,7 +144,7 @@ describe('tcp', function(){
         });
     });
 
-    
+
     describe('#stop()', function(){
         it('server should stop listening', function(done){
             function msgCallback(msg, from){
@@ -183,9 +183,9 @@ describe('tcp', function(){
             a3 = {address: "192.168.1.2", port: 1234};
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
                 tcpDriver1 = driverInstance;
-                tcpDriver1.constructor.compareAddresses(a1,a2).should.be.true();
-                tcpDriver1.constructor.compareAddresses(a1,a3).should.be.false();
-                tcpDriver1.constructor.compareAddresses(a2,a3).should.be.false();
+                driver.compareAddresses(a1,a2).should.be.true();
+                driver.compareAddresses(a1,a3).should.be.false();
+                driver.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });
