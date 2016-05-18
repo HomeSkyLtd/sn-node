@@ -5,6 +5,11 @@ const dgram = require("dgram");
 const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356;
 
+/** @module UdpDriver
+    This module is the UDP driver for the Rainfall library. It exports two
+    functions: createDriver and compareAddresses
+*/
+
 /**
     @class UDP driver
 **/
