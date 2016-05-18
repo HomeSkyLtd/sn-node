@@ -26,7 +26,7 @@ Creates a driver on arbitrary port, uses default broadcast port (2456)
 and will listen to broadcast messages
 ```javascript
 var Udp = require('rainfall-udp');
-Udp.createDriver({udplisten: true}, (err, inst) => {
+Udp.createDriver({rport: 4568, udplisten: true}, (err, inst) => {
   //inst is the created driver, pass it to Rainfall or leaf
 });
 ```

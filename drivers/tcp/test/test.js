@@ -18,7 +18,7 @@ describe('tcp', function(){
 
     describe('#listen()', function(){
         it('should execute without errors', function(done){
-            driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
+            driver.createDriver({  }, function(err, driverInstance){
                 tcpDriver1 = driverInstance;
                 if (err) err.should.not.be.Error();
                 tcpDriver1.listen(

@@ -12,7 +12,8 @@
             * [.send(to, message, [callback])](#module_tcp..Driver+send)
             * [.stop()](#module_tcp..Driver+stop)
             * [.close()](#module_tcp..Driver+close)
-            * [.getBroadcastAddress()](#module_tcp..Driver+getBroadcastAddress) ⇒ <code>module:udp~address</code>
+            * [.getBroadcastAddress()](#module_tcp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_tcp..address)</code>
+            * [.getAddress()](#module_tcp..Driver+getAddress) ⇒ <code>[address](#module_tcp..address)</code>
         * [~initParams](#module_tcp..initParams)
         * [~onInitialized](#module_tcp..onInitialized) : <code>function</code>
         * [~onMessage](#module_tcp..onMessage) : <code>function</code>
@@ -55,7 +56,8 @@ Compares two addresses
     * [.send(to, message, [callback])](#module_tcp..Driver+send)
     * [.stop()](#module_tcp..Driver+stop)
     * [.close()](#module_tcp..Driver+close)
-    * [.getBroadcastAddress()](#module_tcp..Driver+getBroadcastAddress) ⇒ <code>module:udp~address</code>
+    * [.getBroadcastAddress()](#module_tcp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_tcp..address)</code>
+    * [.getAddress()](#module_tcp..Driver+getAddress) ⇒ <code>[address](#module_tcp..address)</code>
 
 <a name="module_tcp..Driver+listen"></a>
 
@@ -98,11 +100,18 @@ Stops the UDP server, if listen() was called. You can still use the driver to li
 **Kind**: instance method of <code>[Driver](#module_tcp..Driver)</code>  
 <a name="module_tcp..Driver+getBroadcastAddress"></a>
 
-#### driver.getBroadcastAddress() ⇒ <code>module:udp~address</code>
+#### driver.getBroadcastAddress() ⇒ <code>[address](#module_tcp..address)</code>
 Gets the broadcast network address.
 
 **Kind**: instance method of <code>[Driver](#module_tcp..Driver)</code>  
-**Returns**: <code>module:udp~address</code> - Broadcast network address  
+**Returns**: <code>[address](#module_tcp..address)</code> - Broadcast network address  
+<a name="module_tcp..Driver+getAddress"></a>
+
+#### driver.getAddress() ⇒ <code>[address](#module_tcp..address)</code>
+Gets the driver network address. Only works when "listening" was called beforehands
+
+**Kind**: instance method of <code>[Driver](#module_tcp..Driver)</code>  
+**Returns**: <code>[address](#module_tcp..address)</code> - Network address  
 <a name="module_tcp..initParams"></a>
 
 ### tcp~initParams
@@ -111,7 +120,7 @@ Gets the broadcast network address.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| udpListen | <code>Boolean</code> | (Optional) True if you want to listen for broadcast     messages and false (or undefined) otherwise |
+| udplisten | <code>Boolean</code> | (Optional) True if you want to listen for broadcast     messages and false (or undefined) otherwise |
 | rport | <code>Number</code> | (Optional) The port listened by the TCP (and UDP if you are     listening for broadcasts). If undefined, server will listen on arbitrary port. |
 | broadcast_port | <code>Number</code> | (Optional) The port used when creating a broadcast address. If undefined, a default value (2356) will be used |
 

@@ -95,6 +95,7 @@ function Driver (params, callback) {
     //Creates UDP for broadcast
     udp.createDriver(params, (err, udpInstance) => {
         this._udpDriver = udpInstance;
+        this._port = udpInstance.getAddress().port;
         if (err)
             callback(err);
         else if (callback)
@@ -174,10 +175,9 @@ Driver.prototype.close = function () {
     this._udpDriver.close();
 };
 
-
 /**
     Gets the broadcast network address.
-    @returns {module:udp~address}  Broadcast network address
+    @returns {module:tcp~address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function () {
     return this._udpDriver.getBroadcastAddress();
@@ -187,6 +187,13 @@ var compareAddresses = function (address1, address2) {
     return address1.address === address2.address;
 };
 
+/**
+    Gets the driver network address. Only works when "listening" was called beforehands
+    @returns {module:tcp~address} Network address
+*/
+Driver.prototype.getAddress = function() {
+    return this._udpDriver.getAddress();
+}
 
 
 /**
