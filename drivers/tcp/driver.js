@@ -4,7 +4,7 @@ var net = require('net');
 var udp = require('rainfall-udp');
 
 const BROADCAST_ADDR = "255.255.255.255";
-const BROADCAST_PORT = 2356;
+const BROADCAST_PORT = 2357;
 
 
 /** @module tcp */
@@ -15,7 +15,7 @@ const BROADCAST_PORT = 2356;
     messages and false (or undefined) otherwise
     @property {Number} [rport] - (Optional) The port listened by the TCP (and UDP if you are
     listening for broadcasts). If undefined, server will listen on arbitrary port.
-    @property {Number} [broadcast_port] - (Optional) The port used when creating a broadcast address. If undefined, a default value (2356) will be used
+    @property {Number} [broadcast_port] - (Optional) The port used when creating a broadcast address. If undefined, a default value (2357) will be used
 */
 
 /**
@@ -59,6 +59,8 @@ function Driver (params, callback) {
     this._port = params.rport;
     this._msgCallback = null;
     this._udpListen = params.udplisten;
+    if (!this.broadcast_port)
+        this.broadcast_port = BROADCAST_PORT;
     //TCP server to listen
     this._tcpServer = net.createServer();
     this._tcpServer.on('error', (err) => {
