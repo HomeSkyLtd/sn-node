@@ -176,9 +176,9 @@ describe('udp', function(){
             a3 = {address: "192.168.1.2", port: 1234};
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
                 udpDriver = driverInstance;
-                udpDriver.compareAddresses(a1,a2).should.be.true();
-                udpDriver.compareAddresses(a1,a3).should.be.false();
-                udpDriver.compareAddresses(a2,a3).should.be.false();
+                driver.compareAddresses(a1,a2).should.be.true();
+                driver.compareAddresses(a1,a3).should.be.false();
+                driver.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });
