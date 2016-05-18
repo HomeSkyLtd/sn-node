@@ -6,7 +6,7 @@ const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356; 
 
 /**
-    @module rainfall-udp
+    @module rainfallUdp
 **/
 
 /**
