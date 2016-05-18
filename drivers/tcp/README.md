@@ -6,7 +6,7 @@ You'll use this driver to pass it to the Rainfall library or the Leaf library. I
 to listen for broadcast messages you must set `udplisten` in the parameters to `true`.
 ###Examples
 
-Creates a driver on port 4567 and uses default broadcast port (2456)
+Creates a driver on port 4567 and uses default broadcast port (2357)
 ```javascript
 var Udp = require('rainfall-udp');
 Udp.createDriver({rport: 4567}, (err, inst) => {
@@ -22,7 +22,7 @@ Udp.createDriver({rport: 4567, broadcast_port: 4567}, (err, inst) => {
 });
 ```
 
-Creates a driver on arbitrary port, uses default broadcast port (2456)
+Creates a driver on arbitrary port, uses default broadcast port (2357)
 and will listen to broadcast messages
 ```javascript
 var Udp = require('rainfall-udp');

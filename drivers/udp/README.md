@@ -7,7 +7,7 @@ You'll use this driver to pass it to the Rainfall library or the Leaf library.
 
 ###Examples
 
-Creates a driver on port 4567 and uses default broadcast port (2456)
+Creates a driver on port 4567 and uses default broadcast port (2356)
 ```javascript
 var Udp = require('rainfall-udp');
 Udp.createDriver({rport: 4567}, (err, inst) => {
@@ -23,7 +23,7 @@ Udp.createDriver({rport: 4567, broadcast_port: 4567}, (err, inst) => {
 });
 ```
 
-Creates a driver on arbitrary port and uses default broadcast port (2456)
+Creates a driver on arbitrary port and uses default broadcast port (2356)
 ```javascript
 var Udp = require('rainfall-udp');
 Udp.createDriver({}, (err, inst) => {
