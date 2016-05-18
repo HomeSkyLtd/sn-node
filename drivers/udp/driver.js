@@ -3,11 +3,40 @@
 const dgram = require("dgram");
 
 const BROADCAST_ADDR = "255.255.255.255";
-const BROADCAST_PORT = 2356; 
+const BROADCAST_PORT = 2356;
 
 /**
-    @module rainfallUdp
-**/
+ * Callback used by Driver.
+ * @callback Driver~onInitialized
+ * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
+ * @param {Driver} driver - The driver object
+ */
+
+/**
+ * Callback used by listen.
+ * @callback Driver~onMessage
+ * @param {Buffer} message - Buffer containing the buffer received from the network
+ * @param {Driver~Address} from - Address of the transmitter
+ */
+
+/**
+ * Callback used by listen.
+ * @callback Driver~onListening
+ * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
+ */
+
+/**
+ * Callback used by send.
+ * @callback Driver~onSent
+ * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */
+
+/**
+    @typedef {Object} Driver~Address
+    @property {String} address - The IP (v4 or v6) address
+    @property {Number} port - The UDP port
+    @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
+ */
 
 /**
     @class UDP driver
@@ -123,7 +152,9 @@ Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port, family: 'IPv4'};
 };
 
-
+/**
+@module rainfallUdp
+*/
 /**
     Creates a driver for UDP socket
     @param {Object} params - an object with the following parameters:<br />
@@ -144,36 +175,3 @@ exports.createDriver = createDriver;
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
 exports.compareAddresses = compareAddresses;
-
-/**
- * Callback used by Driver.
- * @callback Driver~onInitialized
- * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
- * @param {Driver} driver - The driver object
- */
-
-/**
- * Callback used by listen.
- * @callback Driver~onMessage
- * @param {Buffer} message - Buffer containing the buffer received from the network
- * @param {Driver~Address} from - Address of the transmitter
- */
-
-/**
- * Callback used by listen.
- * @callback Driver~onListening
- * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
- */
-
-/**
- * Callback used by send.
- * @callback Driver~onSent
- * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
- */
-
-/**
-    @typedef {Object} Driver~Address
-    @property {String} address - The IP (v4 or v6) address 
-    @property {Number} port - The UDP port
-    @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
- */
