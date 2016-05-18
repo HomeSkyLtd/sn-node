@@ -100,8 +100,8 @@ Driver.prototype.getAddress = function() {
 
 /**
  * Listen to serial port, when it is open. When a frame is received form XBee, executes callback msgCallback.
- * @param {module:xbee_s1~onListening} [msgCallback] - Callback executed when serial port is open.
- * @param {module:xbee_s1~onMessage} [listenCallback] - Callback executed when a XBee delivers a frame.
+ * @param {module:xbee_s1~onListening} [listenCallback] - Callback executed when serial port is open.
+ * @param {module:xbee_s1~onMessage} [msgCallback] - Callback executed when a XBee delivers a frame.
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
 	// Set private msgCallback so it is not null (XBee is open).
@@ -185,6 +185,7 @@ exports.compareAddresses = compareAddresses;
  * Callback used by Driver.
  * @callback module:xbee_s1~onInitialized
  * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
+ * @param {Driver} driver - The created driver object
  */
 
 /**
