@@ -9,6 +9,9 @@ const BROADCAST_PORT = 2356;
     @module rainfall-udp
 **/
 
+/**
+    @class UDP driver
+**/
 function Driver(params, cb){
     //sets listening port, if defined
     if(params.rport !== undefined) this._rport = params.rport;
