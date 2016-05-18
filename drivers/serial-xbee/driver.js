@@ -5,16 +5,12 @@ var SerialPort = require('serialport').SerialPort;
 var C = xbee_api.constants;
 
 /**
+    @module xbee_s1
+*/
+
+/**
 	@class
-	Constructor for xbee driver
-	@param {Object} params - an object with the following parameters:<br/>
-	<ul>
-		<li>baud rate: symbols transmitted per second, 9600 by default
-		<li>data bits: 8 bits by default
-		<li>stop bits: 1 bit by default
-		<li>parity: "None" by default
-	</ul>
-	@param {Driver~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
+	Xbee-S1 driver class
 */
 function Driver(params, callback) {
 	this._tty_port = params.tty_port; // /dev/ttyAMA0, /dev/ttyUSB0, etc.
@@ -47,41 +43,17 @@ function Driver(params, callback) {
 	});
 }
 
-/**
-	Creates a driver for xbee
-	@param {Object} params - an object with the following parameters:<br/>
-	<ul>
-		<li>baud rate: symbols transmitted per second, 9600 by default
-		<li>data bits: 8 bits by default
-		<li>stop bits: 1 bit by default
-		<li>parity: "None" by default
-	</ul>
-	@param {Driver~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
-*/
+
 function createDriver(params, callback) {
 	new Driver(params, callback);
 }
 
-/**
-	Compare if two XBee addresses are equals.
-	@param {object} - First Xbee address
-	@param {object} - Second Xbee address
-	@returns {boolean} True if address1 is equal to address2, false otherwise.
-*/
-Driver.compareAddresses = function(address1, address2) {
+compareAddresses = function(address1, address2) {
 	var addr1Pad = "0".repeat(64).concat(address1.address).substr(-64);
 	var addr2Pad = "0".repeat(64).concat(address2.address).substr(-64);
 	return addr1Pad === addr2Pad;
 };
 
-/*
-	Private method that saves MAC address as this objects' attribute.
-	@param {Driver~onAddressReady} [callback] - Callback function to be executes after address is read from device and saved.
-	@returns {Object} an object with the following parameters:<br/>
-	<ul>
-		<li>address: device's 64 bits MAC address as value in address field.
-	</ul>
-*/
 Driver.prototype._getAddress = function(callback) {
 	// If address is already saved, just return it.
 	if (!this.address) {
@@ -128,8 +100,8 @@ Driver.prototype.getAddress = function() {
 
 /**
  * Listen to serial port, when it is open. When a frame is received form XBee, executes callback msgCallback.
- * @param {Driver~onListen} [callback] - Callback executed when serial port is open.
- * @param {Driver~onMessage} [callback] - Callback executed when a XBee delivers a frame.
+ * @param {module:xbee_s1~onListening} [msgCallback] - Callback executed when serial port is open.
+ * @param {module:xbee_s1~onMessage} [listenCallback] - Callback executed when a XBee delivers a frame.
  */
 Driver.prototype.listen = function (msgCallback, listenCallback) {
 	// Set private msgCallback so it is not null (XBee is open).
@@ -150,10 +122,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 
 /**
  * A method to get the broadcast address, which is defined by XBee and constant equals to 0xFFFF.
- * @returns {Object} An object with the following parameters:<br/>
- * <ul>
- *  <li>address: 64 bit MAC address of the broadcast address, defined by XBee and constant.
- * </ul>
+ * @returns {module:xbee_s1~address} An object with the broadcast address
  */
 Driver.prototype.getBroadcastAddress = function () {
 	return {address: "000000000000FFFF"};
@@ -161,12 +130,9 @@ Driver.prototype.getBroadcastAddress = function () {
 
 /**
  * Send a message to an destination, and an optional callback is executed after.
- * @param {Object} to - an object with the following parameters:<br/>
- * <ul>
- *  <li>address: 64 bit MAC address of the destination device.
- * </ul>
+ * @param {module:xbee_s1~address} to - the destination address
  * @param {Buffer} msg - content to be sent to destination
- * @param {Driver~onSent} [callback] - function to be executed after package is sent
+ * @param {module:xbee_s1~onSent} [callback] - function to be executed after package is sent
  */
 Driver.prototype.send = function (to, msg, callback) {
 	var frame_obj = {
@@ -200,29 +166,59 @@ Driver.prototype.close = function() {
 	}
 };
 
+/**
+	Factory method that constructs Driver instances
+	@param {module:xbee_s1~initParams} params - the object specifying the driver parameters
+	@param {module:xbee_s1~onInitialized} [callback] - Function to be called when serial port is initialized and MAC address is read.
+*/
 exports.createDriver = createDriver;
 
 /**
+	Compare if two XBee addresses are equal.
+	@param {module:xbee_s1~address} a1 - First Xbee address
+	@param {module:xbee_s1~address} a2 - Second Xbee address
+	@returns {boolean} True if address1 is equal to address2, false otherwise.
+*/
+exports.compareAddresses = compareAddresses;
+
+/**
  * Callback used by Driver.
- * @callback Driver~onInitialized
+ * @callback module:xbee_s1~onInitialized
  * @param {Error} error - If there is a problem initializing this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by listen.
- * @callback Driver~onMessage
+ * @callback module:xbee_s1~onMessage
  * @param {Buffer} message - Buffer containing the buffer received from the network
- * @param {Object} from - Object containing the address object of the transmitter
+ * @param {module:xbee_s1~address} from - Object containing the address object of the transmitter
  */
 
 /**
  * Callback used by listen.
- * @callback Driver~onListening
+ * @callback onListening
  * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
  */
 
 /**
  * Callback used by send.
- * @callback Driver~onSent
+ * @callback onSent
  * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+ */
+
+ /**
+     Parameters object used with the factory method
+     @typedef {Object} initParams
+     @property {String} tty_port - The serial port where the xbee module is connected
+     @property {Number} [baud_rate] - Symbols transmitted per second, 9600 by default
+     @property {Number} [data_bits] - Number of bits to be transmitted in the serial channel, 8 by default
+     @property {Number} [stop_bits] - Number of stop bits used in the serial channel, 8 by default
+     @property {String} [parity] - Specify the behavior of the parity bit in the serial channel. Must be
+        one of "none", "even", "mark", "odd", "space". Defaults to "none".
+ */
+
+ /**
+    Address object
+    @typedef {Object} address
+    @property {String} 64-bit MAC address of the device
  */

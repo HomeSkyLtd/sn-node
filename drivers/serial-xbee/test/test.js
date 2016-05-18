@@ -188,12 +188,10 @@ describe('serial-xbee', function(){
                 a1 = {address: "0013A20040B0783F"};
                 a2 = {address: "13A20040B0783F"};
                 a3 = {address: "1013A20040B0783F"};
-                driver.createDriver({tty_port: "/dev/ttyUSB0"}, (err, xbeeDriver) =>{
-                    xbeeDriver.constructor.compareAddresses(a1,a2).should.be.true();
-                    xbeeDriver.constructor.compareAddresses(a1,a3).should.be.false();
-                    xbeeDriver.constructor.compareAddresses(a2,a3).should.be.false();
-                    done();
-                });
+                driver.compareAddresses(a1,a2).should.be.true();
+                driver.compareAddresses(a1,a3).should.be.false();
+                driver.compareAddresses(a2,a3).should.be.false();
+                done();
             });
         });
     });
