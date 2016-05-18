@@ -8,6 +8,11 @@ const BROADCAST_PORT = 2356;
 
 /** @module udp */
 
+/**
+    @typedef initParams
+    @property {Number} [rport] - (Optional) The port listened by the server. If undefined, server will listen on arbitrary port
+    @property {Number} [broadcast_port] - (Optional) The port used when creating a broadcast address. If undefined, a default value (2356) will be used
+*/
 
 /**
  * Callback used by Driver.
@@ -158,13 +163,7 @@ Driver.prototype.getBroadcastAddress = function(){
 
 /**
     Creates a driver for UDP socket
-    @param {Object} params - an object with the following parameters:<br />
-    <ul>
-        <li>[rport]: The port listened by the server. If undefined, server will listen on
-            arbitrary port
-        <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,
-            a default value (2356) will be used
-    </ul>
+    @param {module:udp~initParams} params - Parameters to initialize the udp driver
     @param {module:udp~onInitialized} [callback] - Function to be called when the driver is initialized
 
 */

@@ -14,6 +14,7 @@
             * [.stop()](#module_udp..Driver+stop)
             * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[address](#module_udp..address)</code>
             * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_udp..address)</code>
+        * [~initParams](#module_udp..initParams)
         * [~onInitialized](#module_udp..onInitialized) : <code>function</code>
         * [~onMessage](#module_udp..onMessage) : <code>function</code>
         * [~onListening](#module_udp..onListening) : <code>function</code>
@@ -29,7 +30,7 @@ Creates a driver for UDP socket
 
 | Param | Type | Description |
 | --- | --- | --- |
-| params | <code>Object</code> | an object with the following parameters:<br />     <ul>         <li>[rport]: The port listened by the server. If undefined, server will listen on             arbitrary port         <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,             a default value (2356) will be used     </ul> |
+| params | <code>[initParams](#module_udp..initParams)</code> | Parameters to initialize the udp driver |
 | [callback] | <code>[onInitialized](#module_udp..onInitialized)</code> | Function to be called when the driver is initialized |
 
 <a name="module_udp.compareAddresses"></a>
@@ -109,6 +110,17 @@ Gets the broadcast network address.
 
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 **Returns**: <code>[address](#module_udp..address)</code> - Broadcast network address  
+<a name="module_udp..initParams"></a>
+
+### udp~initParams
+**Kind**: inner typedef of <code>[udp](#module_udp)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| rport | <code>Number</code> | (Optional) The port listened by the server. If undefined, server will listen on arbitrary port |
+| broadcast_port | <code>Number</code> | (Optional) The port used when creating a broadcast address. If undefined, a default value (2356) will be used |
+
 <a name="module_udp..onInitialized"></a>
 
 ### udp~onInitialized : <code>function</code>
