@@ -6,6 +6,10 @@ const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356; 
 
 /**
+    @module UdpDriver
+**/
+
+/**
     @class UDP driver
 **/
 function Driver(params, cb){
