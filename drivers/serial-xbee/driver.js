@@ -165,7 +165,7 @@ Driver.prototype.getBroadcastAddress = function () {
  * <ul>
  *  <li>address: 64 bit MAC address of the destination device.
  * </ul>
- * @param {String} msg - string to be sent to destination
+ * @param {Buffer} msg - content to be sent to destination
  * @param {Driver~onSent} [callback] - function to be executed after package is sent
  */
 Driver.prototype.send = function (to, msg, callback) {

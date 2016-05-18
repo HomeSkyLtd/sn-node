@@ -6,14 +6,6 @@
 </dd>
 </dl>
 
-## Members
-
-<dl>
-<dt><a href="#xbee_api">xbee_api</a></dt>
-<dd><p>XBee S1 driver for the rainfall package</p>
-</dd>
-</dl>
-
 ## Functions
 
 <dl>
@@ -86,7 +78,7 @@ Send a message to an destination, and an optional callback is executed after.
 | Param | Type | Description |
 | --- | --- | --- |
 | to | <code>Object</code> | an object with the following parameters:<br/> <ul>  <li>address: 64 bit MAC address of the destination device. </ul> |
-| msg | <code>String</code> | string to be sent to destination |
+| msg | <code>Buffer</code> | content to be sent to destination |
 | [callback] | <code>[onSent](#Driver..onSent)</code> | function to be executed after package is sent |
 
 <a name="Driver+stop"></a>
@@ -159,12 +151,6 @@ Callback used by send.
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem sending this will be an Error object, otherwise will be null |
 
-<a name="xbee_api"></a>
-
-## xbee_api
-XBee S1 driver for the rainfall package
-
-**Kind**: global variable  
 <a name="createDriver"></a>
 
 ## createDriver(params, [callback])
