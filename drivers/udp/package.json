@@ -1,6 +1,6 @@
 {
   "name": "rainfall-udp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Rainfall UDP driver",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "driver.js",
@@ -9,6 +9,7 @@
     "mocha": "^2.4.5",
     "should": "^8.3.0"
   },
+  "keywords":  [ "rainfall", "driver", "API", "home", "automation", "sensor", "network", "udp", "ip" ],
   "contributors": [
   { "name": "Ricardo Boccoli Gallego", "email": "ricardo.gallego93@gmail.com" },
   { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
