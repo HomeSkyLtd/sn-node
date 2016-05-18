@@ -8,7 +8,7 @@
         * [.compareAddresses](#module_xbee_s1.compareAddresses) ⇒ <code>boolean</code>
     * _inner_
         * [~Driver](#module_xbee_s1..Driver)
-            * [.listen([msgCallback], [listenCallback])](#module_xbee_s1..Driver+listen)
+            * [.listen([listenCallback], [msgCallback])](#module_xbee_s1..Driver+listen)
             * [.getBroadcastAddress()](#module_xbee_s1..Driver+getBroadcastAddress) ⇒ <code>[address](#module_xbee_s1..address)</code>
             * [.send(to, msg, [callback])](#module_xbee_s1..Driver+send)
             * [.stop()](#module_xbee_s1..Driver+stop)
@@ -53,7 +53,7 @@ Xbee-S1 driver class
 **Kind**: inner class of <code>[xbee_s1](#module_xbee_s1)</code>  
 
 * [~Driver](#module_xbee_s1..Driver)
-    * [.listen([msgCallback], [listenCallback])](#module_xbee_s1..Driver+listen)
+    * [.listen([listenCallback], [msgCallback])](#module_xbee_s1..Driver+listen)
     * [.getBroadcastAddress()](#module_xbee_s1..Driver+getBroadcastAddress) ⇒ <code>[address](#module_xbee_s1..address)</code>
     * [.send(to, msg, [callback])](#module_xbee_s1..Driver+send)
     * [.stop()](#module_xbee_s1..Driver+stop)
@@ -61,15 +61,15 @@ Xbee-S1 driver class
 
 <a name="module_xbee_s1..Driver+listen"></a>
 
-#### driver.listen([msgCallback], [listenCallback])
+#### driver.listen([listenCallback], [msgCallback])
 Listen to serial port, when it is open. When a frame is received form XBee, executes callback msgCallback.
 
 **Kind**: instance method of <code>[Driver](#module_xbee_s1..Driver)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [msgCallback] | <code>[onListening](#module_xbee_s1..onListening)</code> | Callback executed when serial port is open. |
-| [listenCallback] | <code>[onMessage](#module_xbee_s1..onMessage)</code> | Callback executed when a XBee delivers a frame. |
+| [listenCallback] | <code>[onListening](#module_xbee_s1..onListening)</code> | Callback executed when serial port is open. |
+| [msgCallback] | <code>[onMessage](#module_xbee_s1..onMessage)</code> | Callback executed when a XBee delivers a frame. |
 
 <a name="module_xbee_s1..Driver+getBroadcastAddress"></a>
 
@@ -113,6 +113,7 @@ Callback used by Driver.
 | Param | Type | Description |
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem initializing this will be an Error object, otherwise will be null |
+| driver | <code>Driver</code> | The created driver object |
 
 <a name="module_xbee_s1..onMessage"></a>
 

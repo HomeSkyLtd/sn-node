@@ -5,6 +5,10 @@ var Rainfall = require("rainfall");
 var fs = require("fs");
 
 /**
+	@module leaf
+*/
+
+/**
  * Construct instance of Leaf and get controller address.
  * @class
  * @param {Object} driver Driver object
@@ -184,18 +188,6 @@ function Leaf (driver, args, callback) {
 	});
 }
 
-/**
- * Factories instance of Leaf and get controller address.
- * @param {Object} driver Driver object
- * @param {Object} args Arguments object: </br>
- * <ul>
- * 		<li> {Array} dataType list of dataTypes to specify data.
- * 		<li> {Array} commandType list of commandList to specify data.
- * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
- * 		<li> {Integer} limitOfPackets number of attempts before stoping.
- * </ul>
- * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
- */
 function createLeaf(driver, args, callback) {
 	new Leaf(driver, args, callback);
 }
@@ -301,4 +293,36 @@ var parseClass = function(dataType, commandType) {
 	return result;
 };
 
+/**
+ * Factories instance of Leaf and get controller address.
+ * @param {Object} driver Driver object
+ * @param {Object} args Arguments object: </br>
+ * <ul>
+ * 		<li> {Array} dataType list of dataTypes to specify data.
+ * 		<li> {Array} commandType list of commandList to specify data.
+ * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
+ * 		<li> {Integer} limitOfPackets number of attempts before stoping.
+ * </ul>
+ * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
+ */
 exports.createLeaf = createLeaf;
+
+/**
+ * Callback used by Leaf.
+ * @callback onInitialized
+ * @param {Error} error - If there is a problem creating leaf this will be an Error object, otherwise will be null
+ * @param {Driver} driver - The created driver object
+ */
+
+/**
+* Callback used by sendData
+* @callback onDataSent
+* @param {Error} error - If there is a problem sending data this will be an Error object, otherwise will be null
+*/
+
+/**
+* Callback used by listenCommand.
+* @callback onCommandListened
+* @param {Error} error - If there is a problem creating leaf this will be an Error object, otherwise will be null
+* @param {Driver} driver - The created driver object
+*/
