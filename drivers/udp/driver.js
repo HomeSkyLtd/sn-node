@@ -86,7 +86,8 @@ function createDriver(params, callback) {
 }
 
 /**
-    Opens an UDP socket listening the port and address specified in the rport parameter
+    Makes the driver call msgCallback when a message arrives (but the driver is already bound
+    to the port)
     @param {module:udp~onMessage} msgCallback - Function to be called when a message arrives
     @param {module:udp~onListening} [listenCallback] - Function to be called when the driver is listening,
         or if an error occurred
@@ -101,7 +102,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 };
 
 /**
-    Sends an UDP packet.
+    Sends the package using UDP
     @param {module:udp~address} to - Object containing the address object of the recipient
     @param {Buffer} message - Buffer containing the message to be sent
     @param {module:udp~onSent} [callback] - Function to be called when the message was sent
@@ -162,7 +163,7 @@ Driver.prototype.getBroadcastAddress = function(){
 };
 
 /**
-    Creates a driver for UDP socket
+    Creates a driver for UDP socket and binds the port.
     @param {module:udp~initParams} params - Parameters to initialize the udp driver
     @param {module:udp~onInitialized} [callback] - Function to be called when the driver is initialized
 
