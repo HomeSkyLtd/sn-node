@@ -146,7 +146,7 @@ Callback used by send.
 | --- | --- | --- |
 | address | <code>String</code> | The IP (v4 or v6) address |
 | port | <code>Number</code> | The UDP port |
-| family | <code>String</code> | The IP version (can be IPv4 or IPv6) |
+| family | <code>String</code> | (Optional) The IP version (can be IPv4 or IPv6) |
 
 <a name="createDriver"></a>
 

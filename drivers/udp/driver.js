@@ -170,5 +170,5 @@ exports.compareAddresses = compareAddresses;
     @typedef {Object} Driver~Address
     @property {String} address - The IP (v4 or v6) address 
     @property {Number} port - The UDP port
-    @property {String} [family] - The IP version (can be IPv4 or IPv6)
+    @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
  */
