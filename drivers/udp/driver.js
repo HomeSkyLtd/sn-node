@@ -3,12 +3,7 @@
 const dgram = require("dgram");
 
 const BROADCAST_ADDR = "255.255.255.255";
-const BROADCAST_PORT = 2356;
-
-/** @module UdpDriver
-    This module is the UDP driver for the Rainfall library. It exports two
-    functions: createDriver and compareAddresses
-*/
+const BROADCAST_PORT = 2356; 
 
 /**
     @class UDP driver
@@ -44,18 +39,6 @@ function Driver(params, cb){
     });
 }
 
-/**
-    Creates a driver for UDP socket
-    @param {Object} params - an object with the following parameters:<br />
-    <ul>
-        <li>[rport]: The port listened by the server. If undefined, server will listen on
-            arbitrary port
-        <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,
-            a default value (2356) will be used
-    </ul>
-    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
-
-*/
 function createDriver(params, callback) {
     new Driver(params, callback);
 }
@@ -124,12 +107,6 @@ Driver.prototype.getAddress = function(){
     return address;
 };
 
-/**
-    Compares two addresses
-    @param {Driver~Address} a1 - First address to compare
-    @param {Driver~Address} a2 - Second address to compare
-    @returns {boolean} true if address1 and adress2 are the same and false otherwise
-*/
 var compareAddresses = function(a1, a2){
     return (a1.address === a2.address);
 };
@@ -142,7 +119,26 @@ Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port, family: 'IPv4'};
 };
 
+
+/**
+    Creates a driver for UDP socket
+    @param {Object} params - an object with the following parameters:<br />
+    <ul>
+        <li>[rport]: The port listened by the server. If undefined, server will listen on
+            arbitrary port
+        <li>[broadcast_port]: The port used when creating a broadcast address. If undefined,
+            a default value (2356) will be used
+    </ul>
+    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
+
+*/
 exports.createDriver = createDriver;
+/**
+    Compares two addresses
+    @param {Driver~Address} a1 - First address to compare
+    @param {Driver~Address} a2 - Second address to compare
+    @returns {boolean} true if address1 and adress2 are the same and false otherwise
+*/
 exports.compareAddresses = compareAddresses;
 
 /**
