@@ -6,14 +6,6 @@
 </dd>
 </dl>
 
-## Members
-
-<dl>
-<dt><a href="#createDriver">createDriver</a></dt>
-<dd><p>Exports createDriver and compareAddresses</p>
-</dd>
-</dl>
-
 ## Functions
 
 <dl>
@@ -156,12 +148,6 @@ Callback used by send.
 | port | <code>Number</code> | The UDP port |
 | family | <code>String</code> | The IP version (can be IPv4 or IPv6) |
 
-<a name="createDriver"></a>
-
-## createDriver
-Exports createDriver and compareAddresses
-
-**Kind**: global variable  
 <a name="createDriver"></a>
 
 ## createDriver(params, [callback])

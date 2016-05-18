@@ -137,7 +137,6 @@ Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port, family: 'IPv4'};
 };
 
-/** Exports createDriver and compareAddresses */
 exports.createDriver = createDriver;
 exports.compareAddresses = compareAddresses;
 
