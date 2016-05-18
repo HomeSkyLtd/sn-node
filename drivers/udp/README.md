@@ -1,5 +1,5 @@
 #UDP Driver
-This is the driver implementation of the UDP driver for the Rainfall library. Besides the `createDriver` method, 
+This is the driver implementation of the UDP driver for the Rainfall library. Besides the `createDriver` method,
 you won't need to call any other method.
 
 ##Usage
@@ -32,5 +32,5 @@ Udp.createDriver({}, (err, inst) => {
 ```
 
 ##Documentation
-For documentation on how to use this driver, refer to 
+For documentation on how to use this driver, refer to
 [this](https://github.com/HomeSkyLtd/sn-node/blob/master/drivers/udp/documentation.MD)
