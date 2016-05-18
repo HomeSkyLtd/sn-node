@@ -20,7 +20,7 @@ const BROADCAST_PORT = 2356;
  * Callback used by listen.
  * @callback onMessage
  * @param {Buffer} message - Buffer containing the buffer received from the network
- * @param {module:udp~Address} from - Address of the transmitter
+ * @param {module:udp~address} from - Address of the transmitter
  */
 
 /**
@@ -36,7 +36,7 @@ const BROADCAST_PORT = 2356;
  */
 
 /**
-    @typedef {Object} Address
+    @typedef {Object} address
     @property {String} address - The IP (v4 or v6) address
     @property {Number} port - The UDP port
     @property {String} family - (Optional) The IP version (can be IPv4 or IPv6)
@@ -97,7 +97,7 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 
 /**
     Sends an UDP packet.
-    @param {module:udp~Address} to - Object containing the address object of the recipient
+    @param {module:udp~address} to - Object containing the address object of the recipient
     @param {Buffer} message - Buffer containing the message to be sent
     @param {module:udp~onSent} [callback] - Function to be called when the message was sent
 
@@ -131,7 +131,7 @@ Driver.prototype.stop = function() {
 
 /**
     Gets the driver network address. Only works when "listening" was called beforehands
-    @returns {module:udp~Address} Network address
+    @returns {module:udp~address} Network address
 */
 Driver.prototype.getAddress = function(){
     var address;
@@ -150,7 +150,7 @@ var compareAddresses = function(a1, a2){
 
 /**
     Gets the broadcast network address.
-    @returns {module:udp~Address}  Broadcast network address
+    @returns {module:udp~address}  Broadcast network address
 */
 Driver.prototype.getBroadcastAddress = function(){
     return {address: BROADCAST_ADDR, port: this._broadcast_port, family: 'IPv4'};
@@ -172,8 +172,8 @@ exports.createDriver = createDriver;
 
 /**
     Compares two addresses
-    @param {module:udp~Address} a1 - First address to compare
-    @param {module:udp~Address} a2 - Second address to compare
+    @param {module:udp~address} a1 - First address to compare
+    @param {module:udp~address} a2 - Second address to compare
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
 exports.compareAddresses = compareAddresses;

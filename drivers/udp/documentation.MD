@@ -12,13 +12,13 @@
             * [.send(to, message, [callback])](#module_udp..Driver+send)
             * [.close()](#module_udp..Driver+close)
             * [.stop()](#module_udp..Driver+stop)
-            * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[Address](#module_udp..Address)</code>
-            * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[Address](#module_udp..Address)</code>
+            * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[address](#module_udp..address)</code>
+            * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_udp..address)</code>
         * [~onInitialized](#module_udp..onInitialized) : <code>function</code>
         * [~onMessage](#module_udp..onMessage) : <code>function</code>
         * [~onListening](#module_udp..onListening) : <code>function</code>
         * [~onSent](#module_udp..onSent) : <code>function</code>
-        * [~Address](#module_udp..Address) : <code>Object</code>
+        * [~address](#module_udp..address) : <code>Object</code>
 
 <a name="module_udp.createDriver"></a>
 
@@ -42,8 +42,8 @@ Compares two addresses
 
 | Param | Type | Description |
 | --- | --- | --- |
-| a1 | <code>[Address](#module_udp..Address)</code> | First address to compare |
-| a2 | <code>[Address](#module_udp..Address)</code> | Second address to compare |
+| a1 | <code>[address](#module_udp..address)</code> | First address to compare |
+| a2 | <code>[address](#module_udp..address)</code> | Second address to compare |
 
 <a name="module_udp..Driver"></a>
 
@@ -55,8 +55,8 @@ Compares two addresses
     * [.send(to, message, [callback])](#module_udp..Driver+send)
     * [.close()](#module_udp..Driver+close)
     * [.stop()](#module_udp..Driver+stop)
-    * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[Address](#module_udp..Address)</code>
-    * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[Address](#module_udp..Address)</code>
+    * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[address](#module_udp..address)</code>
+    * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_udp..address)</code>
 
 <a name="module_udp..Driver+listen"></a>
 
@@ -79,7 +79,7 @@ Sends an UDP packet.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| to | <code>[Address](#module_udp..Address)</code> | Object containing the address object of the recipient |
+| to | <code>[address](#module_udp..address)</code> | Object containing the address object of the recipient |
 | message | <code>Buffer</code> | Buffer containing the message to be sent |
 | [callback] | <code>[onSent](#module_udp..onSent)</code> | Function to be called when the message was sent |
 
@@ -97,18 +97,18 @@ Stops the UDP server, if listen() was called. You can still use the driver to li
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 <a name="module_udp..Driver+getAddress"></a>
 
-#### driver.getAddress() ⇒ <code>[Address](#module_udp..Address)</code>
+#### driver.getAddress() ⇒ <code>[address](#module_udp..address)</code>
 Gets the driver network address. Only works when "listening" was called beforehands
 
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
-**Returns**: <code>[Address](#module_udp..Address)</code> - Network address  
+**Returns**: <code>[address](#module_udp..address)</code> - Network address  
 <a name="module_udp..Driver+getBroadcastAddress"></a>
 
-#### driver.getBroadcastAddress() ⇒ <code>[Address](#module_udp..Address)</code>
+#### driver.getBroadcastAddress() ⇒ <code>[address](#module_udp..address)</code>
 Gets the broadcast network address.
 
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
-**Returns**: <code>[Address](#module_udp..Address)</code> - Broadcast network address  
+**Returns**: <code>[address](#module_udp..address)</code> - Broadcast network address  
 <a name="module_udp..onInitialized"></a>
 
 ### udp~onInitialized : <code>function</code>
@@ -131,7 +131,7 @@ Callback used by listen.
 | Param | Type | Description |
 | --- | --- | --- |
 | message | <code>Buffer</code> | Buffer containing the buffer received from the network |
-| from | <code>[Address](#module_udp..Address)</code> | Address of the transmitter |
+| from | <code>[address](#module_udp..address)</code> | Address of the transmitter |
 
 <a name="module_udp..onListening"></a>
 
@@ -155,9 +155,9 @@ Callback used by send.
 | --- | --- | --- |
 | error | <code>Error</code> | If there is a problem sending this will be an Error object, otherwise will be null |
 
-<a name="module_udp..Address"></a>
+<a name="module_udp..address"></a>
 
-### udp~Address : <code>Object</code>
+### udp~address : <code>Object</code>
 **Kind**: inner typedef of <code>[udp](#module_udp)</code>  
 **Properties**
 
