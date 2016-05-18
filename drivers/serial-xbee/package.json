@@ -1,6 +1,6 @@
 {
   "name": "rainfall-xbee-s1",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "XBee S1 driver for the rainfall protocol",
   "main": "driver.js",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
