@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 var db = require("./database").db;
-var Rainfall = require("../../rainfall/rainfall");
-var Udp = require("../../drivers/udp/driver.js");
+var Rainfall = require("rainfall");
+var Udp = require("rainfall-udp");
 
 var nodes = [];
 const KEEP_ALIVE_TIME = 10 * 1000;//10s
