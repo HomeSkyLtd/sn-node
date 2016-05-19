@@ -58,17 +58,17 @@ Driver.prototype.getBroadcastAddress = function () {
 };
 
 /**
-    Compares two address
+    Compares two address.
     @param {Driver~Address} address1 - First address to compare
     @param {Driver~Address} address2 - Second address to compare
-    @returns {boolean} true if address1 and adress2 are the same and false otherwise
+    @returns {boolean} true if address1 and adress2 are associated to the same device, and false otherwise
 */
-compareAddresses = function (address1, address2) {
+Driver.prototype.compareAddresses = function (address1, address2) {
     throw Error("Not implemented");
 };
 
 exports.createDriver = createDriver;
-exports.compareAddresses = compareAddresses;
+exports.compareAddresses = Driver.prototype.compareAddresses;
 
 /**
     Actually anything used by the driver do identify the address of

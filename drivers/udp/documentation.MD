@@ -8,6 +8,7 @@
         * [.compareAddresses](#module_udp.compareAddresses) ⇒ <code>boolean</code>
     * _inner_
         * [~Driver](#module_udp..Driver)
+            * [.compareAddresses](#module_udp..Driver+compareAddresses) ⇒ <code>boolean</code>
             * [.listen(msgCallback, [listenCallback])](#module_udp..Driver+listen)
             * [.send(to, message, [callback])](#module_udp..Driver+send)
             * [.close()](#module_udp..Driver+close)
@@ -24,7 +25,7 @@
 <a name="module_udp.createDriver"></a>
 
 ### udp.createDriver
-Creates a driver for UDP socket
+Creates a driver for UDP socket and binds the port.
 
 **Kind**: static property of <code>[udp](#module_udp)</code>  
 
@@ -52,6 +53,7 @@ Compares two addresses
 **Kind**: inner class of <code>[udp](#module_udp)</code>  
 
 * [~Driver](#module_udp..Driver)
+    * [.compareAddresses](#module_udp..Driver+compareAddresses) ⇒ <code>boolean</code>
     * [.listen(msgCallback, [listenCallback])](#module_udp..Driver+listen)
     * [.send(to, message, [callback])](#module_udp..Driver+send)
     * [.close()](#module_udp..Driver+close)
@@ -59,10 +61,24 @@ Compares two addresses
     * [.getAddress()](#module_udp..Driver+getAddress) ⇒ <code>[address](#module_udp..address)</code>
     * [.getBroadcastAddress()](#module_udp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_udp..address)</code>
 
+<a name="module_udp..Driver+compareAddresses"></a>
+
+#### driver.compareAddresses ⇒ <code>boolean</code>
+Compares two addresses (it is the same compareAddresses exported function)
+
+**Kind**: instance property of <code>[Driver](#module_udp..Driver)</code>  
+**Returns**: <code>boolean</code> - true if address1 and adress2 are the same and false otherwise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| a1 | <code>[address](#module_udp..address)</code> | First address to compare |
+| a2 | <code>[address](#module_udp..address)</code> | Second address to compare |
+
 <a name="module_udp..Driver+listen"></a>
 
 #### driver.listen(msgCallback, [listenCallback])
-Opens an UDP socket listening the port and address specified in the rport parameter
+Makes the driver call msgCallback when a message arrives (but the driver is already bound
+    to the port)
 
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 
@@ -74,7 +90,7 @@ Opens an UDP socket listening the port and address specified in the rport parame
 <a name="module_udp..Driver+send"></a>
 
 #### driver.send(to, message, [callback])
-Sends an UDP packet.
+Sends the package using UDP
 
 **Kind**: instance method of <code>[Driver](#module_udp..Driver)</code>  
 

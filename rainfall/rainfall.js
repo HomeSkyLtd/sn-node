@@ -595,7 +595,7 @@ Rainfall.prototype.listen = function (objectCallback, packageTypes, addresses, l
                 /* Function to scan all callbacks, searching for mathcing address */
                 var scanAddresses = (callback) => {
                     for (var i in cmpCallback.addresses) {
-                        if (that._driver.constructor.compareAddresses(cmpCallback.addresses[i], from)) {
+                        if (that._driver.compareAddresses(cmpCallback.addresses[i], from)) {
                             callback();
                             break;
                         }

@@ -43,7 +43,7 @@ describe('networkDriver', function(){
         //Check whether the driver starts listening without raising any errors
         describe('#listen()', function(){
             it('should execute without errors', function(done){
-                receiverDriver = new driver.Driver(receiverParams, function(err){
+                driver.createDriver(receiverParams, function(err, receiverDriver){
                     if (err) err.should.not.be.Error();
                     receiverDriver.listen(
                         ()=>{},
@@ -71,14 +71,14 @@ describe('networkDriver', function(){
                     done();
                 }
 
-                receiverDriver = new driver.Driver(senderParams, (err)=>{
+                driver.createDriver(senderParams, (err, receiverDriver)=>{
                     if (err) err.should.not.be.Error();
                     receiverDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
-                                var senderDriver = new driver.Driver(senderParams, (err)=>{
+                                driver.createDriver(senderParams, (err, senderDriver)=>{
                                     if(err) done(err);
                                     senderDriver.send(serverAddress, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
@@ -114,13 +114,13 @@ describe('networkDriver', function(){
                     done();
                 }
 
-                receiverDriver = new driver.Driver(receiverParams, function(err){
+                driver.createDriver(receiverParams, function(err, receiverDriver){
                     receiverDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
-                                senderDriver = new driver.Driver(senderParams, (err)=>{
+                                driver.createDriver(senderParams, (err, senderDriver)=>{
                                     if(err) done(err);
                                     senderDriver.send(receiverDriver.getBroadcastAddress(), new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
@@ -157,14 +157,14 @@ describe('networkDriver', function(){
                     done();
                 }
 
-                receiverDriver = new driver.Driver(receiverParams, function(err){
+                new driver.createDriver(receiverParams, function(err, receiverDriver){
                     if(err) done(err);
                     receiverDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
-                                var senderDriver = new driver.Driver(senderParams, (err)=>{
+                                driver.createDriver(senderParams, (err, senderDriver)=>{
                                     if(err) done(err);
                                     var msgCallback2 = function(msg, from){
                                         senderDriver.send(from, new Buffer.from("Reply"), (err)=>{
@@ -199,7 +199,7 @@ describe('networkDriver', function(){
         */
         describe('#stop()', function(){
             it('server should stop listening', function(done){
-
+                var timer = null;
                 /*
                     This function should not be called after stop() has been called
                 */
@@ -208,17 +208,18 @@ describe('networkDriver', function(){
                 }
 
                 function successCallback(){
+                    clearTimeout(timer);
                     done();
                 }
 
-                receiverDriver = new driver.Driver(receiverParams, function(err){
+                driver.createDriver(receiverParams, function(err, receiverDriver){
                     receiverDriver.listen(
                         msgCallback,
                         (err) => {
                             if(err) done(err);
                             else{
                                 receiverDriver.stop();
-                                senderDriver = new driver.Driver(senderParams, (err)=>{
+                                driver.createDriver(senderParams, (err, senderDriver)=>{
                                     if(err) done(err);
                                     senderDriver.send(serverAddress, new Buffer.from("Test"), (err)=>{
                                         if(err) done(err);
@@ -228,7 +229,7 @@ describe('networkDriver', function(){
                                 });
                                 //should not get any calls to msgCallback
                                 //wait one second for response to ensure correctness
-                                setTimeout(successCallback, 1000);
+                                timer = setTimeout(successCallback, 1000);
                             }
                         }
                     );
@@ -250,9 +251,9 @@ describe('networkDriver', function(){
                     a1 = {address: "192.168.1.1", port: 1234};
                     a2 = {address: "192.168.1.1", port: 1235};
                     a3 = {address: "192.168.1.2", port: 1234};
-                    driver.Driver.compareAddresses(a1,a2).should.be.true();
-                    driver.Driver.compareAddresses(a1,a3).should.be.false();
-                    driver.Driver.compareAddresses(a2,a3).should.be.false();
+                    driver.compareAddresses(a1,a2).should.be.true();
+                    driver.compareAddresses(a1,a3).should.be.false();
+                    driver.compareAddresses(a2,a3).should.be.false();
 
                 */
 

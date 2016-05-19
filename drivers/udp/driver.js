@@ -163,6 +163,14 @@ Driver.prototype.getBroadcastAddress = function(){
 };
 
 /**
+    Compares two addresses (it is the same compareAddresses exported function)
+    @param {module:udp~address} a1 - First address to compare
+    @param {module:udp~address} a2 - Second address to compare
+    @returns {boolean} true if address1 and adress2 are the same and false otherwise
+*/
+Driver.prototype.compareAddresses = compareAddresses;
+
+/**
     Creates a driver for UDP socket and binds the port.
     @param {module:udp~initParams} params - Parameters to initialize the udp driver
     @param {module:udp~onInitialized} [callback] - Function to be called when the driver is initialized
