@@ -292,36 +292,36 @@ exports.createLeaf = createLeaf;
 
 /**
 * Arguments for Leaf constructor.
-* @typedef {Object} Leaf~args
+* @typedef {Object} args
 * @property {Array} dataType - list of dataTypes of specific data.
 * @property {Array} commandType - list of commandList to specify data.
 * @property {Number} timeout - time between two attempts of sending whoiscontroller.
-* @property{Number} limitOfPackets - number of attempts before stoping.
+* @property {Number} limitOfPackets - number of attempts before stoping.
 */
 
 /**
  * Callback used by Leaf.
- * @callback Leaf~onInitialized
+ * @callback onInitialized
  * @param {Error} error - If there is a problem creating leaf this will be an Error object, otherwise will be null
  * @param {Driver} driver - The created driver object
  */
 
 /**
 * Data or list of data send to controller from this leaf.
-* @typedef {Object|Array} Leaf~data
+* @typedef {Object|Array} data
 * @property {Number} id - number identifying which of the metrics that this sensor is sending.
 * @property {Number|String|Boolean} value - data captured by sensor.
 */
 
 /**
 * Callback used by sendData
-* @callback Leaf~onDataSent
+* @callback onDataSent
 * @param {Error} error - If there is a problem sending data this will be an Error object, otherwise will be null
 */
 
 /**
 * Callback used by listenCommand when message of command arrives.
-* @callback Leaf~onCommandListened
+* @callback onCommandListened
 * @returns {boolean|undefined} False if server should stop listening. Otherwise it will keep listening.
 * @param {Object} message - Json object containing the received object
 * @param {Object} from - Object containing the address object of the transmitter
@@ -329,19 +329,43 @@ exports.createLeaf = createLeaf;
 
 /**
 * Callback used by listenCommand when leaf starts listening.
-* @callback Leaf~onListening
+* @callback onListening
 * @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
 */
 
 /**
 * Command or list of commands executed by user and sent from actuator to controller.
-* @typedef {Object|Array} Leaf~command
+* @typedef {Object|Array} command
 * @property {Number} id - number identifying which of the metrics that this sensor is sending.
 * @property {Number|String|Boolean} value - command executed by user of the network and sent from actuator to controller.
 */
 
 /**
 * Callback executed by sendExternalCommand when a command is executed by the user of the network.
-* @callback Leaf~onCommandSent
+* @callback onCommandSent
 * @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
+*/
+
+/**
+    Command type object. Used by actuator to inform the controller the accepted commands.
+    @typedef {Object} commandType
+    @property {Number} id - Id of the command. Defined by the actuator.
+    @property {Rainfall~DATA_TYPES|String} type - The format of the command.
+    @property {Number[]} [range] - Range of the command, it is a list with two values (start and end).
+    It is needed only when the type of the command is numeric.
+    @property {Rainfall~COMMAND_CATEGORIES|String} commandCategory - The category of the command
+    @property {String} unit - Unit of the command (for example: meters, seconds)
+*/
+
+/**
+    Data type object. Used by sensor to inform the controller the collected data.
+    @typedef {Object} dataType
+    @property {Number} id - Id of the data. Defined by the sensor.
+    @property {Rainfall~DATA_TYPES|String} type - The format of the data sent.
+    @property {Number[]} [range] - Range of the data, it is a list with two values (start and end).
+    It is needed only when the type of the data is numeric.
+    @property {Rainfall~DATA_CATEGORIES|String} dataCategory - The category of the data
+    @property {String} unit - Unit of the data (for example: meters, seconds)
+    @property {Rainfall~MEASURE_STRATEGIES|String} measureStrategy - The strategy used by the sensor
+    to measure and send data
 */
