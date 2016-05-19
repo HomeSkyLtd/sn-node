@@ -7,7 +7,6 @@
         * [.createLeaf](#module_Leaf.createLeaf)
     * _inner_
         * [~Leaf](#module_Leaf..Leaf)
-            * [new Leaf(driver, args, [callback])](#new_module_Leaf..Leaf_new)
             * [.sendData(data, [callback])](#module_Leaf..Leaf+sendData)
             * [.listenCommand([callback], [callback])](#module_Leaf..Leaf+listenCommand)
             * [.sendExternalCommand(command, [callback])](#module_Leaf..Leaf+sendExternalCommand)
@@ -34,8 +33,8 @@ Factories instance of Leaf and get controller address.
 | Param | Type | Description |
 | --- | --- | --- |
 | driver | <code>Object</code> | Driver object. |
-| args | <code>Object</code> | Arguments object. |
-| [callback] | <code>Leaf~onInitialized</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
+| args | <code>[args](#module_Leaf..args)</code> | Arguments object. |
+| [callback] | <code>[onInitialized](#module_Leaf..onInitialized)</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
 
 <a name="module_Leaf..Leaf"></a>
 
@@ -43,22 +42,9 @@ Factories instance of Leaf and get controller address.
 **Kind**: inner class of <code>[Leaf](#module_Leaf)</code>  
 
 * [~Leaf](#module_Leaf..Leaf)
-    * [new Leaf(driver, args, [callback])](#new_module_Leaf..Leaf_new)
     * [.sendData(data, [callback])](#module_Leaf..Leaf+sendData)
     * [.listenCommand([callback], [callback])](#module_Leaf..Leaf+listenCommand)
     * [.sendExternalCommand(command, [callback])](#module_Leaf..Leaf+sendExternalCommand)
-
-<a name="new_module_Leaf..Leaf_new"></a>
-
-#### new Leaf(driver, args, [callback])
-Construct instance of Leaf and get controller address.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| driver | <code>Object</code> | Driver object |
-| args | <code>Object</code> | Arguments object |
-| [callback] | <code>Leaf~onInitialized</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
 
 <a name="module_Leaf..Leaf+sendData"></a>
 
@@ -69,8 +55,8 @@ Send a message with data from sensor to controller.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | <code>Object</code> &#124; <code>Array</code> | Array of objects or one object with this fields |
-| [callback] | <code>Leaf~onDataSent</code> | function executed after data is sent |
+| data | <code>[data](#module_Leaf..data)</code> | Array of objects or one object. |
+| [callback] | <code>[onDataSent](#module_Leaf..onDataSent)</code> | function executed after data is sent. |
 
 <a name="module_Leaf..Leaf+listenCommand"></a>
 
@@ -81,8 +67,8 @@ Listen a message with command from actuator to controller.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [callback] | <code>Leaf~onCommandListened</code> | function to be called when a object (command) arrives |
-| [callback] | <code>Leaf~onListening</code> | function to be called when it starts listening |
+| [callback] | <code>[onCommandListened](#module_Leaf..onCommandListened)</code> | function to be called when a object (command) arrives |
+| [callback] | <code>[onListening](#module_Leaf..onListening)</code> | function to be called when it starts listening |
 
 <a name="module_Leaf..Leaf+sendExternalCommand"></a>
 
@@ -93,8 +79,8 @@ Send a message with command from actuator/sensor to controller.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| command | <code>Object</code> &#124; <code>Array</code> | Array of objects. |
-| [callback] | <code>Leaf~onCommandSent</code> | function executed after data is sent |
+| command | <code>[command](#module_Leaf..command)</code> | Array of objects or a single object. |
+| [callback] | <code>[onCommandSent](#module_Leaf..onCommandSent)</code> | function executed after data is sent |
 
 <a name="module_Leaf..createLeaf"></a>
 
@@ -112,8 +98,8 @@ Decide if class is Sensor, Actuator or both.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| dataType | <code>Array</code> | list of dataTypes to specify data. |
-| commandList | <code>Array</code> | list of commandTypes to specify commands. |
+| dataType | <code>[dataType](#module_Leaf..dataType)</code> | list of dataTypes to specify data. |
+| commandList | <code>[commandType](#module_Leaf..commandType)</code> | list of commandTypes to specify commands. |
 
 <a name="module_Leaf..args"></a>
 
@@ -125,8 +111,8 @@ Arguments for Leaf constructor.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| dataType | <code>Array</code> | list of dataTypes of specific data. |
-| commandType | <code>Array</code> | list of commandList to specify data. |
+| dataType | <code>[dataType](#module_Leaf..dataType)</code> | list of dataTypes of specific data. |
+| commandType | <code>[commandType](#module_Leaf..commandType)</code> | list of commandList to specify data. |
 | timeout | <code>Number</code> | time between two attempts of sending whoiscontroller. |
 | limitOfPackets | <code>Number</code> | number of attempts before stoping. |
 
@@ -225,9 +211,9 @@ Command type object. Used by actuator to inform the controller the accepted comm
 | Name | Type | Description |
 | --- | --- | --- |
 | id | <code>Number</code> | Id of the command. Defined by the actuator. |
-| type | <code>Rainfall~DATA_TYPES</code> &#124; <code>String</code> | The format of the command. |
+| type | <code>DATA_TYPES</code> &#124; <code>String</code> | The format of the command. |
 | range | <code>Array.&lt;Number&gt;</code> | Range of the command, it is a list with two values (start and end).     It is needed only when the type of the command is numeric. |
-| commandCategory | <code>Rainfall~COMMAND_CATEGORIES</code> &#124; <code>String</code> | The category of the command |
+| commandCategory | <code>COMMAND_CATEGORIES</code> &#124; <code>String</code> | The category of the command |
 | unit | <code>String</code> | Unit of the command (for example: meters, seconds) |
 
 <a name="module_Leaf..dataType"></a>
@@ -241,9 +227,9 @@ Data type object. Used by sensor to inform the controller the collected data.
 | Name | Type | Description |
 | --- | --- | --- |
 | id | <code>Number</code> | Id of the data. Defined by the sensor. |
-| type | <code>Rainfall~DATA_TYPES</code> &#124; <code>String</code> | The format of the data sent. |
+| type | <code>DATA_TYPES</code> &#124; <code>String</code> | The format of the data sent. |
 | range | <code>Array.&lt;Number&gt;</code> | Range of the data, it is a list with two values (start and end).     It is needed only when the type of the data is numeric. |
-| dataCategory | <code>Rainfall~DATA_CATEGORIES</code> &#124; <code>String</code> | The category of the data |
+| dataCategory | <code>DATA_CATEGORIES</code> &#124; <code>String</code> | The category of the data |
 | unit | <code>String</code> | Unit of the data (for example: meters, seconds) |
-| measureStrategy | <code>Rainfall~MEASURE_STRATEGIES</code> &#124; <code>String</code> | The strategy used by the sensor     to measure and send data |
+| measureStrategy | <code>MEASURE_STRATEGIES</code> &#124; <code>String</code> | The strategy used by the sensor     to measure and send data |
 

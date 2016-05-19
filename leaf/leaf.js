@@ -12,9 +12,11 @@ var fs = require("fs");
  * Construct instance of Leaf and get controller address.
  * @class
  * @param {Object} driver Driver object
- * @param {Object} args Arguments object
- * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
+ * @param {module:Leaf~args} args Arguments object
+ * @param {module:Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
  */
+
+ /** @class */
 function Leaf (driver, args, callback) {
 	nPackagesSent = 0;
 
@@ -54,7 +56,6 @@ function Leaf (driver, args, callback) {
 			this._rain.listen((msg, from) => {
 				clearInterval(timerknock);
 
-				console.log("[leaf.listening] Message welcomeback received from " + JSON.stringify(from));
                 idIsOld = false;
                 this._controllerAddress = from;
 
@@ -66,7 +67,7 @@ function Leaf (driver, args, callback) {
 
 				return false;
 			}, Rainfall.PACKAGE_TYPES.welcomeback, null,
-			function () {console.log("[leaf.listening] Starting listening for welcome back.");});
+			function () {});
 
 
 
@@ -77,14 +78,11 @@ function Leaf (driver, args, callback) {
         this._rain.listen((msg, from) => {
             clearInterval(timerknock);
 
-            console.log("[leaf.listening] Message iamcontroller received from " + JSON.stringify(from) + ": " + JSON.stringify(msg));
             this._controllerAddress = from;
             this._myId = msg.yourId;
             idIsOld = false;
             fs.writeFile(id_dir, this._myId, function (err) {
-                if (err) throw err;
-
-                console.log("[leaf.listening] file " + id_dir + " created.");
+                if (err) callback(err);
             });
 
             for (var func of this._listOfCallbacks) {
@@ -100,9 +98,6 @@ function Leaf (driver, args, callback) {
 				clearInterval(timerknock);
 
 				var lifetimeCallback = function (that) {
-					console.log("[leaf.listening] Message lifetime received");
-
-					// that._controllerAddress = from;
 					that._lifetime = msg.lifetime;
 
 					if (that._lifetime !== 0) {
@@ -111,9 +106,7 @@ function Leaf (driver, args, callback) {
 								packageType: Rainfall.PACKAGE_TYPES.keepalive,
 								id: that._myId
 							};
-							that._rain.send(from, object, function (err) { if (err) throw err; });
-
-							console.log("[leaf.listening] Message keep alive sent to CONTROLLER.");
+							that._rain.send(from, object, function (err) { if (err) callback(err); });
 						}, that._lifetime);
 					}
 				};
@@ -130,8 +123,6 @@ function Leaf (driver, args, callback) {
 			clearInterval(timerknock);
 
 			var describeYourselfCallback = function (that) {
-				console.log("[leaf.listening] Message describeyourself received");
-
 				var enumClass = Rainfall.NODE_CLASSES.get(that._nodeClass);
 				var object = {
 					packageType: Rainfall.PACKAGE_TYPES.description,
@@ -148,8 +139,7 @@ function Leaf (driver, args, callback) {
 					object.dataType = that._dataType;
 				}
 
-				that._rain.send(from, object, function (err) { if (err) throw err; });
-				console.log("[leaf.listening] message description sent " + JSON.stringify(object));
+				that._rain.send(from, object, function (err) { if (err) callback(err); });
 			};
 			if (this._myId && !idIsOld) {
 				describeYourselfCallback(this);
@@ -161,10 +151,9 @@ function Leaf (driver, args, callback) {
 		}, Rainfall.PACKAGE_TYPES.describeyourself, null, null);
 
 		this._rain.sendBroadcast(obj, function (err) {
-			if (err) throw err;
+			if (err) callback(err);
 		});
 		++nPackagesSent;
-		console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 
 		timerknock = setInterval(() => {
 			++nPackagesSent;
@@ -173,9 +162,8 @@ function Leaf (driver, args, callback) {
 				clearInterval(timerknock);
 			} else {
 				this._rain.sendBroadcast(obj, function (err) {
-					if (err) throw err;
+					if (err) callback(err);
 				});
-				console.log("[leaf.sending] message " + JSON.stringify(obj) + " sent in broadcast. " + nPackagesSent + " attempt(s).");
 			}
 		}, timeout);
 
@@ -191,16 +179,16 @@ function createLeaf(driver, args, callback) {
 
 /**
  * Send a message with data from sensor to controller.
- * @param {Object|Array} data Array of objects or one object.
- * @param {Leaf~onDataSent} [callback] function executed after data is sent.
+ * @param {module:Leaf~data} data Array of objects or one object.
+ * @param {module:Leaf~onDataSent} [callback] function executed after data is sent.
  */
 Leaf.prototype.sendData = function (data, callback) {
-	if (!data) throw Error("[leaf.sendData] Can't send undefined object.");
+	if (!data) callback(new Error("[leaf.sendData] Can't send undefined object."));
 	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
 
 	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.sensor)) {
 		var msg = "[leaf.sendData] This leaf is not a sensor. Data cannot be sent.";
-		throw new Error(msg);
+		callback(new Error(msg));
 	}
 
 	var object = {
@@ -213,40 +201,38 @@ Leaf.prototype.sendData = function (data, callback) {
 	}
 
 	object.data = data;
-	console.log("[leaf.sendData] data sent " + JSON.stringify(object));
 
 	this._rain.send(this._controllerAddress, object, callback);
 };
 
 /**
  * Listen a message with command from actuator to controller.
- * @param {Leaf~onCommandListened} [callback] function to be called when a object (command) arrives
- * @param {Leaf~onListening} [callback] function to be called when it starts listening
+ * @param {module:Leaf~onCommandListened} [callback] function to be called when a object (command) arrives
+ * @param {module:Leaf~onListening} [callback] function to be called when it starts listening
  */
 Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
 
 	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
 		var msg = "[leaf.listenCommand] This leaf is not a actuator. Command cannot be received.";
-		throw new Error(msg);
+		callback(new Error(msg));
 	}
 
 	this._rain.listen(objectCallback, Rainfall.PACKAGE_TYPES.command, this._controllerAddress, listenCallback);
-	console.log("[leaf.listenCommand] Listening command from controller.");
 };
 
 /**
  * Send a message with command from actuator/sensor to controller.
- * @param {Object|Array} command Array of objects or a single object.
- * @param {Leaf~onCommandSent} [callback] function executed after data is sent
+ * @param {module:Leaf~command} command Array of objects or a single object.
+ * @param {module:Leaf~onCommandSent} [callback] function executed after data is sent
  */
 Leaf.prototype.sendExternalCommand = function (command, callback) {
-	if (!command) throw Error("[leaf.sendExternalCommand] Can't send undefined object.");
+	if (!command) callback(Error("[leaf.sendExternalCommand] Can't send undefined object."));
 	var enumClass = Rainfall.NODE_CLASSES.get(this._nodeClass);
 
 	if (enumClass && !enumClass.has(Rainfall.NODE_CLASSES.actuator)) {
 		var msg = "[leaf.listenCommand] This leaf is not a actuator. Command cannot be received.";
-		throw new Error(msg);
+		callback(new Error(msg));
 	}
 
 	var object = {
@@ -259,15 +245,14 @@ Leaf.prototype.sendExternalCommand = function (command, callback) {
 	}
 
 	object.command = command;
-	console.log("[leaf.sendExternalCommand] command sent " + JSON.stringify(object));
 
 	this._rain.send(this._controllerAddress, object, callback);
 };
 
 /**
  * Decide if class is Sensor, Actuator or both.
- * @param {Array} dataType list of dataTypes to specify data.
- * @param {Array} commandList list of commandTypes to specify commands.
+ * @param {module:Leaf~dataType} dataType list of dataTypes to specify data.
+ * @param {module:Leaf~commandType} commandList list of commandTypes to specify commands.
  * @returns {Enum} NODE_CLASSES sensor or actuator.
  */
 var parseClass = function(dataType, commandType) {
@@ -285,16 +270,16 @@ var parseClass = function(dataType, commandType) {
 /**
  * Factories instance of Leaf and get controller address.
  * @param {Object} driver Driver object.
- * @param {Object} args Arguments object.
- * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
+ * @param {module:Leaf~args} args Arguments object.
+ * @param {module:Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
  */
 exports.createLeaf = createLeaf;
 
 /**
 * Arguments for Leaf constructor.
 * @typedef {Object} args
-* @property {Array} dataType - list of dataTypes of specific data.
-* @property {Array} commandType - list of commandList to specify data.
+* @property {module:Leaf~dataType} dataType - list of dataTypes of specific data.
+* @property {module:Leaf~commandType} commandType - list of commandList to specify data.
 * @property {Number} timeout - time between two attempts of sending whoiscontroller.
 * @property {Number} limitOfPackets - number of attempts before stoping.
 */
@@ -350,10 +335,10 @@ exports.createLeaf = createLeaf;
     Command type object. Used by actuator to inform the controller the accepted commands.
     @typedef {Object} commandType
     @property {Number} id - Id of the command. Defined by the actuator.
-    @property {Rainfall~DATA_TYPES|String} type - The format of the command.
+    @property {DATA_TYPES|String} type - The format of the command.
     @property {Number[]} [range] - Range of the command, it is a list with two values (start and end).
     It is needed only when the type of the command is numeric.
-    @property {Rainfall~COMMAND_CATEGORIES|String} commandCategory - The category of the command
+    @property {COMMAND_CATEGORIES|String} commandCategory - The category of the command
     @property {String} unit - Unit of the command (for example: meters, seconds)
 */
 
@@ -361,11 +346,11 @@ exports.createLeaf = createLeaf;
     Data type object. Used by sensor to inform the controller the collected data.
     @typedef {Object} dataType
     @property {Number} id - Id of the data. Defined by the sensor.
-    @property {Rainfall~DATA_TYPES|String} type - The format of the data sent.
+    @property {DATA_TYPES|String} type - The format of the data sent.
     @property {Number[]} [range] - Range of the data, it is a list with two values (start and end).
     It is needed only when the type of the data is numeric.
-    @property {Rainfall~DATA_CATEGORIES|String} dataCategory - The category of the data
+    @property {DATA_CATEGORIES|String} dataCategory - The category of the data
     @property {String} unit - Unit of the data (for example: meters, seconds)
-    @property {Rainfall~MEASURE_STRATEGIES|String} measureStrategy - The strategy used by the sensor
+    @property {MEASURE_STRATEGIES|String} measureStrategy - The strategy used by the sensor
     to measure and send data
 */
