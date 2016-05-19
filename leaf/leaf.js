@@ -191,8 +191,8 @@ function createLeaf(driver, args, callback) {
 
 /**
  * Send a message with data from sensor to controller.
- * @param {Object|Array} data Array of objects or one object with this fields
- * @param {Leaf~onDataSent} [callback] function executed after data is sent
+ * @param {Object|Array} data Array of objects or one object.
+ * @param {Leaf~onDataSent} [callback] function executed after data is sent.
  */
 Leaf.prototype.sendData = function (data, callback) {
 	if (!data) throw Error("[leaf.sendData] Can't send undefined object.");
@@ -237,7 +237,7 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 
 /**
  * Send a message with command from actuator/sensor to controller.
- * @param {Object|Array} command Array of objects.
+ * @param {Object|Array} command Array of objects or a single object.
  * @param {Leaf~onCommandSent} [callback] function executed after data is sent
  */
 Leaf.prototype.sendExternalCommand = function (command, callback) {
