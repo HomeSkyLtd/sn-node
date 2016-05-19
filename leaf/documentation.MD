@@ -1,90 +1,249 @@
-## Classes
-
-<dl>
-<dt><a href="#Leaf">Leaf</a></dt>
-<dd></dd>
-</dl>
-
-## Functions
-
-<dl>
-<dt><a href="#createLeaf">createLeaf(driver, args, [callback])</a></dt>
-<dd><p>Factories instance of Leaf and get controller address.</p>
-</dd>
-<dt><a href="#parseClass">parseClass(dataType, commandList)</a> ⇒ <code>Enum</code></dt>
-<dd><p>Decide if class is Sensor, Actuator or both.</p>
-</dd>
-</dl>
-
-<a name="Leaf"></a>
+<a name="module_Leaf"></a>
 
 ## Leaf
-**Kind**: global class  
 
-* [Leaf](#Leaf)
-    * [new Leaf(driver, args, [callback])](#new_Leaf_new)
-    * [.sendData(data, [callback])](#Leaf+sendData)
-    * [.listenCommand([callback], [callback])](#Leaf+listenCommand)
+* [Leaf](#module_Leaf)
+    * _static_
+        * [.createLeaf](#module_Leaf.createLeaf)
+    * _inner_
+        * [~Leaf](#module_Leaf..Leaf)
+            * [new Leaf(driver, args, [callback])](#new_module_Leaf..Leaf_new)
+            * [.sendData(data, [callback])](#module_Leaf..Leaf+sendData)
+            * [.listenCommand([callback], [callback])](#module_Leaf..Leaf+listenCommand)
+            * [.sendExternalCommand(command, [callback])](#module_Leaf..Leaf+sendExternalCommand)
+        * [~createLeaf()](#module_Leaf..createLeaf)
+        * [~parseClass(dataType, commandList)](#module_Leaf..parseClass) ⇒ <code>Enum</code>
+        * [~args](#module_Leaf..args) : <code>Object</code>
+        * [~onInitialized](#module_Leaf..onInitialized) : <code>function</code>
+        * [~data](#module_Leaf..data) : <code>Object</code> &#124; <code>Array</code>
+        * [~onDataSent](#module_Leaf..onDataSent) : <code>function</code>
+        * [~onCommandListened](#module_Leaf..onCommandListened) ⇒ <code>boolean</code> &#124; <code>undefined</code>
+        * [~onListening](#module_Leaf..onListening) : <code>function</code>
+        * [~command](#module_Leaf..command) : <code>Object</code> &#124; <code>Array</code>
+        * [~onCommandSent](#module_Leaf..onCommandSent) : <code>function</code>
+        * [~commandType](#module_Leaf..commandType) : <code>Object</code>
+        * [~dataType](#module_Leaf..dataType) : <code>Object</code>
 
-<a name="new_Leaf_new"></a>
+<a name="module_Leaf.createLeaf"></a>
 
-### new Leaf(driver, args, [callback])
+### Leaf.createLeaf
+Factories instance of Leaf and get controller address.
+
+**Kind**: static property of <code>[Leaf](#module_Leaf)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| driver | <code>Object</code> | Driver object. |
+| args | <code>Object</code> | Arguments object. |
+| [callback] | <code>Leaf~onInitialized</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
+
+<a name="module_Leaf..Leaf"></a>
+
+### Leaf~Leaf
+**Kind**: inner class of <code>[Leaf](#module_Leaf)</code>  
+
+* [~Leaf](#module_Leaf..Leaf)
+    * [new Leaf(driver, args, [callback])](#new_module_Leaf..Leaf_new)
+    * [.sendData(data, [callback])](#module_Leaf..Leaf+sendData)
+    * [.listenCommand([callback], [callback])](#module_Leaf..Leaf+listenCommand)
+    * [.sendExternalCommand(command, [callback])](#module_Leaf..Leaf+sendExternalCommand)
+
+<a name="new_module_Leaf..Leaf_new"></a>
+
+#### new Leaf(driver, args, [callback])
 Construct instance of Leaf and get controller address.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | driver | <code>Object</code> | Driver object |
-| args | <code>Object</code> | Arguments object: </br> <ul> 		<li> {Array} dataType list of dataTypes to specify data. 		<li> {Array} commandType list of commandList to specify data. 		<li> {Integer} timeout time between two attempts of sending whoiscontroller. 		<li> {Integer} limitOfPackets number of attempts before stoping. </ul> |
+| args | <code>Object</code> | Arguments object |
 | [callback] | <code>Leaf~onInitialized</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
 
-<a name="Leaf+sendData"></a>
+<a name="module_Leaf..Leaf+sendData"></a>
 
-### leaf.sendData(data, [callback])
+#### leaf.sendData(data, [callback])
 Send a message with data from sensor to controller.
 
-**Kind**: instance method of <code>[Leaf](#Leaf)</code>  
+**Kind**: instance method of <code>[Leaf](#module_Leaf..Leaf)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | <code>Object</code> &#124; <code>Array</code> | Array of objects or one object with this fields <ul> 		<li>id: which of its parameters he is sending. 		<li>value: value captured by sensor. </ul> |
+| data | <code>Object</code> &#124; <code>Array</code> | Array of objects or one object with this fields |
 | [callback] | <code>Leaf~onDataSent</code> | function executed after data is sent |
 
-<a name="Leaf+listenCommand"></a>
+<a name="module_Leaf..Leaf+listenCommand"></a>
 
-### leaf.listenCommand([callback], [callback])
+#### leaf.listenCommand([callback], [callback])
 Listen a message with command from actuator to controller.
 
-**Kind**: instance method of <code>[Leaf](#Leaf)</code>  
+**Kind**: instance method of <code>[Leaf](#module_Leaf..Leaf)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | [callback] | <code>Leaf~onCommandListened</code> | function to be called when a object (command) arrives |
 | [callback] | <code>Leaf~onListening</code> | function to be called when it starts listening |
 
-<a name="createLeaf"></a>
+<a name="module_Leaf..Leaf+sendExternalCommand"></a>
 
-## createLeaf(driver, args, [callback])
-Factories instance of Leaf and get controller address.
+#### leaf.sendExternalCommand(command, [callback])
+Send a message with command from actuator/sensor to controller.
 
-**Kind**: global function  
+**Kind**: instance method of <code>[Leaf](#module_Leaf..Leaf)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| driver | <code>Object</code> | Driver object |
-| args | <code>Object</code> | Arguments object: </br> <ul> 		<li> {Array} dataType list of dataTypes to specify data. 		<li> {Array} commandType list of commandList to specify data. 		<li> {Integer} timeout time between two attempts of sending whoiscontroller. 		<li> {Integer} limitOfPackets number of attempts before stoping. </ul> |
-| [callback] | <code>Leaf~onInitialized</code> | function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter. |
+| command | <code>Object</code> &#124; <code>Array</code> | Array of objects. |
+| [callback] | <code>Leaf~onCommandSent</code> | function executed after data is sent |
 
-<a name="parseClass"></a>
+<a name="module_Leaf..createLeaf"></a>
 
-## parseClass(dataType, commandList) ⇒ <code>Enum</code>
+### Leaf~createLeaf()
+Factory method to construct a Leaf instance. Do not return anything.
+
+**Kind**: inner method of <code>[Leaf](#module_Leaf)</code>  
+<a name="module_Leaf..parseClass"></a>
+
+### Leaf~parseClass(dataType, commandList) ⇒ <code>Enum</code>
 Decide if class is Sensor, Actuator or both.
 
-**Kind**: global function  
+**Kind**: inner method of <code>[Leaf](#module_Leaf)</code>  
 **Returns**: <code>Enum</code> - NODE_CLASSES sensor or actuator.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | dataType | <code>Array</code> | list of dataTypes to specify data. |
 | commandList | <code>Array</code> | list of commandTypes to specify commands. |
+
+<a name="module_Leaf..args"></a>
+
+### Leaf~args : <code>Object</code>
+Arguments for Leaf constructor.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| dataType | <code>Array</code> | list of dataTypes of specific data. |
+| commandType | <code>Array</code> | list of commandList to specify data. |
+| timeout | <code>Number</code> | time between two attempts of sending whoiscontroller. |
+| limitOfPackets | <code>Number</code> | number of attempts before stoping. |
+
+<a name="module_Leaf..onInitialized"></a>
+
+### Leaf~onInitialized : <code>function</code>
+Callback used by Leaf.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | <code>Error</code> | If there is a problem creating leaf this will be an Error object, otherwise will be null |
+| driver | <code>Driver</code> | The created driver object |
+
+<a name="module_Leaf..data"></a>
+
+### Leaf~data : <code>Object</code> &#124; <code>Array</code>
+Data or list of data send to controller from this leaf.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>Number</code> | number identifying which of the metrics that this sensor is sending. |
+| value | <code>Number</code> &#124; <code>String</code> &#124; <code>Boolean</code> | data captured by sensor. |
+
+<a name="module_Leaf..onDataSent"></a>
+
+### Leaf~onDataSent : <code>function</code>
+Callback used by sendData
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | <code>Error</code> | If there is a problem sending data this will be an Error object, otherwise will be null |
+
+<a name="module_Leaf..onCommandListened"></a>
+
+### Leaf~onCommandListened ⇒ <code>boolean</code> &#124; <code>undefined</code>
+Callback used by listenCommand when message of command arrives.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Returns**: <code>boolean</code> &#124; <code>undefined</code> - False if server should stop listening. Otherwise it will keep listening.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>Object</code> | Json object containing the received object |
+| from | <code>Object</code> | Object containing the address object of the transmitter |
+
+<a name="module_Leaf..onListening"></a>
+
+### Leaf~onListening : <code>function</code>
+Callback used by listenCommand when leaf starts listening.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | <code>Error</code> | If there is a problem listening this will be an Error object, otherwise will be null |
+
+<a name="module_Leaf..command"></a>
+
+### Leaf~command : <code>Object</code> &#124; <code>Array</code>
+Command or list of commands executed by user and sent from actuator to controller.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>Number</code> | number identifying which of the metrics that this sensor is sending. |
+| value | <code>Number</code> &#124; <code>String</code> &#124; <code>Boolean</code> | command executed by user of the network and sent from actuator to controller. |
+
+<a name="module_Leaf..onCommandSent"></a>
+
+### Leaf~onCommandSent : <code>function</code>
+Callback executed by sendExternalCommand when a command is executed by the user of the network.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | <code>Error</code> | If there is a problem sending this will be an Error object, otherwise will be null |
+
+<a name="module_Leaf..commandType"></a>
+
+### Leaf~commandType : <code>Object</code>
+Command type object. Used by actuator to inform the controller the accepted commands.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>Number</code> | Id of the command. Defined by the actuator. |
+| type | <code>Rainfall~DATA_TYPES</code> &#124; <code>String</code> | The format of the command. |
+| range | <code>Array.&lt;Number&gt;</code> | Range of the command, it is a list with two values (start and end).     It is needed only when the type of the command is numeric. |
+| commandCategory | <code>Rainfall~COMMAND_CATEGORIES</code> &#124; <code>String</code> | The category of the command |
+| unit | <code>String</code> | Unit of the command (for example: meters, seconds) |
+
+<a name="module_Leaf..dataType"></a>
+
+### Leaf~dataType : <code>Object</code>
+Data type object. Used by sensor to inform the controller the collected data.
+
+**Kind**: inner typedef of <code>[Leaf](#module_Leaf)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>Number</code> | Id of the data. Defined by the sensor. |
+| type | <code>Rainfall~DATA_TYPES</code> &#124; <code>String</code> | The format of the data sent. |
+| range | <code>Array.&lt;Number&gt;</code> | Range of the data, it is a list with two values (start and end).     It is needed only when the type of the data is numeric. |
+| dataCategory | <code>Rainfall~DATA_CATEGORIES</code> &#124; <code>String</code> | The category of the data |
+| unit | <code>String</code> | Unit of the data (for example: meters, seconds) |
+| measureStrategy | <code>Rainfall~MEASURE_STRATEGIES</code> &#124; <code>String</code> | The strategy used by the sensor     to measure and send data |
 
