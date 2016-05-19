@@ -5,20 +5,14 @@ var Rainfall = require("rainfall");
 var fs = require("fs");
 
 /**
-	@module leaf
+	@module Leaf
 */
 
 /**
  * Construct instance of Leaf and get controller address.
  * @class
  * @param {Object} driver Driver object
- * @param {Object} args Arguments object: </br>
- * <ul>
- * 		<li> {Array} dataType list of dataTypes to specify data.
- * 		<li> {Array} commandType list of commandList to specify data.
- * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
- * 		<li> {Integer} limitOfPackets number of attempts before stoping.
- * </ul>
+ * @param {Object} args Arguments object
  * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
  */
 function Leaf (driver, args, callback) {
@@ -188,6 +182,9 @@ function Leaf (driver, args, callback) {
 	});
 }
 
+/**
+* Factory method to construct a Leaf instance. Do not return anything.
+*/
 function createLeaf(driver, args, callback) {
 	new Leaf(driver, args, callback);
 }
@@ -195,10 +192,6 @@ function createLeaf(driver, args, callback) {
 /**
  * Send a message with data from sensor to controller.
  * @param {Object|Array} data Array of objects or one object with this fields
- * <ul>
- * 		<li>id: which of its parameters he is sending.
- * 		<li>value: value captured by sensor.
- * </ul>
  * @param {Leaf~onDataSent} [callback] function executed after data is sent
  */
 Leaf.prototype.sendData = function (data, callback) {
@@ -244,12 +237,8 @@ Leaf.prototype.listenCommand = function (objectCallback, listenCallback) {
 
 /**
  * Send a message with command from actuator/sensor to controller.
- * @param {Object|Array} command Array of objects or one object with this fields
- * <ul>
- * 		<li>id: which of its parameters he is sending.
- * 		<li>command: executed by actuator
- * </ul>
- * @param {Leaf~onDataSent} [callback] function executed after data is sent
+ * @param {Object|Array} command Array of objects.
+ * @param {Leaf~onCommandSent} [callback] function executed after data is sent
  */
 Leaf.prototype.sendExternalCommand = function (command, callback) {
 	if (!command) throw Error("[leaf.sendExternalCommand] Can't send undefined object.");
@@ -295,34 +284,64 @@ var parseClass = function(dataType, commandType) {
 
 /**
  * Factories instance of Leaf and get controller address.
- * @param {Object} driver Driver object
- * @param {Object} args Arguments object: </br>
- * <ul>
- * 		<li> {Array} dataType list of dataTypes to specify data.
- * 		<li> {Array} commandType list of commandList to specify data.
- * 		<li> {Integer} timeout time between two attempts of sending whoiscontroller.
- * 		<li> {Integer} limitOfPackets number of attempts before stoping.
- * </ul>
+ * @param {Object} driver Driver object.
+ * @param {Object} args Arguments object.
  * @param {Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
  */
 exports.createLeaf = createLeaf;
 
 /**
+* Arguments for Leaf constructor.
+* @typedef {Object} Leaf~args
+* @property {Array} dataType - list of dataTypes of specific data.
+* @property {Array} commandType - list of commandList to specify data.
+* @property {Number} timeout - time between two attempts of sending whoiscontroller.
+* @property{Number} limitOfPackets - number of attempts before stoping.
+*/
+
+/**
  * Callback used by Leaf.
- * @callback onInitialized
+ * @callback Leaf~onInitialized
  * @param {Error} error - If there is a problem creating leaf this will be an Error object, otherwise will be null
  * @param {Driver} driver - The created driver object
  */
 
 /**
+* Data or list of data send to controller from this leaf.
+* @typedef {Object|Array} Leaf~data
+* @property {Number} id - number identifying which of the metrics that this sensor is sending.
+* @property {Number|String|Boolean} value - data captured by sensor.
+*/
+
+/**
 * Callback used by sendData
-* @callback onDataSent
+* @callback Leaf~onDataSent
 * @param {Error} error - If there is a problem sending data this will be an Error object, otherwise will be null
 */
 
 /**
-* Callback used by listenCommand.
-* @callback onCommandListened
-* @param {Error} error - If there is a problem creating leaf this will be an Error object, otherwise will be null
-* @param {Driver} driver - The created driver object
+* Callback used by listenCommand when message of command arrives.
+* @callback Leaf~onCommandListened
+* @returns {boolean|undefined} False if server should stop listening. Otherwise it will keep listening.
+* @param {Object} message - Json object containing the received object
+* @param {Object} from - Object containing the address object of the transmitter
+*/
+
+/**
+* Callback used by listenCommand when leaf starts listening.
+* @callback Leaf~onListening
+* @param {Error} error - If there is a problem listening this will be an Error object, otherwise will be null
+*/
+
+/**
+* Command or list of commands executed by user and sent from actuator to controller.
+* @typedef {Object|Array} Leaf~command
+* @property {Number} id - number identifying which of the metrics that this sensor is sending.
+* @property {Number|String|Boolean} value - command executed by user of the network and sent from actuator to controller.
+*/
+
+/**
+* Callback executed by sendExternalCommand when a command is executed by the user of the network.
+* @callback Leaf~onCommandSent
+* @param {Error} error - If there is a problem sending this will be an Error object, otherwise will be null
 */
