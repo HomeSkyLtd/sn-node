@@ -8,6 +8,7 @@
         * [.compareAddresses](#module_tcp.compareAddresses) ⇒ <code>boolean</code>
     * _inner_
         * [~Driver](#module_tcp..Driver)
+            * [.compareAddresses](#module_tcp..Driver+compareAddresses) ⇒ <code>boolean</code>
             * [.listen(msgCallback, [listenCallback])](#module_tcp..Driver+listen)
             * [.send(to, message, [callback])](#module_tcp..Driver+send)
             * [.stop()](#module_tcp..Driver+stop)
@@ -52,12 +53,26 @@ Compares two addresses
 **Kind**: inner class of <code>[tcp](#module_tcp)</code>  
 
 * [~Driver](#module_tcp..Driver)
+    * [.compareAddresses](#module_tcp..Driver+compareAddresses) ⇒ <code>boolean</code>
     * [.listen(msgCallback, [listenCallback])](#module_tcp..Driver+listen)
     * [.send(to, message, [callback])](#module_tcp..Driver+send)
     * [.stop()](#module_tcp..Driver+stop)
     * [.close()](#module_tcp..Driver+close)
     * [.getBroadcastAddress()](#module_tcp..Driver+getBroadcastAddress) ⇒ <code>[address](#module_tcp..address)</code>
     * [.getAddress()](#module_tcp..Driver+getAddress) ⇒ <code>[address](#module_tcp..address)</code>
+
+<a name="module_tcp..Driver+compareAddresses"></a>
+
+#### driver.compareAddresses ⇒ <code>boolean</code>
+Compares two addresses (it is the same compareAddresses exported function)
+
+**Kind**: instance property of <code>[Driver](#module_tcp..Driver)</code>  
+**Returns**: <code>boolean</code> - true if address1 and adress2 are the same and false otherwise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| a1 | <code>[address](#module_tcp..address)</code> | First address to compare |
+| a2 | <code>[address](#module_tcp..address)</code> | Second address to compare |
 
 <a name="module_tcp..Driver+listen"></a>
 
@@ -122,7 +137,7 @@ Gets the driver network address. Only works when "listening" was called beforeha
 | --- | --- | --- |
 | udplisten | <code>Boolean</code> | (Optional) True if you want to listen for broadcast     messages and false (or undefined) otherwise |
 | rport | <code>Number</code> | (Optional) The port listened by the TCP (and UDP if you are     listening for broadcasts). If undefined, server will listen on arbitrary port. |
-| broadcast_port | <code>Number</code> | (Optional) The port used when creating a broadcast address. If undefined, a default value (2356) will be used |
+| broadcast_port | <code>Number</code> | (Optional) The port used when creating a broadcast address. If undefined, a default value (2357) will be used |
 
 <a name="module_tcp..onInitialized"></a>
 

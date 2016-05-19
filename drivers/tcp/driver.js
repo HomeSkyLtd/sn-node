@@ -195,8 +195,16 @@ var compareAddresses = function (address1, address2) {
 */
 Driver.prototype.getAddress = function() {
     return this._udpDriver.getAddress();
-}
+};
 
+
+/**
+    Compares two addresses (it is the same compareAddresses exported function)
+    @param {module:tcp~address} a1 - First address to compare
+    @param {module:tcp~address} a2 - Second address to compare
+    @returns {boolean} true if address1 and adress2 are the same and false otherwise
+*/
+Driver.prototype.compareAddresses = compareAddresses;
 
 /**
     Creates a driver for TCP socket. It doesn't bind the port. But binds this port to the UDP.

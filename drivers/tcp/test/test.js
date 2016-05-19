@@ -184,8 +184,8 @@ describe('tcp', function(){
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
                 tcpDriver1 = driverInstance;
                 driver.compareAddresses(a1,a2).should.be.true();
-                driver.compareAddresses(a1,a3).should.be.false();
-                driver.compareAddresses(a2,a3).should.be.false();
+                tcpDriver1.compareAddresses(a1,a3).should.be.false();
+                tcpDriver1.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });

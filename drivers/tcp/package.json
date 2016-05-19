@@ -1,6 +1,6 @@
 {
   "name": "rainfall-tcp",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Rainfall TCP driver",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "driver.js",
