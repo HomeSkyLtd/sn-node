@@ -43,12 +43,17 @@ function Driver(params, callback) {
 	});
 }
 
-
 function createDriver(params, callback) {
 	new Driver(params, callback);
 }
 
-compareAddresses = function(address1, address2) {
+/**
+	Compare if two XBee addresses are equal.
+	@param {module:xbee_s1~address} a1 - First Xbee address
+	@param {module:xbee_s1~address} a2 - Second Xbee address
+	@returns {boolean} True if address1 is equal to address2, false otherwise.
+*/
+Driver.prototype.compareAddresses = function(address1, address2) {
 	var addr1Pad = "0".repeat(64).concat(address1.address).substr(-64);
 	var addr2Pad = "0".repeat(64).concat(address2.address).substr(-64);
 	return addr1Pad === addr2Pad;
@@ -179,7 +184,7 @@ exports.createDriver = createDriver;
 	@param {module:xbee_s1~address} a2 - Second Xbee address
 	@returns {boolean} True if address1 is equal to address2, false otherwise.
 */
-exports.compareAddresses = compareAddresses;
+exports.compareAddresses = Driver.prototype.compareAddresses;
 
 /**
  * Callback used by Driver.

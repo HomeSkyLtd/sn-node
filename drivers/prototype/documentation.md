@@ -12,9 +12,6 @@
 <dd><p>The client should call this function to instantiate the driver. The new driver is passed in the callback function.
     The implementation is very simple, just copy and paste the code bellow.</p>
 </dd>
-<dt><a href="#compareAddresses">compareAddresses(address1, address2)</a> ⇒ <code>boolean</code></dt>
-<dd><p>Compares two address</p>
-</dd>
 </dl>
 
 <a name="Driver"></a>
@@ -29,6 +26,7 @@
         * [.close()](#Driver+close)
         * [.send(to, message, [callback])](#Driver+send)
         * [.getBroadcastAddress()](#Driver+getBroadcastAddress) ⇒ <code>[Address](#Driver..Address)</code>
+        * [.compareAddresses(address1, address2)](#Driver+compareAddresses) ⇒ <code>boolean</code>
     * _inner_
         * [~Address](#Driver..Address)
         * [~onInitialized](#Driver..onInitialized) : <code>function</code>
@@ -81,6 +79,19 @@ Gets the broadcast network address. Only needs to work when "listening" was call
 
 **Kind**: instance method of <code>[Driver](#Driver)</code>  
 **Returns**: <code>[Address](#Driver..Address)</code> - Broadcast network address  
+<a name="Driver+compareAddresses"></a>
+
+### driver.compareAddresses(address1, address2) ⇒ <code>boolean</code>
+Compares two address.
+
+**Kind**: instance method of <code>[Driver](#Driver)</code>  
+**Returns**: <code>boolean</code> - true if address1 and adress2 are associated to the same device, and false otherwise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address1 | <code>[Address](#Driver..Address)</code> | First address to compare |
+| address2 | <code>[Address](#Driver..Address)</code> | Second address to compare |
+
 <a name="Driver..Address"></a>
 
 ### Driver~Address
@@ -146,17 +157,4 @@ The client should call this function to instantiate the driver. The new driver i
 | --- | --- | --- |
 | [params] | <code>Object</code> | An object containing parameters for the specific driver |
 | [callback] | <code>[onInitialized](#Driver..onInitialized)</code> | Function to be called when the driver is initialized |
-
-<a name="compareAddresses"></a>
-
-## compareAddresses(address1, address2) ⇒ <code>boolean</code>
-Compares two address
-
-**Kind**: global function  
-**Returns**: <code>boolean</code> - true if address1 and adress2 are the same and false otherwise  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| address1 | <code>[Address](#Driver..Address)</code> | First address to compare |
-| address2 | <code>[Address](#Driver..Address)</code> | Second address to compare |
 
