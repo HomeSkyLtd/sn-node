@@ -177,8 +177,8 @@ describe('udp', function(){
             driver.createDriver({rport:4567, broadcast_port: 4567}, function(err, driverInstance){
                 udpDriver = driverInstance;
                 driver.compareAddresses(a1,a2).should.be.true();
-                driver.compareAddresses(a1,a3).should.be.false();
-                driver.compareAddresses(a2,a3).should.be.false();
+                udpDriver.compareAddresses(a1,a3).should.be.false();
+                udpDriver.compareAddresses(a2,a3).should.be.false();
                 done();
             });
         });

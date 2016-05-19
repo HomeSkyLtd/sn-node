@@ -1,6 +1,6 @@
 {
   "name": "rainfall-udp",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Rainfall UDP driver",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "driver.js",
