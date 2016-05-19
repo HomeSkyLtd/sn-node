@@ -2,30 +2,33 @@
   "name": "rainfall-tcp",
   "version": "0.0.1",
   "description": "Rainfall TCP driver",
+  "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "driver.js",
   "scripts": {
     "test": "mocha"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/HomeSkyLtd/sn-node.git"
   },
   "devDependencies": {
     "jsdoc": ">=3.4.0",
     "mocha": "^2.4.5",
     "should": "^8.3.0"
   },
+  "dependencies": {
+    "rainfall-udp": ">=0.0.4"
+  },
   "keywords": [
     "rainfall",
     "tcp",
     "driver",
     "home",
-    "automation"
+    "automation",
+    "API",
+    "network",
+    "ip"
   ],
-  "author": "Ricardo Boccoli Gallego <ricardo.gallego93@gmail.com>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/HomeSkyLtd/sn-node/issues"
-  },
-  "homepage": "https://github.com/HomeSkyLtd/sn-node#readme"
+  "contributors": [
+  { "name": "Ricardo Boccoli Gallego", "email": "ricardo.gallego93@gmail.com" },
+  { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
+  { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" }
+  ],
+  "license": "ISC"
 }

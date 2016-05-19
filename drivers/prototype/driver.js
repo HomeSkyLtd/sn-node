@@ -1,16 +1,12 @@
 /**
 	@class
-    Driver object for a network protocol. This function can't be called directly by the client. The client
-    will call createDriver
-    @param {Object} [params] - An object containing parameters for the specific driver
-    @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 */
 function Driver (params, callback) {
     throw Error("Not implemented");
 }
 /**
     The client should call this function to instantiate the driver. The new driver is passed in the callback function.
-    The implementation is very example, just copy and paste the code bellow.
+    The implementation is very simple, just copy and paste the code bellow.
     @param {Object} [params] - An object containing parameters for the specific driver
     @param {Driver~onInitialized} [callback] - Function to be called when the driver is initialized
 **/
@@ -35,7 +31,7 @@ Driver.prototype.stop = function () {
 };
 
 /**
-    Closes driver. After that call, the driver don't need to work anymore and should stop any assync task
+    Closes driver. After that call, the driver doesn't need to work anymore and should stop any assync task
 */
 Driver.prototype.close = function () {
     throw Error("Not implemented");
@@ -46,19 +42,11 @@ Driver.prototype.close = function () {
   	@param {Driver~Address} to - Object containing the address object of the recipient
   	@param {Buffer} message - Buffer containing the message to be sent
   	@param {Driver~onSent} [callback] - Function to be called when the message was sent
-
 */
 Driver.prototype.send = function (to, message, callback) {
     throw Error("Not implemented");
 };
 
-/**
-    Gets the driver network address. Only need to work when "listening" was called
-    @returns {Driver~Address} Network address
-*/
-Driver.prototype.getAddress = function () {
-    throw Error("Not implemented");
-};
 
 /**
     Gets the broadcast network address. Only needs to work when "listening" was called.
@@ -75,11 +63,12 @@ Driver.prototype.getBroadcastAddress = function () {
     @param {Driver~Address} address2 - Second address to compare
     @returns {boolean} true if address1 and adress2 are the same and false otherwise
 */
-Driver.compareAddresses = function (address1, address2) {
+compareAddresses = function (address1, address2) {
     throw Error("Not implemented");
 };
 
 exports.createDriver = createDriver;
+exports.compareAddresses = compareAddresses;
 
 /**
     Actually anything used by the driver do identify the address of
