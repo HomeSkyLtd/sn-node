@@ -1,0 +1,14 @@
+{
+  "name": "ruled-controller",
+  "version": "1.0.0",
+  "description": "Controller with rules that receives data from sensor and send command to actuator if data respects rule. ",
+  "main": "controller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rainfall-controller": "0.0.3"
+  }
+}
