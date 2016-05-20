@@ -51,7 +51,9 @@ function Leaf (driver, args, callback) {
     var idIsOld = false;
 
 	fs.access(id_dir, fs.F_OK, (err) => {
-		if (!err) {
+		if (err || args.path === false) {
+			obj = {packageType: Rainfall.PACKAGE_TYPES.whoiscontroller};
+		} else {
 			this._myId = fs.readFileSync(id_dir, 'utf8', 'r');
 			obj = {
 				packageType: Rainfall.PACKAGE_TYPES.iamback,
@@ -73,11 +75,6 @@ function Leaf (driver, args, callback) {
 				return false;
 			}, Rainfall.PACKAGE_TYPES.welcomeback, null,
 			function () {});
-
-
-
-		} else {
-			obj = {packageType: Rainfall.PACKAGE_TYPES.whoiscontroller};
 		}
 
         this._rain.listen((msg, from) => {

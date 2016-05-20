@@ -38,7 +38,8 @@ describe('sensor-driver', function () {
 							unit: "cd"
 						}],
 						timeout: 5*1000,
-						limitOfPackets: 3
+						limitOfPackets: 3,
+						path: "/home/henrique/test"
 					},
 					(err, leaf) => {
 						if (err || err !== null) {
