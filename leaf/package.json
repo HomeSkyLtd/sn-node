@@ -1,6 +1,6 @@
 {
   "name": "rainfall-leaf",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Leaf class representing sensor or actuator",
   "main": "leaf.js",
   "scripts": {
