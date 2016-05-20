@@ -3,8 +3,8 @@
 var should = require("should");
 
 var Leaf = require("../leaf.js");
-var Driver = require("../../rainfall/test/test_driver.js");
-var Rainfall = require("../../rainfall/rainfall.js");
+var Driver = require("rainfall/test/test_driver.js");
+var Rainfall = require("rainfall");
 
 describe('sensor-driver', function () {
 	Driver.createDriver({id: 1}, (err, driver) => {
@@ -39,7 +39,7 @@ describe('sensor-driver', function () {
 						}],
 						timeout: 5*1000,
 						limitOfPackets: 3,
-						path: "/home/henrique/test"
+						path: false
 					},
 					(err, leaf) => {
 						if (err || err !== null) {

@@ -1,6 +1,6 @@
 {
   "name": "rainfall-leaf",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Leaf class representing sensor or actuator",
   "main": "leaf.js",
   "scripts": {
@@ -33,7 +33,7 @@
   "dependencies": {
     "enum": "^2.3.0",
     "mocha": "^2.4.5",
-    "rainfall": "0.0.5",
-    "should": "^8.3.1"
+    "rainfall": "^0.1.0",
+    "should": "^8.3.2"
   }
 }
