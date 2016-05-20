@@ -1,0 +1,8 @@
+{
+  "name": "simple-controller",
+  "main": "controller.js",
+  "dependencies": {
+    "rainfall": ">=0.1.0",
+    "rainfall-tcp": ">=0.1.0"
+  }
+}
