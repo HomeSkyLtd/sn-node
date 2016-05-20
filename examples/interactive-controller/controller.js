@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 var Rainfall = require("rainfall");
 var Tcp = require("rainfall-tcp");
-var db = require("./database");
 
 const readline = require('readline');
 
