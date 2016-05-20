@@ -41,6 +41,11 @@ function Leaf (driver, args, callback) {
 	this._rain = new Rainfall.Rainfall(this._driver);
 
 	var id_dir = process.env.HOME + "/.node_id";
+	if (typeof args.path === 'string') {
+		fs.mkdirSync(args.path);
+		id_dir = args.path + "/.node_id";
+	}
+
 	var obj = {};
 
     var idIsOld = false;
@@ -81,9 +86,12 @@ function Leaf (driver, args, callback) {
             this._controllerAddress = from;
             this._myId = msg.yourId;
             idIsOld = false;
-            fs.writeFile(id_dir, this._myId, function (err) {
-                if (err) callback(err);
-            });
+
+			if (args.path !== false) {
+	            fs.writeFile(id_dir, this._myId, function (err) {
+	                if (err) callback(err);
+	            });
+			}
 
             for (var func of this._listOfCallbacks) {
                 func(this);
@@ -282,6 +290,7 @@ exports.createLeaf = createLeaf;
 * @property {module:Leaf~commandType} commandType - list of commandList to specify data.
 * @property {Number} timeout - time between two attempts of sending whoiscontroller.
 * @property {Number} limitOfPackets - number of attempts before stoping.
+* @property {Boolean|String} path - Where to save the id in the filesystem. If false, the id is not saved, if undefined the id is saved in the home directory, otherwise it is saved in the path passed.
 */
 
 /**

@@ -31,7 +31,17 @@ Udp.createDriver({rport: 4567}, (err, driver) => {
 						unit: "ºC"
 					}
 				],
-				commandType: []
+				// As example of command type, this is a lamp with light intensity control.
+				commandType: [{
+					id: 2,
+					type: "real",
+					range: [0, 1],
+					commandCategory: "lightintensity",
+					unit: "cd"
+				}],
+				timeout: 5*1000,
+				limitOfPackets: 3,
+				path: "/home/user/node_id_dir"
 			},
 			(err, leaf) => {
 				// use leaf methods to send data, send external command or listen command.
@@ -44,6 +54,19 @@ Udp.createDriver({rport: 4567}, (err, driver) => {
 On the callback, use leaf to send a data to central controller. Data is a object with id and value.
 ```javascript
 leaf.sendData({id: 1, value: 23.2}, function (err) {
+	if (err) {
+		// Treat error.
+	} else {
+		// Do something else.
+	}
+})
+```
+
+Also, use leaf to listen commands from central controller.
+```javascript
+leaf.listenCommand(function(msg, from) {
+	// Do something with message and from.
+}, function (err) {
 	if (err) {
 		// Treat error.
 	} else {

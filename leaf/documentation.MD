@@ -115,6 +115,7 @@ Arguments for Leaf constructor.
 | commandType | <code>[commandType](#module_Leaf..commandType)</code> | list of commandList to specify data. |
 | timeout | <code>Number</code> | time between two attempts of sending whoiscontroller. |
 | limitOfPackets | <code>Number</code> | number of attempts before stoping. |
+| path | <code>Boolean</code> &#124; <code>String</code> | Where to save the id in the filesystem. If false, the id is not saved, if undefined the id is saved in the home directory, otherwise it is saved in the path passed. |
 
 <a name="module_Leaf..onInitialized"></a>
 
