@@ -1,8 +1,8 @@
 /*jshint esversion: 6*/
 
-var Leaf = require("../../leaf/leaf.js");
-var Driver = require("../../drivers/udp/driver.js");
-var Rainfall = require("../../rainfall/rainfall.js");
+var Leaf = require("rainfall-leaf");
+var Driver = require("rainfall-tcp");
+var Rainfall = require("rainfall");
 
 var port = 4567;
 if (process.argv[2]) {
@@ -26,15 +26,18 @@ Driver.createDriver({rport: port}, function(err, driver) {
 						unit: "ºC"
 					}
 				],
-				commandType: []
+				commandType: [],
+				path: false
 			},
 			(err, leaf) => {
 				if (err) console.log(err);
 				else {
+					console.log("[sensor] Node connected to network.");
 					var i = 0;
 					setInterval(() => {
-						leaf.sendData({id: 1 , value: 20+i%10}, function (err) {if (err) console.log(err);});
-						i += 0.1;
+						console.log("[sensor] sending data to controller");
+						leaf.sendData({id: 1 , value: 18+i%10}, function (err) {if (err) console.log(err);});
+						i += 1;
 					}, 5*1000);
 				}
 			});
