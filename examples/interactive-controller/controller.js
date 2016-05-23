@@ -148,15 +148,8 @@ printActuators = function(){
 };
 
 printFormattedData = function (is_command, input, node) {
-    var description = null;
-    var iters = is_command ? node.desc.commandType : node.desc.dataType;
-    for (var i in iters) {
-        var desc = iters[i];
-        if (input.id === desc.id) {
-            description = desc;
-            break;
-        }    
-    }
+    var description = (is_command ? node.desc.commandType : node.desc.dataType)[input.id];
+    
     if (is_command) {
         if (description === null)
             print_message("    [external command] Unexpected external command received: id " + input.id + "received: " + input.value);

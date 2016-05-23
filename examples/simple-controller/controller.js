@@ -54,7 +54,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
             return;
         }
         console.log("[new external command] External Command from node " + obj.id + " received: ");
-        obj.command.forEach((cmd) => {
+        obj.command.forEach((command) => {
             console.log("   [external command] Command with id " + command.id + " received: " + command.value);
         });
 	}, 'externalcommand');
