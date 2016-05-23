@@ -112,7 +112,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
         print_message("[new data] Data from node " + obj.id + " received: ");
         //Print all received data
 		obj.data.forEach((data) => {
-			print_message("	[data] Data with id " + data.id + " received: " + data.value);
+            printFormattedData(false, data, nodes[obj.id]);
 		});
 
 	}, 'data');
@@ -124,8 +124,8 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
             return;
         }
         print_message("[new external command] External Command from node " + obj.id + " received: ");
-        obj.command.forEach((cmd) => {
-            print_message("   [external command] Command with id " + command.id + " received: " + command.value);
+        obj.command.forEach((command) => {
+           printFormattedData(true, command, nodes[obj.id]);
         });
 	}, 'externalcommand');
 });
@@ -145,6 +145,34 @@ printActuators = function(){
 			}
 		}
 	}
+};
+
+printFormattedData = function (is_command, input, node) {
+    var description = null;
+    var iters = is_command ? node.desc.commandType : node.desc.dataType;
+    for (var i in iters) {
+        var desc = iters[i];
+        if (input.id === desc.id) {
+            description = desc;
+            break;
+        }    
+    }
+    if (is_command) {
+        if (description === null)
+            print_message("    [external command] Unexpected external command received: id " + input.id + "received: " + input.value);
+        else
+            print_message("    [external command] Command with id " + input.id + " (" + 
+                Rainfall.COMMAND_CATEGORIES.get(description.commandCategory).key + ") received: " + input.value +
+                description.unit);
+    }
+    else {
+         if (description === null)
+            print_message("    [data] Unexpected data received: id " + input.id + "received: " + input.value);
+        else
+            print_message("    [data] Data with id " + input.id + " (" + 
+                Rainfall.DATA_CATEGORIES.get(description.dataCategory).key + ") received: " + input.value +
+                description.unit);
+    }
 };
 
 hasActuator = function(){
