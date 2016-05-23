@@ -9,7 +9,9 @@ const readline = require('readline');
 */
 
 var rules = new Rule.Rule();
-var nodeState = {};	// map of nodes id, each one has map of data ids which the value is the data from sensor.
+var nodeDataState = {};	// map of nodes id, each one has map of data ids which the value is the data from sensor.
+var nodeCmdState = {};	// map of nodes id, each one has map of commands ids which the value is the command from actuator.
+
 var nodes = [];
 
 /* Example
@@ -106,11 +108,11 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
         print_message("[new data] Data from node " + obj.id + " received: ");
         //Print all received data
 		obj.data.forEach((data) => {
-			if (nodeState[obj.id] === undefined) {
-				nodeState[obj.id] = {};
+			if (nodeDataState[obj.id] === undefined) {
+				nodeDataState[obj.id] = {};
 			}
-			nodeState[obj.id][data.id] = data.value;
-			print_message("	[data] Data with id " + data.id + " received: " + data.value);
+			nodeDataState[obj.id][data.id] = data.value;
+			printFormattedData(false, data, nodes[obj.id]);
 		});
 
 		rules.getCommandsIfClauseIsTrue((commands) => {
@@ -120,14 +122,17 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 
 	//Listens for external commands
 	rainfall.listen((obj, from) => {
-		if (obj.id < 0 || obj.id > ids) {
+		if (obj.id < 0 || obj.id >= nodes.length) {
             print_message("[new external command] Received external command from unknown node " + obj.id);
             return;
         }
         print_message("[new external command] External Command from node " + obj.id + " received: ");
         obj.command.forEach((cmd) => {
-			nodeState[obj.id][cmd.id] = cmd.value;
-            print_message("   [external command] Command with id " + cmd.id + " received: " + cmd.value);
+			if (nodeCmdState[obj.id] === undefined) {
+				nodeCmdState[obj.id] = {};
+			}
+			nodeCmdState[obj.id][cmd.id] = cmd.value;
+            printFormattedData(true, cmd, nodes[obj.id]);
         });
 
 		rules.getCommandsIfClauseIsTrue((commands) => {
@@ -316,4 +321,33 @@ parseParams = function (params) {
 	return [lhs, params[1], rhs];
 };
 
-exports.nodeState = nodeState;
+printFormattedData = function (is_command, input, node) {
+    var description = null;
+    var iters = is_command ? node.desc.commandType : node.desc.dataType;
+    for (var i in iters) {
+        var desc = iters[i];
+        if (input.id === desc.id) {
+            description = desc;
+            break;
+        }
+    }
+    if (is_command) {
+        if (description === null)
+            print_message("    [external command] Unexpected external command received: id " + input.id + "received: " + input.value);
+        else
+            print_message("    [external command] Command with id " + input.id + " (" +
+                Rainfall.COMMAND_CATEGORIES.get(description.commandCategory).key + ") received: " + input.value +
+                description.unit);
+    }
+    else {
+         if (description === null)
+            print_message("    [data] Unexpected data received: id " + input.id + "received: " + input.value);
+        else
+            print_message("    [data] Data with id " + input.id + " (" +
+                Rainfall.DATA_CATEGORIES.get(description.dataCategory).key + ") received: " + input.value +
+                description.unit);
+    }
+};
+
+exports.nodeDataState = nodeDataState;
+exports.nodeCmdState = nodeCmdState;

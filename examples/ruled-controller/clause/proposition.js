@@ -7,7 +7,8 @@ function isNumeric(n) {
 }
 
 function saveValue(lhsOrRhs, callback) {
-	var nodeState = Controller.nodeState;
+	var nodeDataState = Controller.nodeDataState;
+	var nodeCmdState = Controller.nodeCmdState;
 
 	if (lhsOrRhs === undefined || lhsOrRhs === null) {
 		throw new Error('[Proposition] Empty operand');
@@ -18,13 +19,24 @@ function saveValue(lhsOrRhs, callback) {
 		}
 
 		nodeId = ids[0];
-		dataId = ids[1];
 
-		if (nodeState[nodeId] === undefined) {
+		if (nodeCmdState[nodeId] === undefined && nodeDataState[nodeId] === undefined) {
 			throw new Error('Node Id ' + nodeId + " undefined.");
 		}
 
-		callback(nodeState[nodeId][dataId]);
+		if (ids[1].substr(ids[1].length - 1) === 'c') {
+			var cmdId = ids[1].substr(0, ids[1].length - 1);
+			console.log("COMANDO EXECUTED: " + nodeId + " " + cmdId);
+			callback(nodeCmdState[nodeId][cmdId]);
+		} else if (ids[1].substr(ids[1].length - 1) === 'd') {
+			var dataId = ids[1].substr(0, ids[1].length - 1);
+			console.log("DATA EXECUTED: " + nodeId + " " + dataId);
+			callback(nodeDataState[nodeId][dataId]);
+		} else {
+			console.log("DATA EXECUTED: " + nodeId + " " + ids[1]);
+			callback(nodeDataState[nodeId][ids[1]]);
+		}
+
 	} else if (isNumeric(lhsOrRhs)) {
 		callback(lhsOrRhs);
 	} else {
