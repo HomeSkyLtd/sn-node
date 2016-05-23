@@ -28,12 +28,12 @@ Driver.createDriver({}, function(err, driver) {
                     console.log("[initialized] Temperature sensor initialized");
                     var i = 0;
                     setInterval(() => {
-                        var value = Math.floor((20+i%10) * 10)/10;
+                        var value = Math.floor(20+i%10);
                         leaf.sendData({id: 1 , value: value}, function (err) {
                             if (err) console.log(err);
                             console.log("[data sent] temperature: " + value + "ºC");
                         });
-                        i += 0.1;
+                        i += 1;
                     }, 5*1000);
                 }
             });
