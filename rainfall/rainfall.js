@@ -158,6 +158,43 @@ const PACKAGE_FIELDS = {
     }
 };
 
+function searchRepeatedIds(pkt, fields) {
+    var ids = {};
+    for (var i = 0; i < fields.length; i++) {
+        if (pkt[fields[i]]) {
+            for (var el of pkt[fields[i]]) {
+                if (ids[el.id] !== undefined) {
+                    return {
+                        id: el.id,
+                        obj1: fields[ids[el.id]],
+                        obj2: fields[i],
+                    };
+                }
+                ids[el.id] = i;
+            }
+        }
+    }
+    return null;
+}
+
+/*
+    This object contains additional checks that must be performed on every package
+*/
+function AdditionalCheck(pkt) {
+    //Should check for non repeated dataType and commandType ids
+    var err = searchRepeatedIds(pkt, ['dataType', 'commandType']);
+    if (err) {
+        throw new Error("Repeated id " + err.id + " in field" + (err.obj1 === err.obj2 ? 
+            " " + err.obj1 : "s " + err.obj1 + " and " + err.obj2));
+    }
+    //Check in data and command
+    err = searchRepeatedIds(pkt, ['data', 'command']);
+    if (err) {
+        throw new Error("Repeated id " + err.id + " in field" + (err.obj1 === err.obj2 ? 
+            " " + err.obj1 : "s " + err.obj1 + " and " + err.obj2));
+    }
+}
+
 // List of previous defined fields
 // Values in brackets [] can accept lists of values
 const VALUES = {
@@ -430,6 +467,9 @@ function checkPackage(pkt) {
     for (key in fields)
         if (!(key in pkt))
             throw new Error("Missing field '" + key + "' in package");
+
+    //Additional package checks
+    AdditionalCheck(pkt);
 }
 
 
@@ -713,7 +753,7 @@ exports.Rainfall = Rainfall;
 /**
     Data type object. Used by sensor to inform the controller the collected data.
     @typedef {Object} Rainfall~dataType
-    @property {Number} id - Id of the data. Defined by the sensor.
+    @property {Number} id - Id of the data. Defined by the sensor, shouldn't repeat in dataType and commandType.
     @property {DATA_TYPES|String} type - The format of the data sent.
     @property {Number[]} [range] - Range of the data, it is a list with two values (start and end).
     It is needed only when the type of the data is numeric.
@@ -727,7 +767,7 @@ exports.Rainfall = Rainfall;
 /**
     Command type object. Used by actuator to inform the controller the accepted commands.
     @typedef {Object} Rainfall~commandType
-    @property {Number} id - Id of the command. Defined by the actuator.
+    @property {Number} id - Id of the command. Defined by the actuator, shouldn't repeat in dataType and commandType.
     @property {DATA_TYPES|String} type - The format of the command.
     @property {Number[]} [range] - Range of the command, it is a list with two values (start and end).
     It is needed only when the type of the command is numeric.
