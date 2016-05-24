@@ -1,6 +1,6 @@
 {
   "name": "rainfall-udp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rainfall UDP driver",
   "repository": "https://github.com/HomeSkyLtd/sn-node",
   "main": "driver.js",
@@ -13,7 +13,7 @@
   "contributors": [
   { "name": "Ricardo Boccoli Gallego", "email": "ricardo.gallego93@gmail.com" },
   { "name": "Henrique Rodrigues", "email": "henriqrodrigues@gmail.com" },
-  { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" } 
+  { "name": "Fabio Tsuyoshi Muramatsu", "email": "ftmtsuyoshi@gmail.com" }
   ],
   "scripts": {
     "test": "mocha"
