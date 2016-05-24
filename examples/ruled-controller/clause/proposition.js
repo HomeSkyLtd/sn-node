@@ -47,6 +47,8 @@ Proposition.prototype.evaluate = function(callback) {
 	saveValue(this.lhs, (lhs) => {
 		saveValue(this.rhs, (rhs) => {
 
+			console.log(lhs + this.operator + rhs);
+
 			if (lhs === undefined && rhs === undefined)
 				return false;
 

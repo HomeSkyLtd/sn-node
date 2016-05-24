@@ -1,6 +1,8 @@
 /*jshint esversion: 6 */
 
 const dgram = require("dgram");
+const os = require('os');
+const ifaces = os.networkInterfaces();
 
 const BROADCAST_ADDR = "255.255.255.255";
 const BROADCAST_PORT = 2356;
@@ -109,14 +111,38 @@ Driver.prototype.listen = function (msgCallback, listenCallback) {
 
 */
 Driver.prototype.send = function(to, msg, callback) {
-    if(to.address === BROADCAST_ADDR) this._server.setBroadcast(true);
-
-    this._server.send(msg, to.port, to.address, (err) => {
-        if (callback) callback(err);
-    });
+    if(to.address === BROADCAST_ADDR) {
+        this._server.setBroadcast(true);
+        this._sendBroadcast(msg, to, callback);
+    }
+    else {
+        this._server.send(msg, to.port, to.address, (err) => {
+            if (callback) callback(err);
+        });
+    }
 
 };
 
+Driver.prototype._sendBroadcast = function(msg, to, callback){
+    Object.keys(ifaces).forEach((ifname) => {
+        var alias = 0;
+
+        ifaces[ifname].forEach((iface) => {
+            if ('IPv4' !== iface.family || iface.internal !== false) {
+                // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+                return;
+            }
+            var mask = iface.netmask.split(".").map((s_object) => {return ~(Number(s_object));});
+            var ip = iface.address.split(".").map((s_object) => {return Number(s_object);});
+            var broadcast = [];
+            for(var i = 0 ; i < 4 ; ++i)
+            broadcast[i] = (mask[i] & 255) | ip[i];
+            this._server.send(msg, to.port, broadcast.join("."), (err) => {
+                if (callback) callback(err);
+            });
+        });
+    });
+};
 /**
     Closes the UDP socket. This driver should not be used anmore.
 */
