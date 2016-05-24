@@ -102,6 +102,11 @@ Driver.createDriver({ }, function(err, driver) {
                                                         id: 2,
                                                         value: answers[1]
                                                     });
+												else
+													external.push({
+														id: 2,
+														value: 22
+													});
                                                 leaf.sendExternalCommand(external);
                                             }
                                             can_print = true;
