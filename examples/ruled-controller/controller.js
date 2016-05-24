@@ -9,8 +9,7 @@ const readline = require('readline');
 */
 
 var rules = new Rule.Rule();
-var nodeDataState = {};	// map of nodes id, each one has map of data ids which the value is the data from sensor.
-var nodeCmdState = {};	// map of nodes id, each one has map of commands ids which the value is the command from actuator.
+var nodeState = {};	// map of nodes id, each one has map of data ids which the value is the data from sensor.
 
 var nodes = [];
 
@@ -108,10 +107,10 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
         print_message("[new data] Data from node " + obj.id + " received: ");
         //Print all received data
 		obj.data.forEach((data) => {
-			if (nodeDataState[obj.id] === undefined) {
-				nodeDataState[obj.id] = {};
+			if (nodeState[obj.id] === undefined) {
+				nodeState[obj.id] = {};
 			}
-			nodeDataState[obj.id][data.id] = data.value;
+			nodeState[obj.id][data.id] = data.value;
 			printFormattedData(false, data, nodes[obj.id]);
 		});
 
@@ -128,10 +127,10 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
         }
         print_message("[new external command] External Command from node " + obj.id + " received: ");
         obj.command.forEach((cmd) => {
-			if (nodeCmdState[obj.id] === undefined) {
-				nodeCmdState[obj.id] = {};
+			if (nodeState[obj.id] === undefined) {
+				nodeState[obj.id] = {};
 			}
-			nodeCmdState[obj.id][cmd.id] = cmd.value;
+			nodeState[obj.id][cmd.id] = cmd.value;
             printFormattedData(true, cmd, nodes[obj.id]);
         });
 
@@ -172,7 +171,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 							can_print = true;
 							print_message("Proposition must be: 'rhs operator lhs'.");
 						} else {
-							andExps.push(new Proposition(params[0], params[1], params[2]));
+							andExps.push(new Proposition(params[2], params[1], params[0]));
 							ask.question("Write AND, OR or OK: ", insertRule);
 						}
 					});
@@ -185,7 +184,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 							can_print = true;
 							print_message("Proposition must be: 'rhs operator lhs'.");
 						} else {
-							andExps.push(new Proposition(params[0], params[1], params[2]));
+							andExps.push(new Proposition(params[2], params[1], params[0]));
 							ask.question("Write AND, OR or OK: ", insertRule);
 						}
 					});
@@ -235,7 +234,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 					print_message("Proposition must be: 'rhs operator lhs'.");
 					return;
 				} else {
-					andExps.push(new Proposition(params[0], params[1], params[2]));
+					andExps.push(new Proposition(params[2], params[1], params[0]));
 					ask.question('Write AND, OR or OK: ', insertRule);
 				}
             });
@@ -349,5 +348,4 @@ printFormattedData = function (is_command, input, node) {
     }
 };
 
-exports.nodeDataState = nodeDataState;
-exports.nodeCmdState = nodeCmdState;
+exports.nodeState = nodeState;

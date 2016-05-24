@@ -7,8 +7,7 @@ function isNumeric(n) {
 }
 
 function saveValue(lhsOrRhs, callback) {
-	var nodeDataState = Controller.nodeDataState;
-	var nodeCmdState = Controller.nodeCmdState;
+	var nodeState = Controller.nodeState;
 
 	if (lhsOrRhs === undefined || lhsOrRhs === null) {
 		throw new Error('[Proposition] Empty operand');
@@ -19,23 +18,13 @@ function saveValue(lhsOrRhs, callback) {
 		}
 
 		nodeId = ids[0];
+		dataOrCmdId = ids[1];
 
-		if (nodeCmdState[nodeId] === undefined && nodeDataState[nodeId] === undefined) {
+		if (nodeState[nodeId] === undefined) {
 			throw new Error('Node Id ' + nodeId + " undefined.");
 		}
 
-		if (ids[1].substr(ids[1].length - 1) === 'c') {
-			var cmdId = ids[1].substr(0, ids[1].length - 1);
-			console.log("COMANDO EXECUTED: " + nodeId + " " + cmdId);
-			callback(nodeCmdState[nodeId][cmdId]);
-		} else if (ids[1].substr(ids[1].length - 1) === 'd') {
-			var dataId = ids[1].substr(0, ids[1].length - 1);
-			console.log("DATA EXECUTED: " + nodeId + " " + dataId);
-			callback(nodeDataState[nodeId][dataId]);
-		} else {
-			console.log("DATA EXECUTED: " + nodeId + " " + ids[1]);
-			callback(nodeDataState[nodeId][ids[1]]);
-		}
+		callback(nodeState[nodeId][dataOrCmdId]);
 
 	} else if (isNumeric(lhsOrRhs)) {
 		callback(lhsOrRhs);
@@ -44,7 +33,7 @@ function saveValue(lhsOrRhs, callback) {
 	}
 }
 
-Proposition = function(lhs, operator, rhs, cb){
+Proposition = function(lhs, operator, rhs){
 	var ids;
 	var nodeId;
 	var dataId;
@@ -58,28 +47,28 @@ Proposition.prototype.evaluate = function(callback) {
 	saveValue(this.lhs, (lhs) => {
 		saveValue(this.rhs, (rhs) => {
 
-	    switch(this.operator){
-	        case '>':
-	            callback(lhs > rhs);
-				break;
-	        case '<':
-	            callback(lhs < rhs);
-				break;
-	        case '>=':
-	            callback(lhs >= rhs);
-				break;
-	        case '<=':
-	            callback(lhs <= rhs);
-				break;
-	        case '==':
-	            callback(lhs == rhs);
-				break;
-	        case '!=':
-	            callback(lhs != rhs);
-				break;
-	        default:
-	            throw new Error(`Operator ${this.operator} is not defined`);
-	    }
+		    switch(this.operator){
+		        case '>':
+		            callback(lhs > rhs);
+					break;
+		        case '<':
+		            callback(lhs < rhs);
+					break;
+		        case '>=':
+		            callback(lhs >= rhs);
+					break;
+		        case '<=':
+		            callback(lhs <= rhs);
+					break;
+		        case '==':
+		            callback(lhs == rhs);
+					break;
+		        case '!=':
+		            callback(lhs != rhs);
+					break;
+		        default:
+		            throw new Error(`Operator ${this.operator} is not defined`);
+		    }
 		});
 	});
 };
