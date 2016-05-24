@@ -4,8 +4,8 @@ var Driver = require("rainfall-tcp");
 var Leaf = require("rainfall-leaf");
 
 //Creates the TCP driver
-Driver.createDriver({ }, function (err, driver) {
-	if (err) 
+Driver.createDriver({rport: 4568}, function (err, driver) {
+	if (err)
         console.log(err);
 	else {
         //Creates the Leaf
@@ -24,7 +24,7 @@ Driver.createDriver({ }, function (err, driver) {
                 path: false
 			},
 			function (err, leaf) {
-				if (err) 
+				if (err)
                     console.log(err);
 				else {
 					leaf.listenCommand(
@@ -32,7 +32,7 @@ Driver.createDriver({ }, function (err, driver) {
                             onCommand(obj.command[0]);
 						},
 						function() {
-							if (err) 
+							if (err)
                                 console.log(err);
 							else {
                                 //Node is running

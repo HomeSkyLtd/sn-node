@@ -32,8 +32,10 @@
   "license": "ISC",
   "dependencies": {
     "enum": "^2.3.0",
-    "mocha": "^2.4.5",
-    "rainfall": "^0.1.0",
-    "should": "^8.3.2"
+    "rainfall": "^0.1.0"
+},
+  "devDependencies": {
+	  "mocha": "^2.4.5",
+	  "should": "^8.3.2"
   }
 }

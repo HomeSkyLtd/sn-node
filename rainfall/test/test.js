@@ -134,6 +134,16 @@ describe('Rainfall', function() {
                     done();
                 });
             });
+            it('should check repeated ids in description for sensor', (done) => {
+                 node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: Rainfall.NODE_CLASSES.sensor, dataType: [{
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    },{ id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    }] }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
 
             it('should check required fields in description for actuator', (done) => {
                 node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
@@ -156,6 +166,63 @@ describe('Rainfall', function() {
                     id: 3, nodeClass: Rainfall.NODE_CLASSES.actuator, commandType: [{
                         id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
                     }], dataType: []}, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check repeated ids in description for actuator', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: "actuator", commandType: [{
+                        id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }, {
+                        id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+
+
+            it('should check required fields in description for actuator and sensor', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: 'sensor | actuator', dataType: [{
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    }, ], commandType: [{
+                        id:  4, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
+                    should(err).not.be.Error();
+                    done();
+                });
+            });
+            it('should check missing fields in description for actuator and sensor', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: 'sensor | actuator', dataType: [{
+                        id:  5, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    }, ], commandType: [{
+                        id:  4, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check not required fields in description for actuator and sensor', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: 'sensor | actuator', 'lifetime': 5, dataType: [{
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    }, ], commandType: [{
+                        id:  4, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check repeated ids in description for actuator and sensor', (done) => {
+               node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.description,
+                    id: 0, nodeClass: 'sensor | actuator', dataType: [{
+                        id:  5, measureStrategy: 1, type: 1, range: [0, 50], unit: 'C', dataCategory: 1
+                    }, ], commandType: [{
+                        id:  5, type: 1, unit: "", range: [0, 50], commandCategory: 1
+                    }] }, (err) => {
                     should(err).be.Error();
                     done();
                 });
@@ -188,6 +255,15 @@ describe('Rainfall', function() {
                     done();
                 });
             });
+            it('should check repated ids in data', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.data,
+                    id: 0, data: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 0, value: "person"}
+                    ]}, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
 
             it('should check required fields in command', (done) => {
                 node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command,
@@ -209,6 +285,15 @@ describe('Rainfall', function() {
                 node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command,
                     id: 3, command: [
                         { id:0, value: 0}, { id:1, value: 3.8}, { id: 2, value: "person"}
+                    ]}, (err) => {
+                    should(err).be.Error();
+                    done();
+                });
+            });
+            it('should check repated ids in command', (done) => {
+                node1.send(getDriver2Address(), { packageType: Rainfall.PACKAGE_TYPES.command,
+                    id: 0, command: [
+                        { id:0, value: 0}, { id:1, value: 3.8}, { id: 0, value: "person"}
                     ]}, (err) => {
                     should(err).be.Error();
                     done();

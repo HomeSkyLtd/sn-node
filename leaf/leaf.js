@@ -163,7 +163,7 @@ function Leaf (driver, args, callback) {
 		timerknock = setInterval(() => {
 			++nPackagesSent;
 			if (nPackagesSent > limitOfPackets) {
-				callback(new Error("Package sent " + args.limitOfPackets + " times. Stoping connection"), this);
+				callback(new Error("Package sent " + limitOfPackets + " times. Stoping connection"), this);
 				clearInterval(timerknock);
 			} else {
 				this._rain.sendBroadcast(obj, function (err) {

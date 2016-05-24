@@ -42,7 +42,8 @@
     * _instance_
         * [.send(to, object, [callback])](#Rainfall+send)
         * [.sendBroadcast(object, [callback])](#Rainfall+sendBroadcast)
-        * [.listen(objectCallback, [packageTypes], [addresses])](#Rainfall+listen)
+        * [.listen(objectCallback, [packageTypes], [addresses], [listenCallback])](#Rainfall+listen)
+        * [.stopListen([packageTypes])](#Rainfall+stopListen)
         * [.close()](#Rainfall+close)
     * _inner_
         * [~Message](#Rainfall..Message) : <code>Object</code>
@@ -88,7 +89,7 @@ Sends a json object to broadcast address
 
 <a name="Rainfall+listen"></a>
 
-### rainfall.listen(objectCallback, [packageTypes], [addresses])
+### rainfall.listen(objectCallback, [packageTypes], [addresses], [listenCallback])
 Starts listening for objects. You can call this method multiple times to set multiple callbacks
     for each package type (or addresses). All callbacks that match the object address and type will be called
 
@@ -99,6 +100,19 @@ Starts listening for objects. You can call this method multiple times to set mul
 | objectCallback | <code>[onMessage](#Rainfall..onMessage)</code> | Function to be called when a object arrives |
 | [packageTypes] | <code>[Array.&lt;PACKAGE_TYPES&gt;](#PACKAGE_TYPES)</code> &#124; <code>[PACKAGE_TYPES](#PACKAGE_TYPES)</code> &#124; <code>Array.&lt;String&gt;</code> &#124; <code>String</code> | Package types that will issue the callback. It is null if listening     for all package types |
 | [addresses] | <code>Array.&lt;Object&gt;</code> &#124; <code>Object</code> | Addresses that will issue the callback. It is null if listening     for or all package types |
+| [listenCallback] | <code>[onListening](#Rainfall..onListening)</code> | Function to be called when it starts listening for packages (or there is an error) |
+
+<a name="Rainfall+stopListen"></a>
+
+### rainfall.stopListen([packageTypes])
+Stops all callbacks associated with the specified packageType from being called when the package arrives.
+    If a callback listens for more than one package type, it will still be called. Throws error if rainfall is closed.
+
+**Kind**: instance method of <code>[Rainfall](#Rainfall)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [packageTypes] | <code>[Array.&lt;PACKAGE_TYPES&gt;](#PACKAGE_TYPES)</code> &#124; <code>[PACKAGE_TYPES](#PACKAGE_TYPES)</code> &#124; <code>Array.&lt;String&gt;</code> &#124; <code>String</code> | Package types that will stop being listened. If     it is falsy, stops all callbacks. |
 
 <a name="Rainfall+close"></a>
 
@@ -152,7 +166,7 @@ Data type object. Used by sensor to inform the controller the collected data.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| id | <code>Number</code> | Id of the data. Defined by the sensor. |
+| id | <code>Number</code> | Id of the data. Defined by the sensor, shouldn't repeat in dataType and commandType. |
 | type | <code>[DATA_TYPES](#DATA_TYPES)</code> &#124; <code>String</code> | The format of the data sent. |
 | range | <code>Array.&lt;Number&gt;</code> | Range of the data, it is a list with two values (start and end).     It is needed only when the type of the data is numeric. |
 | dataCategory | <code>[DATA_CATEGORIES](#DATA_CATEGORIES)</code> &#124; <code>String</code> | The category of the data |
@@ -169,7 +183,7 @@ Command type object. Used by actuator to inform the controller the accepted comm
 
 | Name | Type | Description |
 | --- | --- | --- |
-| id | <code>Number</code> | Id of the command. Defined by the actuator. |
+| id | <code>Number</code> | Id of the command. Defined by the actuator, shouldn't repeat in dataType and commandType. |
 | type | <code>[DATA_TYPES](#DATA_TYPES)</code> &#124; <code>String</code> | The format of the command. |
 | range | <code>Array.&lt;Number&gt;</code> | Range of the command, it is a list with two values (start and end).     It is needed only when the type of the command is numeric. |
 | commandCategory | <code>[COMMAND_CATEGORIES](#COMMAND_CATEGORIES)</code> &#124; <code>String</code> | The category of the command |

@@ -1,0 +1,8 @@
+{
+  "name": "air-conditioner",
+  "main": "air.js",
+  "dependencies": {
+    "rainfall-leaf": ">=0.1.0",
+    "rainfall-tcp": ">=0.1.0"
+  }
+}
