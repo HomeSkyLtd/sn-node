@@ -171,7 +171,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 							can_print = true;
 							print_message("Proposition must be: 'rhs operator lhs'.");
 						} else {
-							andExps.push(new Proposition(params[2], params[1], params[0]));
+							andExps.push(new Proposition(params[0], params[1], params[2]));
 							ask.question("Write AND, OR or OK: ", insertRule);
 						}
 					});
@@ -184,7 +184,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 							can_print = true;
 							print_message("Proposition must be: 'rhs operator lhs'.");
 						} else {
-							andExps.push(new Proposition(params[2], params[1], params[0]));
+							andExps.push(new Proposition(params[0], params[1], params[2]));
 							ask.question("Write AND, OR or OK: ", insertRule);
 						}
 					});
@@ -234,7 +234,7 @@ Tcp.createDriver({rport:2356, broadcast_port: 2356, udplisten: true}, (err, driv
 					print_message("Proposition must be: 'rhs operator lhs'.");
 					return;
 				} else {
-					andExps.push(new Proposition(params[2], params[1], params[0]));
+					andExps.push(new Proposition(params[0], params[1], params[2]));
 					ask.question('Write AND, OR or OK: ', insertRule);
 				}
             });
