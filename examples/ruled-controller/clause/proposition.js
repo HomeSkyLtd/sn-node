@@ -18,13 +18,14 @@ function saveValue(lhsOrRhs, callback) {
 		}
 
 		nodeId = ids[0];
-		dataId = ids[1];
+		dataOrCmdId = ids[1];
 
 		if (nodeState[nodeId] === undefined) {
 			throw new Error('Node Id ' + nodeId + " undefined.");
 		}
 
-		callback(nodeState[nodeId][dataId]);
+		callback(nodeState[nodeId][dataOrCmdId]);
+
 	} else if (isNumeric(lhsOrRhs)) {
 		callback(lhsOrRhs);
 	} else {
@@ -32,7 +33,7 @@ function saveValue(lhsOrRhs, callback) {
 	}
 }
 
-Proposition = function(lhs, operator, rhs, cb){
+Proposition = function(lhs, operator, rhs){
 	var ids;
 	var nodeId;
 	var dataId;
@@ -46,28 +47,28 @@ Proposition.prototype.evaluate = function(callback) {
 	saveValue(this.lhs, (lhs) => {
 		saveValue(this.rhs, (rhs) => {
 
-	    switch(this.operator){
-	        case '>':
-	            callback(lhs > rhs);
-				break;
-	        case '<':
-	            callback(lhs < rhs);
-				break;
-	        case '>=':
-	            callback(lhs >= rhs);
-				break;
-	        case '<=':
-	            callback(lhs <= rhs);
-				break;
-	        case '==':
-	            callback(lhs == rhs);
-				break;
-	        case '!=':
-	            callback(lhs != rhs);
-				break;
-	        default:
-	            throw new Error(`Operator ${this.operator} is not defined`);
-	    }
+		    switch(this.operator){
+		        case '>':
+		            callback(lhs > rhs);
+					break;
+		        case '<':
+		            callback(lhs < rhs);
+					break;
+		        case '>=':
+		            callback(lhs >= rhs);
+					break;
+		        case '<=':
+		            callback(lhs <= rhs);
+					break;
+		        case '==':
+		            callback(lhs == rhs);
+					break;
+		        case '!=':
+		            callback(lhs != rhs);
+					break;
+		        default:
+		            throw new Error(`Operator ${this.operator} is not defined`);
+		    }
 		});
 	});
 };

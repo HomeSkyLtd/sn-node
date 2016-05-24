@@ -35,7 +35,7 @@ Driver.createDriver({ }, function(err, driver) {
                 ],
                 dataType: [
                     {
-                        id: 1,
+                        id: 3,
                         type: "real",
                         range: [-40, 40],
                         dataCategory: "temperature",
@@ -43,7 +43,7 @@ Driver.createDriver({ }, function(err, driver) {
                         unit: "°C"
                     },
                     {
-                        id: 2,
+                        id: 4,
                         type: "int",
                         range: [0, 100],
                         dataCategory: "humidity",
@@ -73,7 +73,7 @@ Driver.createDriver({ }, function(err, driver) {
                         if (err)
                             console.log(err);
                         else {
-                            //Node is running 
+                            //Node is running
                             console.log("[initialized] Air-conditioner initialized");
                             state.print_state();
                             var change = () => {
@@ -86,7 +86,7 @@ Driver.createDriver({ }, function(err, driver) {
                                         input: process.stdin,
                                         output: process.stdout
                                     });
-                                    ask.question("Type the air-conditioner state (0 for off and 1 for on) and the new temperature (if on): ", 
+                                    ask.question("Type the air-conditioner state (0 for off and 1 for on) and the new temperature (if on): ",
                                         (answer) => {
                                             if (answer !== '') {
                                                 var answers = answer.split(' ');
@@ -104,7 +104,7 @@ Driver.createDriver({ }, function(err, driver) {
                                                     });
                                                 leaf.sendExternalCommand(external);
                                             }
-                                            can_print = true; 
+                                            can_print = true;
                                             ask.close();
                                             change();
 
@@ -113,8 +113,8 @@ Driver.createDriver({ }, function(err, driver) {
                             };
                             state.on_change = function () {
                                 //Send data
-                                leaf.sendData([{id: 1, value: state.get_temperature()},
-                                    {id: 2, value: Math.floor(Math.random() * 100)}]);
+                                leaf.sendData([{id: 3, value: state.get_temperature()},
+                                    {id: 4, value: Math.floor(Math.random() * 100)}]);
                             };
                             change();
                         }
@@ -145,12 +145,12 @@ var state = function() {
         if (real > conf) {
             real = (real - rate_temp);
             if (real < conf)
-                real = conf; 
+                real = conf;
         }
         else if (real < conf) {
             real = (real + rate_temp);
             if (real > conf)
-                real = conf; 
+                real = conf;
         }
         print_state();
         if (real != conf)
