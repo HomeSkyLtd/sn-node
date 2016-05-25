@@ -10,8 +10,6 @@
             * [.sendData(data, [callback])](#module_Leaf..Leaf+sendData)
             * [.listenCommand([callback], [callback])](#module_Leaf..Leaf+listenCommand)
             * [.sendExternalCommand(command, [callback])](#module_Leaf..Leaf+sendExternalCommand)
-        * [~createLeaf()](#module_Leaf..createLeaf)
-        * [~parseClass(dataType, commandList)](#module_Leaf..parseClass) ⇒ <code>Enum</code>
         * [~args](#module_Leaf..args) : <code>Object</code>
         * [~onInitialized](#module_Leaf..onInitialized) : <code>function</code>
         * [~data](#module_Leaf..data) : <code>Object</code> &#124; <code>Array</code>
@@ -81,25 +79,6 @@ Send a message with command from actuator/sensor to controller.
 | --- | --- | --- |
 | command | <code>[command](#module_Leaf..command)</code> | Array of objects or a single object. |
 | [callback] | <code>[onCommandSent](#module_Leaf..onCommandSent)</code> | function executed after data is sent |
-
-<a name="module_Leaf..createLeaf"></a>
-
-### Leaf~createLeaf()
-Factory method to construct a Leaf instance. Do not return anything.
-
-**Kind**: inner method of <code>[Leaf](#module_Leaf)</code>  
-<a name="module_Leaf..parseClass"></a>
-
-### Leaf~parseClass(dataType, commandList) ⇒ <code>Enum</code>
-Decide if class is Sensor, Actuator or both.
-
-**Kind**: inner method of <code>[Leaf](#module_Leaf)</code>  
-**Returns**: <code>Enum</code> - NODE_CLASSES sensor or actuator.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dataType | <code>[dataType](#module_Leaf..dataType)</code> | list of dataTypes to specify data. |
-| commandList | <code>[commandType](#module_Leaf..commandType)</code> | list of commandTypes to specify commands. |
 
 <a name="module_Leaf..args"></a>
 

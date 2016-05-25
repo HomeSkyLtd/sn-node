@@ -9,14 +9,8 @@ var fs = require("fs");
 */
 
 /**
- * Construct instance of Leaf and get controller address.
- * @class
- * @param {Object} driver Driver object
- * @param {module:Leaf~args} args Arguments object
- * @param {module:Leaf~onInitialized} [callback] function executed after Leaf instance initialized, or when an error of timeout occurred, which is the first parameter.
- */
-
- /** @class */
+	@class
+*/
 function Leaf (driver, args, callback) {
 	nPackagesSent = 0;
 
@@ -175,9 +169,6 @@ function Leaf (driver, args, callback) {
 	});
 }
 
-/**
-* Factory method to construct a Leaf instance. Do not return anything.
-*/
 function createLeaf(driver, args, callback) {
 	new Leaf(driver, args, callback);
 }
@@ -254,11 +245,11 @@ Leaf.prototype.sendExternalCommand = function (command, callback) {
 	this._rain.send(this._controllerAddress, object, callback);
 };
 
-/**
+/*
  * Decide if class is Sensor, Actuator or both.
- * @param {module:Leaf~dataType} dataType list of dataTypes to specify data.
- * @param {module:Leaf~commandType} commandList list of commandTypes to specify commands.
- * @returns {Enum} NODE_CLASSES sensor or actuator.
+ * dataType - list of dataTypes to specify data.
+ * commandList - list of commandTypes to specify commands.
+ * returns Enum NODE_CLASSES sensor or actuator.
  */
 var parseClass = function(dataType, commandType) {
 	var result = 0;
