@@ -46,5 +46,5 @@ Driver.createDriver({rport: 4568}, function (err, driver) {
 
 //Command callback
 function onCommand(cmd) {
-    console.log("[command received] " + (!cmd.value ? "Turn off" : "Turn On"));
+    console.log("[command received] " + (!cmd.value ? "Turn Off" : "Turn On"));
 }

@@ -1,7 +1,7 @@
 Leaf
 ========
 
-API implementation of Leaf, used in home automation above Rainfall protocol.
+API implementation of Leaf, used in home automation above Rainfall protocol. A sensor, or a controller or an actuator are implemented using leaf to send data from sensor, actuator listen command from controller and send external command from actuator to controller. 
 
 ## Documentation
 For documentation on how to use the API, refer to [this](https://github.com/HomeSkyLtd/sn-node/blob/master/leaf/documentation.MD)
@@ -59,7 +59,7 @@ leaf.sendData({id: 1, value: 23.2}, function (err) {
 	} else {
 		// Do something else.
 	}
-})
+});
 ```
 
 Also, use leaf to listen commands from central controller.
@@ -72,5 +72,5 @@ leaf.listenCommand(function(msg, from) {
 	} else {
 		// Do something else.
 	}
-})
+});
 ```
