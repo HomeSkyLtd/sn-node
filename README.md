@@ -20,7 +20,7 @@ The Leaf is available on the npm: [rainfall-leaf](https://www.npmjs.com/package/
 This folder contains some driver implementations that need to be used to send messages using the Rainfall, so you can use any network protocol implemented here to send messages (or you can implement your own by following the instructions in the drivers/prototype).
 
 ##Tests
-All drivers, the leaf API and the rainfall API use mocha for testing. To run the tests, just type `npm test` on its folder.
+All drivers, the leaf API and the rainfall API use mocha for testing. To run the tests, just type `npm test` on its folder. Do not forget to install all dependencies before testing and developing: `npm install`.
 
 ##Examples
 There is a folder with examples using both the Rainfall API and the Leaf API. If you want to see the power of the rainfall protocol, this is a good start point.
