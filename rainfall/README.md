@@ -16,7 +16,7 @@ Actually, the protocol is flexible enough to let you define a node as both a sen
 For documentation on how to use the API, refer to [this](https://github.com/HomeSkyLtd/sn-node/blob/master/rainfall/documentation.MD)
 
 ##Usage
-First of all you need to choose which driver you'll use, and then insantiate it:
+First of all you need to choose which driver you'll use, and then instantiate it:
 ```javascript
 const Driver = require('my-driver');
 Driver.createDriver({/*driver params*/}, (err, driver) => {
