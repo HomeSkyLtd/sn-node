@@ -59,8 +59,8 @@ function Driver (params, callback) {
     this._port = params.rport;
     this._msgCallback = null;
     this._udpListen = params.udplisten;
-    if (!this.broadcast_port)
-        this.broadcast_port = BROADCAST_PORT;
+    if (!params.broadcast_port)
+        params.broadcast_port = BROADCAST_PORT;
     //TCP server to listen
     this._tcpServer = net.createServer();
     this._tcpServer.on('error', (err) => {
