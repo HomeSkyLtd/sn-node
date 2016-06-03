@@ -86,9 +86,10 @@ const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
     @property { EnumItem } acmode - Model of the air conditioning (value: 5)
     @property { EnumItem } lightintensity - Controls the light intensity (value: 6)
     @property { EnumItem } lightcolor - Controls the light color (value: 7)
+    @property { EnumItem } custom - Customized command type (value: 8)
 **/
 const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "lightswitch": 4, "acmode": 5,
-        "lightintensity": 6, "lightcolor": 7});
+        "lightintensity": 6, "lightcolor": 7, "custom": 8});
 /**
     Enum containing all possible data categories, it is used do define which category of data that the
     sensor sends.
@@ -101,9 +102,11 @@ const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "l
     @property { EnumItem } pressure - Indicates the pressure of the environment (value: 5)
     @property { EnumItem } windspeed - Indicates the speed of the wind of the environment (value: 6)
     @property { EnumItem } smoke - Indicates if any smoke is present (value: 7)
+    @property { EnumItem } custom - Customized data (value: 8)
+    @property { EnumItem } pressed - Indicates if the button is pressed (value: 9)
 **/
 const DATA_CATEGORIES = new Enum({"temperature": 1, "luminance": 2, "presence": 3, "humidity": 4, "pressure": 5,
-        "windspeed": 6, "smoke": 7 });
+        "windspeed": 6, "smoke": 7, "custom": 8, "pressed": 9 });
 
 exports.PACKAGE_TYPES = PACKAGE_TYPES;
 exports.NODE_CLASSES = NODE_CLASSES;
