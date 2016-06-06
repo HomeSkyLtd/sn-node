@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-     "commander": "^2.9.0"
+     "commander": "^2.9.0",
+     "cbor": "^1.0.1",
+     "enum": "^2.3.0"
   },
   "author": "",
   "license": "ISC"
