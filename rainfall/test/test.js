@@ -8,7 +8,7 @@ var Driver = require("./test_driver");
 describe('Rainfall', function() {
     var driver1, driver2;
 
-    before('Instanciation of drivers', (done) => {
+    before('Instantiation of drivers', (done) => {
         Driver.createDriver({id: 0}, (err, driver) => {
             driver1 = driver;
             Driver.createDriver({id: 1}, (err, driver) => {
