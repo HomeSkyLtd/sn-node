@@ -34,7 +34,7 @@ Driver.createDriver({}, function(err, driver) {
                             console.log("[data sent] temperature: " + value + "ºC");
                         });
                         i += 1;
-                    }, 5*1000);
+                    }, 500);
                 }
             });
     }
