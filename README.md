@@ -1,8 +1,8 @@
 # sn-node
-This project is aimed to be used in home automation. It implements the Rainfall protocol and contains two APIs: Rainfall and Leaf and is useful to send payloads between sensors, actuators and the central node using distinct network protocols but a unique application protocol.
+This project is aimed to be used in home automation. It implements the Rainfall protocol and contains two APIs: Rainfall and Leaf. It is useful to send payloads between sensors, actuators and the central node using distinct network protocols but a unique application protocol.
 
 ##Rainfall
-The Rainfall is an application protocol for home automation. It uses CBOR to send JSONs between the nodes in a network and is defined in such a way that in a network there is one (or more) controllers and some sensors and actuaros. The role of the controller is to receive all data from the sensors and send commands to the actuators. It is an open protocol, so you can implement it in any envoriment, but in this repository we have implemented it using nodejs.
+The Rainfall is an application protocol for home automation. It uses CBOR to send JSONs between the nodes in a network and is defined in such a way that in a network there is one (or more) controllers and some sensors and actuators. The role of the controller is to receive all data from the sensors and send commands to the actuators. It is an open protocol, so you can implement it in any envoriment, but in this repository we have implemented it using nodejs.
 
 There is a more extense description of the protocol in the rainfall folder, but the protocol is very simple. It requires that the actuator/sensor sends a broadcast message asking "Who is the controller?", then the controllers answers saying "I am the controller", says the lifetime (in other words, how often the node needs to say "I am alive") and can ask the node to "Describe yourself". Then the node answers with its description and the real conversation can begin.
 If the node is a sensor, it sends data to the controller when he wants to do so.

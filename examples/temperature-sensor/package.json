@@ -2,7 +2,7 @@
   "name": "temperature-sensor",
   "main": "sensor.js",
   "dependencies": {
-    "rainfall-leaf": ">=0.1.0",
+    "rainfall-leaf": "0.1.3",
     "rainfall-tcp": ">=0.1.0"
   }
 }
