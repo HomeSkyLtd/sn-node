@@ -36,7 +36,14 @@ function Leaf (driver, args, callback) {
 
 	var id_dir = process.env.HOME + "/.node_id";
 	if (typeof args.path === 'string') {
-		fs.mkdirSync(args.path);
+		try {
+			fs.mkdirSync(args.path);
+		}
+		catch(err) {
+			//If folder already exists, ignore the error
+			if(err.code !==  "EEXIST")
+				throw err;
+		}
 		id_dir = args.path + "/.node_id";
 	}
 
