@@ -56,6 +56,10 @@ Driver.createDriver({ }, function(err, driver) {
             (err, leaf) => {
                 if (err) console.log(err);
                 else {
+                    //Initialize leaf
+                    leaf.sendExternalCommand([{ id: 1, value: 0 }, { id: 2, value: 22.0 }]);
+                    leaf.sendData([{id: 3, value: 25.0},
+                                    {id: 4, value: Math.floor(Math.random() * 100)}]);
                     leaf.listenCommand(
                     function (obj) {
                         var cmds = obj.command;

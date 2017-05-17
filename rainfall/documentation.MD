@@ -308,6 +308,8 @@ Enum containing all possible command categories, it is used do define which cate
 | acmode | <code>EnumItem</code> | Model of the air conditioning (value: 5) |
 | lightintensity | <code>EnumItem</code> | Controls the light intensity (value: 6) |
 | lightcolor | <code>EnumItem</code> | Controls the light color (value: 7) |
+| custom | <code>EnumItem</code> | Customized command type (value: 8) |
+| channel | <code>EnumItem</code> | Control channel of the TV (value: 9) |
 
 <a name="DATA_CATEGORIES"></a>
 
@@ -327,4 +329,6 @@ Enum containing all possible data categories, it is used do define which categor
 | pressure | <code>EnumItem</code> | Indicates the pressure of the environment (value: 5) |
 | windspeed | <code>EnumItem</code> | Indicates the speed of the wind of the environment (value: 6) |
 | smoke | <code>EnumItem</code> | Indicates if any smoke is present (value: 7) |
+| custom | <code>EnumItem</code> | Customized data (value: 8) |
+| pressed | <code>EnumItem</code> | Indicates if the button is pressed (value: 9) |
 

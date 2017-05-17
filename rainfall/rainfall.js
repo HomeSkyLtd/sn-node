@@ -87,9 +87,10 @@ const MEASURE_STRATEGIES = new Enum({event: 1, periodic: 2});
     @property { EnumItem } lightintensity - Controls the light intensity (value: 6)
     @property { EnumItem } lightcolor - Controls the light color (value: 7)
     @property { EnumItem } custom - Customized command type (value: 8)
+    @property { EnumItem } channel -  Control channel of the TV (value: 9)
 **/
 const COMMAND_CATEGORIES = new Enum({"toggle": 1, "temperature": 2, "fan": 3, "lightswitch": 4, "acmode": 5,
-        "lightintensity": 6, "lightcolor": 7, "custom": 8});
+        "lightintensity": 6, "lightcolor": 7, "custom": 8, "channel": 9});
 /**
     Enum containing all possible data categories, it is used do define which category of data that the
     sensor sends.

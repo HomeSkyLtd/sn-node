@@ -27,6 +27,7 @@ Driver.createDriver({rport: 4568}, function (err, driver) {
 				if (err)
                     console.log(err);
 				else {
+                    leaf.sendExternalCommand([{ id: 0, value: 0 }]);
 					leaf.listenCommand(
 						function (obj) {
                             onCommand(obj.command[0]);

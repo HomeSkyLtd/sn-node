@@ -34,6 +34,8 @@ Driver.createDriver({ }, function(err, driver) {
             (err, leaf) => {
                 if (err) console.log(err);
                 else {
+                    //Send initial data
+                    leaf.sendData({id:1, value: 0});
                     console.log("[initialized] Presence sensor initialized");
                     console.log("Press ENTER to send presence event");
                     console.log("Current state: nobody home");
