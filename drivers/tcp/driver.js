@@ -4,7 +4,6 @@ var net = require('net');
 var udp = require('rainfall-udp');
 
 const BROADCAST_ADDR = "255.255.255.255";
-const BROADCAST_PORT = 2357;
 
 
 /** @module tcp */
@@ -59,8 +58,7 @@ function Driver (params, callback) {
     this._port = params.rport;
     this._msgCallback = null;
     this._udpListen = params.udplisten;
-    if (!params.broadcast_port)
-        params.broadcast_port = BROADCAST_PORT;
+
     //TCP server to listen
     this._tcpServer = net.createServer();
     this._tcpServer.on('error', (err) => {
