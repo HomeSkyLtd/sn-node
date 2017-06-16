@@ -83,7 +83,7 @@ function Driver (params, callback) {
                 buf = Buffer.concat([buf, data], buf.length + data.length);
         });
         socket.on('end', () => {
-            if (this._msgCallback) {
+            if (this._msgCallback && buf !== null) {
                 if (!error) {
                     address.port = buf.readUInt32BE(buf.length - 4);
                     this._msgCallback(buf.slice(0, buf.length - 4), address);
